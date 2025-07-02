@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Log Kayıtları</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+</head>
+<body class="bg-light">
+  <header class="header-section text-center">
+    <div class="container">
+      <div class="d-flex justify-content-between align-items-center">
+        <h2 class="h4 mb-0"><i class="bi bi-scissors me-2"></i>Kuaför Yönetim</h2>
+        <div>
+          {% if current_user.is_authenticated %}
+            {% if current_user.rol == 'admin' %}
+              <a href="{{ url_for('sadece_admin') }}" class="btn btn-sm btn-outline-light me-1">
+                <i class="bi bi-gear"></i>
+              </a>
+            {% endif %}
+            <a href="{{ url_for('logout') }}" class="btn btn-sm btn-light">
+              <i class="bi bi-box-arrow-right"></i>
+            </a>
+          {% else %}
+            <a href="{{ url_for('login') }}" class="btn btn-sm btn-light">
+              <i class="bi bi-box-arrow-in-right"></i> Giriş
+            </a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="container">
+    <!-- Mobil Menü -->
+    <div class="d-md-none mobile-menu-container">
+      <ul class="nav nav-tabs nav-fill mb-3">
+        <li class="nav-item">
+          <a class="nav-link active" data-bs-toggle="tab" href="#menu-tab">Menü</a>
+        </li>
+      </ul>
+      
+      <div class="tab-content">
+        <div class="tab-pane fade show active" id="menu-tab">
+          <div class="list-group compact-menu mb-3">
+            <a href="{{ url_for('index') }}" class="list-group-item list-group-item-action">
+              <i class="bi bi-house-door"></i> Anasayfa
+            </a>
+            <a href="{{ url_for('musteri_kayit') }}" class="list-group-item list-group-item-action">
+              <i class="bi bi-person-plus"></i> Müşteri Ekle
+            </a>
+            <a href="{{ url_for('musteri_listesi') }}" class="list-group-item list-group-item-action">
+              <i class="bi bi-people"></i> Müşteriler
+            </a>
+            <a href="{{ url_for('gelir_gider_defteri') }}" class="list-group-item list-group-item-action">
+              <i class="bi bi-cash-stack"></i> Kasa Defteri
+            </a>
+            <a href="{{ url_for('stoklar') }}" class="list-group-item list-group-item-action">
+              <i class="bi bi-box-seam"></i> Stok
+            </a>
+            <a href="{{ url_for('dashboard') }}" class="list-group-item list-group-item-action">
+              <i class="bi bi-bar-chart"></i> Dashboard
+            </a>
+            <a href="{{ url_for('log_kayitlari') }}" class="list-group-item list-group-item-action active">
+              <i class="bi bi-journal-text"></i> Log Kayıtları
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <!-- Sol Menü -->
+      <div class="col-lg-3 d-none d-lg-block">
+        <!-- Admin Menü Kartları -->
+        <div class="card shadow-sm mb-3">
+          <div class="card-header bg-white">
+            <h6 class="mb-0 text-primary"><i class="bi bi-people me-2"></i>Personel</h6>
+          </div>
+          <div class="card-body p-2">
+            <div class="d-grid gap-2">
+              <a href="{{ url_for('kullanici_yonetimi') }}" class="btn btn-sm btn-outline-primary">
+                <i class="bi bi-people me-1"></i>Kullanıcılar
+              </a>
+              <a href="{{ url_for('calisan_yonetimi') }}" class="btn btn-sm btn-outline-primary">
+                <i class="bi bi-person-badge me-1"></i>Çalışanlar
+              </a>
+              <a href="{{ url_for('yetki_yonetimi') }}" class="btn btn-sm btn-outline-primary">
+                <i class="bi bi-shield-lock me-1"></i>Yetkiler
+              </a>
+            </div>
+          </div>
+        </div>
+        
+        <div class="card shadow-sm mb-3">
+          <div class="card-header bg-white">
+            <h6 class="mb-0 text-primary"><i class="bi bi-gear me-2"></i>Sistem</h6>
+          </div>
+          <div class="card-body p-2">
+            <div class="d-grid gap-2">
+              <a href="{{ url_for('sistem_ayarlar') }}" class="btn btn-sm btn-outline-secondary">
+                <i class="bi bi-sliders me-1"></i>Ayarlar
+              </a>
+              <a href="{{ url_for('yedekleme') }}" class="btn btn-sm btn-outline-secondary">
+                <i class="bi bi-hdd-stack me-1"></i>Yedekleme
+              </a>
+              <a href="{{ url_for('log_kayitlari') }}" class="btn btn-sm btn-primary">
+                <i class="bi bi-journal-text me-1"></i>Loglar
+              </a>
+            </div>
+          </div>
+        </div>
+        
+        <div class="card shadow-sm">
+          <div class="card-header bg-white">
+            <h6 class="mb-0 text-primary"><i class="bi bi-pencil-square me-2"></i>İçerik</h6>
+          </div>
+          <div class="card-body p-2">
+            <div class="d-grid gap-2">
+              <a href="{{ url_for('hizmet_tanimlari') }}" class="btn btn-sm btn-outline-info">
+                <i class="bi bi-list-check me-1"></i>Hizmetler
+              </a>
+              <a href="{{ url_for('bildirim_ayarlar') }}" class="btn btn-sm btn-outline-info">
+                <i class="bi bi-bell me-1"></i>Bildirimler
+              </a>
+              <a href="{{ url_for('destek') }}" class="btn btn-sm btn-outline-info">
+                <i class="bi bi-question-circle me-1"></i>Destek
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Ana İçerik -->
+      <div class="col-md-9 col-lg-9">
+        <div class="card shadow-sm">
+          <div class="card-header bg-white d-flex justify-content-between align-items-center">
+            <h5 class="mb-0 text-primary"><i class="bi bi-journal-text me-2"></i>Log Kayıtları</h5>
+            <button class="btn btn-info" id="exportExcel">
+              <i class="bi bi-file-earmark-excel me-1"></i> Excel
+            </button>
+          </div>
+          <div class="card-body">
+            {% include '_flash_messages.html' %}
+            
+            <!-- Filtreleme -->
+            <form method="GET" action="{{ url_for('log_kayitlari') }}" class="row g-3 mb-4">
+              <div class="col-md-3">
+                <label for="islem_turu" class="form-label">İşlem Türü</label>
+                <select class="form-select" id="islem_turu" name="islem_turu">
+                  <option value="">Tümü</option>
+                  {% for islem in islem_turleri %}
+                    <option value="{{ islem.islem_turu }}" {% if request.args.get('islem_turu') == islem.islem_turu %}selected{% endif %}>{{ islem.islem_turu }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="col-md-3">
+                <label for="baslangic_tarihi" class="form-label">Başlangıç Tarihi</label>
+                <input type="date" class="form-control" id="baslangic_tarihi" name="baslangic_tarihi" value="{{ request.args.get('baslangic_tarihi', '') }}">
+              </div>
+              <div class="col-md-3">
+                <label for="bitis_tarihi" class="form-label">Bitiş Tarihi</label>
+                <input type="date" class="form-control" id="bitis_tarihi" name="bitis_tarihi" value="{{ request.args.get('bitis_tarihi', '') }}">
+              </div>
+              <div class="col-md-3">
+                <label for="kullanici" class="form-label">Kullanıcı</label>
+                <select class="form-select" id="kullanici" name="kullanici">
+                  <option value="">Tümü</option>
+                  {% for k in kullanicilar %}
+                    <option value="{{ k.kullanici_adi }}" {% if request.args.get('kullanici') == k.kullanici_adi %}selected{% endif %}>{{ k.kullanici_adi }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="col-12 text-end">
+                <button type="submit" class="btn btn-primary">
+                  <i class="bi bi-filter me-1"></i> Filtrele
+                </button>
+                <a href="{{ url_for('log_kayitlari') }}" class="btn btn-secondary">
+                  <i class="bi bi-x-circle me-1"></i> Temizle
+                </a>
+              </div>
+            </form>
+            
+            <!-- Log Tablosu -->
+            <div class="table-responsive">
+              <table class="table table-striped table-hover" id="logTable">
+                <thead>
+                  <tr>
+                    <th>Tarih</th>
+                    <th>Kullanıcı</th>
+                    <th>İşlem Türü</th>
+                    <th>Açıklama</th>
+                    <th>IP Adresi</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for log in loglar %}
+                  <tr>
+                    <td>{{ log.tarih|tarih_format }}</td>
+                    <td>{{ log.kullanici_adi or 'Sistem' }}</td>
+                    <td>
+                      <span class="badge 
+                        {% if 'Silme' in log.islem_turu %}bg-danger
+                        {% elif 'Ekleme' in log.islem_turu %}bg-success
+                        {% elif 'Güncelleme' in log.islem_turu %}bg-warning
+                        {% elif 'Giriş' in log.islem_turu %}bg-info
+                        {% else %}bg-secondary{% endif %}">
+                        {{ log.islem_turu }}
+                      </span>
+                    </td>
+                    <td>{{ log.aciklama }}</td>
+                    <td>{{ log.ip_adresi }}</td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+            
+            {% if not loglar %}
+            <div class="alert alert-info text-center my-5">
+              <i class="bi bi-info-circle me-2"></i> Kayıt bulunamadı.
+            </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="bg-dark text-white py-2 mt-3">
+    <div class="container text-center">
+      <small>&copy; {{ current_year|default(2024) }} Kuaför Yönetim Sistemi</small>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script>
+    document.getElementById('exportExcel').addEventListener('click', function() {
+      // Tabloyu seç
+      const table = document.getElementById('logTable');
+      
+      // Başlık satırını al
+      const headers = [];
+      table.querySelectorAll('thead th').forEach(th => {
+        headers.push(th.textContent.trim());
+      });
+      
+      // Veri satırlarını al
+      const rows = [];
+      table.querySelectorAll('tbody tr').forEach(tr => {
+        const row = [];
+        tr.querySelectorAll('td').forEach(td => {
+          row.push(td.textContent.trim());
+        });
+        rows.push(row);
+      });
+      
+      // Tüm verileri birleştir
+      const data = [headers, ...rows];
+      
+      // Excel dosyası oluştur
+      const ws = XLSX.utils.aoa_to_sheet(data);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Log_Kayitlari");
+      
+      // Dosyayı indir
+      const fileName = `Log_Kayitlari_${new Date().toISOString().slice(0,10)}.xlsx`;
+      XLSX.writeFile(wb, fileName);
+    });
+  </script>
+</body>
+</html>
