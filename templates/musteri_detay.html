@@ -246,7 +246,10 @@
             {% set ilgili_taksitler = taksitler | selectattr('satis_id', 'equalto', satis.id) | list %}
             {% if ilgili_taksitler|length == 0 %}
               {% set tahsilat = tahsilatlar | selectattr('satis_id', 'equalto', satis.id) | first %}
-              <tr class="{% if satis.odendi == 1 %}table-success{% endif %}">
+              {% set kismi_odeme_taksitleri = taksitler | selectattr('satis_id', 'equalto', satis.id) | list %}
+              {% set kismi_odeme_var = kismi_odeme_taksitleri|length > 0 %}
+              {% set tahsilat_tutar = tahsilat.tutar if tahsilat else 0 %}
+              <tr class="{% if satis.odendi == 1 %}table-success{% elif kismi_odeme_var %}table-info{% endif %}">
                 <td>
                   {% if tahsilat and tahsilat.tarih %}
                     {{ tahsilat.tarih | tarih_format }}
@@ -255,8 +258,22 @@
                   {% endif %}
                 </td>
                 <td>-</td>
-                <td>{{ "₺{:.2f}".format(satis.fiyat) }}</td>
-                <td>{% if satis.odendi == 1 %}Ödendi{% else %}Ödenmedi{% endif %}</td>
+                <td>
+                  {% if kismi_odeme_var and tahsilat %}
+                    {{ "₺{:.2f}".format(tahsilat_tutar) }} / {{ "₺{:.2f}".format(satis.fiyat) }}
+                  {% else %}
+                    {{ "₺{:.2f}".format(satis.fiyat) }}
+                  {% endif %}
+                </td>
+                <td>
+                  {% if satis.odendi == 1 %}
+                    Ödendi
+                  {% elif kismi_odeme_var %}
+                    Kısmi Ödendi
+                  {% else %}
+                    Ödenmedi
+                  {% endif %}
+                </td>
                 <td class="text-start">{{ satis.hizmet_adi or '-' }} (Taksitsiz Satış)</td>
                 <td>
                   {% if satis.odendi == 0 %}
@@ -274,6 +291,48 @@
                   {% endif %}
                 </td>
               </tr>
+              
+              <!-- Taksitsiz satışlar için kısmi ödeme taksitleri -->
+              {% set kismi_odeme_taksitleri = taksitler | selectattr('satis_id', 'equalto', satis.id) | list %}
+              {% for taksit in kismi_odeme_taksitleri %}
+                {% set taksit_tahsilat = tahsilatlar | selectattr('taksit_id', 'equalto', taksit.id) | first %}
+                <tr class="{% if taksit.odendi %}table-success{% else %}table-warning{% endif %}">
+                  <td>
+                    {% if taksit_tahsilat and taksit_tahsilat.tarih %}
+                      {{ taksit_tahsilat.tarih | tarih_format }}
+                    {% else %}
+                      -
+                    {% endif %}
+                  </td>
+                  <td>
+                    {% if taksit.son_odeme_tarihi %}
+                      {{ taksit.son_odeme_tarihi | tarih_format }}
+                    {% else %}
+                      -
+                    {% endif %}
+                  </td>
+                  <td>{{ "₺{:.2f}".format(taksit.tutar) }}</td>
+                  <td>{% if taksit.odendi %}Ödendi{% else %}Ödenmedi{% endif %}</td>
+                  <td class="text-start ps-4 border-start border-warning">
+                    <span class="text-warning">↓ <strong>Kalan:</strong> {{ taksit.aciklama }}</span>
+                  </td>
+                  <td>
+                    {% if not taksit.odendi %}
+                      <button
+                        type="button"
+                        class="btn btn-sm btn-outline-success"
+                        data-bs-toggle="modal"
+                        data-bs-target="#taksitTahsilatModal"
+                        data-tutar="{{ taksit.tutar }}"
+                        data-aciklama="{{ satis.hizmet_adi or 'Satış Adı Yok' }} - Kalan Taksit"
+                        data-taksit_id="{{ taksit.id }}"
+                      >
+                        Tahsilat Gir
+                      </button>
+                    {% endif %}
+                  </td>
+                </tr>
+              {% endfor %}
             {% endif %}
           {% endfor %}
 
