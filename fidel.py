@@ -2025,11 +2025,17 @@ def online_randevu():
                 )
 
                 # Satış kaydı (otomatik)
+                # Hizmet bilgisi ve fiyatını çek
+                hizmet_row = conn.execute('SELECT hizmet_adi, seans, fiyat FROM hizmetler WHERE id = ?', (hizmet_id,)).fetchone()
+                fiyat = hizmet_row['fiyat'] if hizmet_row else 0
+
+                # Satış kaydında gerçek fiyatı kullan
                 conn.execute(
                     '''INSERT INTO satislar (musteri_id, urun_id, miktar, fiyat, aciklama, tarih, toplam_seans, kalan_seans)
-                       VALUES (?, ?, ?, ?, ?, ?, ?, ?)''',
-                    (musteri_id, hizmet_id, 1, 0, 'Online randevu ile otomatik satış', tarih, seans, seans)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?)''',
+                    (musteri_id, hizmet_id, 1, fiyat, 'Online randevu ile otomatik satış', tarih, seans, seans)
                 )
+
 
                 conn.commit()
 
