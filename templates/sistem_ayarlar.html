@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Sistem Ayarları</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+</head>
+<body class="bg-light">
+  <header class="header-section text-center">
+    <div class="container">
+      <div class="d-flex justify-content-between align-items-center">
+        <h2 class="h4 mb-0"><i class="bi bi-scissors me-2"></i>Kuaför Yönetim</h2>
+        <div>
+          {% if current_user.is_authenticated %}
+            {% if current_user.rol == 'admin' %}
+              <a href="{{ url_for('sadece_admin') }}" class="btn btn-sm btn-outline-light me-1">
+                <i class="bi bi-gear"></i>
+              </a>
+            {% endif %}
+            <a href="{{ url_for('logout') }}" class="btn btn-sm btn-light">
+              <i class="bi bi-box-arrow-right"></i>
+            </a>
+          {% else %}
+            <a href="{{ url_for('login') }}" class="btn btn-sm btn-light">
+              <i class="bi bi-box-arrow-in-right"></i> Giriş
+            </a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="container">
+    <!-- Mobil Menü -->
+    <div class="d-md-none mobile-menu-container">
+      <ul class="nav nav-tabs nav-fill mb-3">
+        <li class="nav-item">
+          <a class="nav-link active" data-bs-toggle="tab" href="#menu-tab">Menü</a>
+        </li>
+      </ul>
+      
+      <div class="tab-content">
+        <div class="tab-pane fade show active" id="menu-tab">
+          <div class="list-group compact-menu mb-3">
+            <a href="{{ url_for('index') }}" class="list-group-item list-group-item-action">
+              <i class="bi bi-house-door"></i> Anasayfa
+            </a>
+            <a href="{{ url_for('musteri_kayit') }}" class="list-group-item list-group-item-action">
+              <i class="bi bi-person-plus"></i> Müşteri Ekle
+            </a>
+            <a href="{{ url_for('musteri_listesi') }}" class="list-group-item list-group-item-action">
+              <i class="bi bi-people"></i> Müşteriler
+            </a>
+            <a href="{{ url_for('gelir_gider_defteri') }}" class="list-group-item list-group-item-action">
+              <i class="bi bi-cash-stack"></i> Kasa Defteri
+            </a>
+            <a href="{{ url_for('stoklar') }}" class="list-group-item list-group-item-action">
+              <i class="bi bi-box-seam"></i> Stok
+            </a>
+            <a href="{{ url_for('dashboard') }}" class="list-group-item list-group-item-action">
+              <i class="bi bi-bar-chart"></i> Dashboard
+            </a>
+            <a href="{{ url_for('sistem_ayarlar') }}" class="list-group-item list-group-item-action active">
+              <i class="bi bi-gear"></i> Sistem Ayarları
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <!-- Sol Menü -->
+      <div class="col-lg-3 d-none d-lg-block">
+        <!-- Admin Menü Kartları -->
+        <div class="card shadow-sm mb-3">
+          <div class="card-header bg-white">
+            <h6 class="mb-0 text-primary"><i class="bi bi-people me-2"></i>Personel</h6>
+          </div>
+          <div class="card-body p-2">
+            <div class="d-grid gap-2">
+              <a href="{{ url_for('kullanici_yonetimi') }}" class="btn btn-sm btn-outline-primary">
+                <i class="bi bi-people me-1"></i>Kullanıcılar
+              </a>
+              <a href="{{ url_for('calisan_yonetimi') }}" class="btn btn-sm btn-outline-primary">
+                <i class="bi bi-person-badge me-1"></i>Çalışanlar
+              </a>
+              <a href="{{ url_for('yetki_yonetimi') }}" class="btn btn-sm btn-outline-primary">
+                <i class="bi bi-shield-lock me-1"></i>Yetkiler
+              </a>
+            </div>
+          </div>
+        </div>
+        
+        <div class="card shadow-sm mb-3">
+          <div class="card-header bg-white">
+            <h6 class="mb-0 text-primary"><i class="bi bi-gear me-2"></i>Sistem</h6>
+          </div>
+          <div class="card-body p-2">
+            <div class="d-grid gap-2">
+              <a href="{{ url_for('sistem_ayarlar') }}" class="btn btn-sm btn-primary">
+                <i class="bi bi-sliders me-1"></i>Ayarlar
+              </a>
+              <a href="{{ url_for('yedekleme') }}" class="btn btn-sm btn-outline-secondary">
+                <i class="bi bi-hdd-stack me-1"></i>Yedekleme
+              </a>
+              <a href="{{ url_for('log_kayitlari') }}" class="btn btn-sm btn-outline-secondary">
+                <i class="bi bi-journal-text me-1"></i>Loglar
+              </a>
+            </div>
+          </div>
+        </div>
+        
+        <div class="card shadow-sm">
+          <div class="card-header bg-white">
+            <h6 class="mb-0 text-primary"><i class="bi bi-pencil-square me-2"></i>İçerik</h6>
+          </div>
+          <div class="card-body p-2">
+            <div class="d-grid gap-2">
+              <a href="{{ url_for('hizmet_tanimlari') }}" class="btn btn-sm btn-outline-info">
+                <i class="bi bi-list-check me-1"></i>Hizmetler
+              </a>
+              <a href="{{ url_for('bildirim_ayarlar') }}" class="btn btn-sm btn-outline-info">
+                <i class="bi bi-bell me-1"></i>Bildirimler
+              </a>
+              <a href="{{ url_for('destek') }}" class="btn btn-sm btn-outline-info">
+                <i class="bi bi-question-circle me-1"></i>Destek
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Ana İçerik -->
+      <div class="col-md-9 col-lg-9">
+        <div class="card shadow-sm">
+          <div class="card-header bg-white d-flex justify-content-between align-items-center">
+            <h5 class="mb-0 text-primary"><i class="bi bi-gear me-2"></i>Sistem Ayarları</h5>
+          </div>
+          <div class="card-body">
+            {% include '_flash_messages.html' %}
+            
+            <div class="row">
+              <!-- Genel Ayarlar -->
+              <div class="col-md-6 mb-4">
+                <div class="card h-100">
+                  <div class="card-header bg-light">
+                    <h5 class="mb-0 text-dark"><i class="bi bi-sliders me-2"></i>Genel Ayarlar</h5>
+                  </div>
+                  <div class="card-body">
+                    <form method="POST" action="{{ url_for('sistem_ayarlar') }}">
+                      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                      <div class="mb-3">
+                        <label class="form-label">İşletme Adı</label>
+                        <input type="text" class="form-control" name="isletme_adi" value="{{ ayarlar.isletme_adi or '' }}">
+                      </div>
+                      <div class="mb-3">
+                        <label class="form-label">Telefon</label>
+                        <input type="text" class="form-control" name="telefon" value="{{ ayarlar.telefon or '' }}">
+                      </div>
+                      <div class="mb-3">
+                        <label class="form-label">Adres</label>
+                        <textarea class="form-control" name="adres" rows="3">{{ ayarlar.adres or '' }}</textarea>
+                      </div>
+                      <button type="submit" name="action" value="genel" class="btn btn-primary">
+                        <i class="bi bi-save me-1"></i> Kaydet
+                      </button>
+                    </form>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Randevu Ayarları -->
+              <div class="col-md-6 mb-4">
+                <div class="card h-100">
+                  <div class="card-header bg-light">
+                    <h5 class="mb-0 text-dark"><i class="bi bi-calendar me-2"></i>Randevu Ayarları</h5>
+                  </div>
+                  <div class="card-body">
+                    <form method="POST" action="{{ url_for('sistem_ayarlar') }}">
+                      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                      <div class="mb-3">
+                        <label class="form-label">Çalışma Saatleri Başlangıç</label>
+                        <input type="time" class="form-control" name="calisma_baslangic" value="{{ ayarlar.calisma_baslangic or '09:00' }}">
+                      </div>
+                      <div class="mb-3">
+                        <label class="form-label">Çalışma Saatleri Bitiş</label>
+                        <input type="time" class="form-control" name="calisma_bitis" value="{{ ayarlar.calisma_bitis or '18:00' }}">
+                      </div>
+                      <div class="mb-3">
+                        <label class="form-label">Randevu Aralığı (dakika)</label>
+                        <select class="form-select" name="randevu_araligi">
+                          <option value="15" {{ 'selected' if ayarlar.randevu_araligi == '15' else '' }}>15 dakika</option>
+                          <option value="30" {{ 'selected' if ayarlar.randevu_araligi == '30' else '' }}>30 dakika</option>
+                          <option value="60" {{ 'selected' if ayarlar.randevu_araligi == '60' else '' }}>60 dakika</option>
+                        </select>
+                      </div>
+                      <button type="submit" name="action" value="randevu" class="btn btn-primary">
+                        <i class="bi bi-save me-1"></i> Kaydet
+                      </button>
+                    </form>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Yedekleme -->
+              <div class="col-md-6 mb-4">
+                <div class="card h-100">
+                  <div class="card-header bg-light">
+                    <h5 class="mb-0 text-dark"><i class="bi bi-download me-2"></i>Yedekleme</h5>
+                  </div>
+                  <div class="card-body">
+                    <p>Veritabanınızı yedekleyin ve geri yükleyin.</p>
+                    <div class="d-flex gap-2">
+                      <a href="/yedek_al" class="btn btn-success" target="_blank">
+                        <i class="bi bi-download me-1"></i> Yedek Al
+                      </a>
+                      <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#restoreModal">
+                        <i class="bi bi-upload me-1"></i> Geri Yükle
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Sistem Bilgileri -->
+              <div class="col-md-6 mb-4">
+                <div class="card h-100">
+                  <div class="card-header bg-light">
+                    <h5 class="mb-0 text-dark"><i class="bi bi-info-circle me-2"></i>Sistem Bilgileri</h5>
+                  </div>
+                  <div class="card-body">
+                    <div class="table-responsive">
+                      <table class="table table-borderless">
+                        <tbody>
+                          <tr>
+                            <td><strong><i class="bi bi-tag me-2"></i>Versiyon:</strong></td>
+                            <td>1.0.0</td>
+                          </tr>
+                          <tr>
+                            <td><strong><i class="bi bi-database me-2"></i>Veritabanı:</strong></td>
+                            <td>SQLite</td>
+                          </tr>
+                          <tr>
+                            <td><strong><i class="bi bi-calendar-check me-2"></i>Son Güncelleme:</strong></td>
+                            <td>{{ son_guncelleme or 'Bilinmiyor' }}</td>
+                          </tr>
+                          <tr>
+                            <td><strong><i class="bi bi-people me-2"></i>Toplam Müşteri:</strong></td>
+                            <td>{{ toplam_musteri or 0 }}</td>
+                          </tr>
+                          <tr>
+                            <td><strong><i class="bi bi-calendar-event me-2"></i>Toplam Randevu:</strong></td>
+                            <td>{{ toplam_randevu or 0 }}</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="bg-dark text-white py-2 mt-3">
+    <div class="container text-center">
+      <small>&copy; {{ current_year|default(2024) }} Kuaför Yönetim Sistemi</small>
+    </div>
+  </footer>
+
+  <!-- Geri Yükleme Modalı -->
+  <div class="modal fade" id="restoreModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title"><i class="bi bi-upload me-2"></i>Veritabanı Geri Yükle</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <form method="POST" action="/yedek_yukle" enctype="multipart/form-data">
+          <div class="modal-body">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="mb-3">
+              <label class="form-label">Yedek Dosyası Seçin</label>
+              <input type="file" class="form-control" name="backup_file" accept=".db" required>
+            </div>
+            <div class="alert alert-warning">
+              <i class="bi bi-exclamation-triangle me-2"></i><strong>Uyarı:</strong> Bu işlem mevcut verilerin üzerine yazacaktır!
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+              <i class="bi bi-x-circle me-1"></i> İptal
+            </button>
+            <button type="submit" class="btn btn-danger">
+              <i class="bi bi-upload me-1"></i> Geri Yükle
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
