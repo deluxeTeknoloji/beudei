@@ -247,7 +247,8 @@
             {% if ilgili_taksitler|length == 0 %}
               {% set tahsilat = tahsilatlar | selectattr('satis_id', 'equalto', satis.id) | first %}
               <tr class="{% if satis.odendi == 1 %}table-success{% endif %}">
-              {% if tahsilat and tahsilat.tarih %}
+                <td>
+                  {% if tahsilat and tahsilat.tarih %}
                     {{ tahsilat.tarih | tarih_format }}
                   {% else %}
                     -
