@@ -1,0 +1,702 @@
+/* ======================
+   Değişkenler
+   ====================== */
+:root {
+    --mor: #6a1b9a;
+    --mor-acik: #8e24aa;
+    --mor-koyu: #4a148c;
+    --altin: #ffd700;
+    --gri: #f0f0f0;
+    --gri-koyu: #e0e0e0;
+    --beyaz: #ffffff;
+    --text-dark: #343a40;
+    --primary-font: 'Roboto', sans-serif;
+    --secondary-font: 'Playfair Display', serif;
+}
+
+/* ======================
+   Genel Stiller
+   ====================== */
+body {
+    background-color: var(--gri);
+    font-family: var(--primary-font);
+    color: var(--text-dark);
+    margin: 0;
+    padding: 0;
+}
+
+h1, h2, h3, h4, h5 {
+    font-family: var(--secondary-font);
+    color: var(--beyaz);
+}
+
+h6 {
+    font-family: var(--secondary-font);
+    color: var(--text-dark);
+    font-weight: bold;
+}
+
+.text-purple { color: var(--mor); }
+.bg-purple { background-color: var(--mor) !important; color: var(--beyaz) !important; }
+
+/* ======================
+   Header ve Menü
+   ====================== */
+.main-header {
+    background: linear-gradient(90deg, var(--mor) 0%, var(--altin) 100%);
+    color: #fff;
+    border-radius: 0 0 1rem 1rem;
+    box-shadow: 0 4px 24px rgba(106,27,154,0.08);
+    padding: 1.2rem 0 0.7rem 0;
+    margin-bottom: 0.2rem;
+}
+.main-header h1 { font-size: 2rem; margin-bottom: 0.3rem; }
+.main-header p { font-size: 1rem; margin-bottom: 0; }
+
+.top-menu-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: center;
+    align-items: center;
+    background: var(--beyaz);
+    border-radius: 0 0 1rem 1rem;
+    box-shadow: 0 2px 10px rgba(106,27,154,0.06);
+    padding: 14px 0 8px 0;
+    margin-bottom: 1.5rem;
+}
+.menu-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--mor);
+    color: var(--beyaz);
+    border: none;
+    padding: 10px 18px;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 10px;
+    transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 2px 10px rgba(106,27,154,0.08);
+    text-decoration: none;
+    white-space: nowrap;
+}
+.menu-btn:hover {
+    background: var(--mor-koyu);
+    transform: translateY(-2px) scale(1.04);
+    box-shadow: 0 4px 16px rgba(106,27,154,0.13);
+    color: var(--beyaz);
+}
+
+/* ======================
+   Kartlar ve Başlıklar
+   ====================== */
+.card {
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    background-color: var(--beyaz);
+    overflow: hidden;
+    letter-spacing: 1px;
+}
+.card-header, .modal-header {
+    background-color: var(--mor);
+    color: var(--beyaz);
+    border-radius: 10px 10px 0 0;
+    font-weight: 700;
+    border-bottom: 1px solid #e0e0e0;
+}
+.card-title { font-size: 1.25rem; font-weight: bold; }
+.card-body { padding: 20px; background-color: var(--gri); border-radius: 10px; }
+.card-footer .btn {
+    border-radius: 5px;
+    padding: 8px 8px;
+    font-size: 12px;
+    text-align: center;
+    width: 70px;
+}
+.card-footer .btn:last-child { margin-right: 0; }
+
+/* ======================
+   Tablolar
+   ====================== */
+.table {
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+.table thead, table.table thead, .table-header {
+    background-color: var(--mor) !important;
+    color: var(--beyaz) !important;
+    text-align: center;
+    font-weight: bold;
+}
+.table-striped tbody tr:nth-child(odd) { background-color: var(--gri); }
+.table-striped tbody tr:hover { background-color: var(--gri-koyu); }
+.table-bordered { border: 1px solid var(--gri-koyu); }
+.table th, .table td { 
+  vertical-align: middle; 
+  white-space: nowrap;
+  font-size: 0.9rem;
+}
+
+@media (max-width: 1200px) {
+  .table th, .table td {
+    font-size: 0.8rem;
+    padding: 0.5rem 0.3rem;
+  }
+  .table th {
+    white-space: nowrap;
+  }
+}
+
+.table-warning-light {
+    background-color: #fff8dc !important; /* Açık sarı */
+    color: #6a1b9a !important; /* Mor yazı */
+    font-size: 0.85rem;         /* Daha küçük yazı */
+    font-style: italic;
+}
+
+
+/* ======================
+   Formlar
+   ====================== */
+.form-label { font-weight: 500; color: #333; }
+.form-control, .form-select, .search-bar input, .search-bar select {
+    border-radius: 8px;
+    padding: 10px;
+    border: 1px solid var(--gri-koyu);
+}
+.form-control:focus, .form-select:focus {
+    border-color: var(--mor);
+    box-shadow: 0 0 0 0.2rem rgba(106, 27, 154, 0.25);
+}
+.invalid-feedback { font-size: 0.875rem; color: #e74c3c; }
+
+/* ======================
+   Butonlar
+   ====================== */
+.btn-purple {
+    background-color: #6f42c1;
+    color: white;
+    transition: background-color 0.3s ease;
+}
+.btn-purple:hover { background-color: #5a3791; }
+.btn-warning {
+    background-color: #ffc107;
+    color: black;
+    transition: background-color 0.3s ease;
+}
+.btn-warning:hover { background-color: #e0a800; }
+.btn-danger {
+    background-color: #dc3545;
+    color: white;
+    transition: background-color 0.3s ease;
+}
+.btn-danger:hover { background-color: #c82333; }
+
+/* ======================
+   Alert ve Flash Mesajlar
+   ====================== */
+.alert {
+    border-radius: 8px;
+    font-weight: 500;
+    margin-bottom: 20px;
+}
+
+/* ======================
+   Responsive
+   ====================== */
+@media (max-width: 991px) {
+    .main-header { border-radius: 0 0 1rem 1rem; }
+    .dashboard-header { border-radius: 0 0 1rem 1rem; }
+    #takvim-icerik table { min-width: 400px; }
+}
+@media (max-width: 767px) {
+    .stat-card, .chart-card { margin-bottom: 1.5rem; }
+    .dashboard-header { padding: 1.5rem 0 1rem 0; }
+    #takvim-icerik table { min-width: 320px; font-size: 0.85rem; }
+    .menu-container { flex-direction: column; gap: 10px; }
+    .musteri-kart .card-title { font-size: 1.05rem; margin-top: 28px; }
+    .musteri-avatar { width: 48px; height: 48px; font-size: 1.5rem; }
+    .musteri-kart .card { padding-bottom: 1.5rem; }
+}
+@media (max-width: 575px) {
+  .card, .stat-card, .chart-card, .randevu-item, .toplam-gelir, .toplam-gider, .net-bakiye {
+    padding: 10px;
+    font-size: 0.9rem;
+    border-radius: 6px;
+  }
+  .main-header, .dashboard-header {
+    padding: 1rem 0 0.5rem 0;
+    font-size: 1.2rem;
+  }
+  .table, .table thead, .table td, .table th {
+    font-size: 0.8rem;
+  }
+}
+@media (min-width: 768px) {
+  .row.gx-lg-4 {
+    --bs-gutter-x: 1rem !important; /* Varsayılan 1.5rem yerine daha az boşluk */
+  }
+}
+.mb-4 {
+  margin-bottom: 1rem !important; /* 1.5rem yerine 1rem */
+}
+
+@media (min-width: 992px) { /* lg breakpoint */
+  .container .row.gx-lg-0 > .col-lg-2,
+  .container .row.gx-lg-0 > .col-lg-8 { /* col-lg-8'i de ekledik */
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+}
+
+/* ======================
+   Takvim ve Modal
+   ====================== */
+.calendar-day {
+    min-height: 120px;
+    width: 14.2857%;
+    position: relative;
+    text-align: center;
+    vertical-align: top;
+    transition: background-color 0.3s ease;
+}
+.calendar-day:hover {
+    background-color: #f0f4ff;
+    box-shadow: 0px 4px 8px rgba(111, 66, 193, 0.2);
+}
+.calendar-day[data-has-appointment="true"] {
+    background-color: rgba(111, 66, 193, 0.15);
+    border-left: 5px solid var(--mor);
+}
+.calendar-day .fw-bold { font-size: 1rem; }
+.modal-content { border-radius: 10px; }
+.modal-title { color: white; }
+
+/* Takvim Stilleri */
+.calendar-container {
+  background-color: white;
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  margin-bottom: 1rem;
+}
+
+.stats-container {
+  background-color: white;
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  margin-bottom: 1rem;
+}
+
+.stat-value {
+  font-size: 1.25rem;
+  font-weight: bold;
+  color: var(--primary-color);
+}
+
+.stat-label {
+  color: #6c757d;
+  font-size: 0.9rem;
+}
+
+.nav-tabs .nav-link {
+  color: #495057;
+}
+
+.nav-tabs .nav-link.active {
+  color: var(--primary-color);
+  font-weight: bold;
+}
+
+.compact-menu .list-group-item {
+  padding: 0.5rem 0.75rem;
+}
+
+.compact-menu .list-group-item i {
+  width: 20px;
+}
+
+/* Mobil Görünüm */
+@media (max-width: 767.98px) {
+  .mobile-menu-container {
+    margin-bottom: 1rem;
+  }
+  
+  .calendar-container {
+    height: calc(100vh - 250px);
+    overflow-y: auto;
+  }
+  
+  .stats-row {
+    display: flex;
+    flex-wrap: wrap;
+  }
+  
+  .stats-item {
+    flex: 1 0 50%;
+    padding: 0.25rem;
+  }
+}
+  
+    :root {
+      --primary-color: #6f42c1;
+      --secondary-color: #b197fc;
+    }
+    
+    .btn-purple {
+      background-color: var(--primary-color);
+      color: white;
+    }
+    
+    .btn-purple:hover {
+      background-color: #5a32a3;
+      color: white;
+    }
+    
+    .text-purple {
+      color: var(--primary-color);
+    }
+    
+    .header-section {
+      background-color: var(--primary-color);
+      color: white;
+      padding: 1rem 0;
+      margin-bottom: 1rem;
+    }
+
+/* ======================
+   Dashboard Kartları ve Grafikler
+   ====================== */
+.dashboard-header {
+    margin-bottom: 2rem;
+    padding: 2rem 0 1rem 0;
+    background: linear-gradient(90deg, var(--mor) 0%, var(--altin) 100%);
+    color: #fff;
+    border-radius: 0 0 2rem 2rem;
+    box-shadow: 0 4px 24px rgba(106,27,154,0.08);
+}
+.stat-card, .chart-card {
+    border: none;
+    border-radius: 1.5rem;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.07);
+    background: var(--beyaz);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+.stat-card:hover, .chart-card:hover {
+    transform: translateY(-4px) scale(1.03);
+    box-shadow: 0 4px 24px rgba(106,27,154,0.13);
+}
+.stat-icon { font-size: 2.5rem; margin-bottom: 0.5rem; }
+.stat-title { font-size: 1.1rem; font-weight: 600; color: var(--mor); }
+.stat-value { font-size: 2rem; font-weight: bold; }
+.stat-desc { font-size: 0.95rem; color: #888; }
+.chart-title { font-size: 1.1rem; font-weight: 600; color: var(--mor); margin-bottom: 1rem; }
+
+/* ======================
+   Ekstra: Satış, Tahsilat, Randevu Detayları
+   ====================== */
+.randevu-item {
+    margin-bottom: 15px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+    font-size: 0.92rem;
+}
+.randevu-item h6 { font-weight: bold; margin-bottom: 5px; }
+.randevu-item .text-muted { font-size: 0.875rem; color: #6c757d; }
+
+.detail-label {
+  min-width: 120px;
+  margin-bottom: 0 !important;
+}
+.detail-value {
+  margin-bottom: 0 !important;
+  font-weight: 500;
+  color: #222;
+}
+
+.overdue {
+    background-color: #fff0f0; /* Açık kırmızı arka plan */
+    color: #dc3545; /* Kırmızı metin rengi */
+    }
+
+/* ======================
+   Kasa Defteri Kartları
+   ====================== */
+.toplam-gelir, .toplam-gider, .net-bakiye {
+    padding: 20px;
+    border-radius: 10px;
+}
+.toplam-gelir { background-color: #28a745; color: #fff; }
+.toplam-gider { background-color: #dc3545; color: #fff; }
+.net-bakiye { background-color: #007bff; color: #fff; }
+
+/* static/style.css dosyasına eklenecek */
+
+/* Takvim hücreleri içindeki randevu etiketlerinin metninin sığması için */
+.calendar-day .badge {
+  white-space: normal; /* Metnin normal şekilde satır atlamasına izin ver */
+  word-wrap: break-word; /* Uzun kelimelerin kırılmasına izin ver */
+  text-align: left; /* Metni sola hizala */
+}
+
+/* Küçük ekranlar için (<= 767.98px) */
+@media (max-width: 767.98px) {
+  .calendar-day {
+    padding: 0.2rem !important; /* Hücre iç boşluğunu azalt */
+    font-size: 0.8rem; /* Hücredeki genel font boyutunu azalt */
+  }
+  .calendar-day .badge {
+    padding: 0.1rem 0.2rem !important; /* Etiket iç boşluğunu azalt */
+    font-size: 0.6rem !important; /* Etiket font boyutunu azalt */
+    margin-bottom: 0.1rem !important; /* Etiket alt boşluğunu azalt */
+  }
+  .calendar-day .badge .small {
+     font-size: 0.5rem !important; /* Etiket içindeki küçük metin (saat) boyutunu azalt */
+  }
+
+  /* Günlük görünümdeki randevu öğeleri için */
+  .randevu-item {
+    padding: 0.5rem !important; /* Öğe iç boşluğunu azalt */
+    font-size: 0.9rem; /* Öğe font boyutunu azalt */
+  }
+  .randevu-item .small {
+    font-size: 0.8rem; /* Öğe içindeki küçük metin boyutunu azalt */
+  }
+}
+
+/* Orta ekranlar için (>= 768px ve <= 991.98px) */
+@media (min-width: 768px) and (max-width: 991.98px) {
+   .calendar-day {
+    padding: 0.4rem !important; /* Hücre iç boşluğunu biraz azalt */
+    font-size: 0.9rem; /* Hücredeki genel font boyutunu biraz azalt */
+  }
+  .calendar-day .badge {
+    padding: 0.2rem 0.4rem !important; /* Etiket iç boşluğunu biraz azalt */
+    font-size: 0.7rem !important; /* Etiket font boyutunu biraz azalt */
+    margin-bottom: 0.2rem !important; /* Etiket alt boşluğunu biraz azalt */
+  }
+   .calendar-day .badge .small {
+     font-size: 0.6rem !important; /* Etiket içindeki küçük metin (saat) boyutunu biraz azalt */
+  }
+
+  /* Günlük görünümdeki randevu öğeleri için */
+   .randevu-item {
+    padding: 0.75rem !important; /* Öğe iç boşluğunu biraz azalt */
+    font-size: 0.95rem; /* Öğe font boyutunu biraz azalt */
+  }
+   .randevu-item .small {
+    font-size: 0.85rem; /* Öğe içindeki küçük metin boyutunu biraz azalt */
+  }
+}
+
+/* Büyük ekranlar için (>= 992px) - Varsayılan stiller */
+@media (min-width: 992px) {
+   .calendar-day {
+    padding: 0.5rem; /* Varsayılan iç boşluk */
+    font-size: 1rem; /* Varsayılan font boyutu */
+  }
+  .calendar-day .badge {
+    padding: 0.35em 0.65em; /* Varsayılan etiket iç boşluk */
+    font-size: 0.75em; /* Varsayılan etiket font boyutu */
+    margin-bottom: 0.25rem; /* Varsayılan etiket alt boşluk */
+  }
+   .calendar-day .badge .small {
+     font-size: 0.875em; /* Varsayılan küçük metin boyutu */
+  }
+
+   /* Günlük görünümdeki randevu öğeleri için */
+   .randevu-item {
+    padding: 1rem; /* Varsayılan iç boşluk */
+    font-size: 1rem; /* Varsayılan font boyutu */
+  }
+   .randevu-item .small {
+    font-size: 0.875em; /* Varsayılan küçük metin boyutu */
+  }
+}
+/* static/style.css dosyasına eklenecek */
+
+/* Bugün Randevuları kart başlığı ve içeriği için boşlukları ayarla */
+.container .row.gx-lg-0 > .col-lg-2 .card-header,
+.container .row.gx-lg-0 > .col-lg-2 .card-body {
+  padding: 0.5rem !important; /* Varsayılan padding'i biraz azalt */
+}
+
+/* Bugün Randevuları içindeki randevu öğeleri için */
+.container .row.gx-lg-0 > .col-lg-2 .randevu-item {
+  padding: 0.5rem !important; /* Randevu öğesi iç boşluğunu azalt */
+  margin-bottom: 0.5rem !important; /* Randevu öğesi alt boşluğunu azalt */
+}
+
+.container .row.gx-lg-0 > .col-lg-2 .randevu-item:last-child {
+  margin-bottom: 0 !important; /* Son öğenin alt boşluğunu kaldır */
+}
+
+/* Küçük ekranlar için (<= 767.98px) */
+@media (max-width: 767.98px) {
+  .container .row.gx-lg-0 > .col-lg-2 .card-header,
+  .container .row.gx-lg-0 > .col-lg-2 .card-body {
+    padding: 0.3rem !important; /* Daha da azalt */
+  }
+   .container .row.gx-lg-0 > .col-lg-2 .card-header span {
+     font-size: 0.8rem; /* Başlık metin boyutunu azalt */
+   }
+  .container .row.gx-lg-0 > .col-lg-2 .randevu-item {
+    padding: 0.3rem !important; /* Daha da azalt */
+    margin-bottom: 0.3rem !important; /* Daha da azalt */
+    font-size: 0.8rem; /* Randevu öğesi font boyutunu azalt */
+  }
+  .container .row.gx-lg-0 > .col-lg-2 .randevu-item .fw-bold {
+      font-size: 0.8rem; /* Kalın metin boyutunu azalt */
+  }
+  .container .row.gx-lg-0 > .col-lg-2 .randevu-item .small {
+    font-size: 0.7rem !important; /* Küçük metin boyutunu azalt */
+  }
+}
+
+/* Orta ekranlar için (>= 768px ve <= 991.98px) */
+@media (min-width: 768px) and (max-width: 991.98px) {
+   .container .row.gx-lg-0 > .col-lg-2 .card-header,
+   .container .row.gx-lg-0 > .col-lg-2 .card-body {
+    padding: 0.4rem !important; /* Biraz azalt */
+  }
+   .container .row.gx-lg-0 > .col-lg-2 .card-header span {
+     font-size: 0.9rem; /* Başlık metin boyutunu biraz azalt */
+   }
+  .container .row.gx-lg-0 > .col-lg-2 .randevu-item {
+    padding: 0.4rem !important; /* Biraz azalt */
+    margin-bottom: 0.4rem !important; /* Biraz azalt */
+    font-size: 0.9rem; /* Randevu öğesi font boyutunu biraz azalt */
+  }
+   .container .row.gx-lg-0 > .col-lg-2 .randevu-item .fw-bold {
+      font-size: 0.9rem; /* Kalın metin boyutunu biraz azalt */
+  }
+  .container .row.gx-lg-0 > .col-lg-2 .randevu-item .small {
+    font-size: 0.8rem !important; /* Küçük metin boyutunu biraz azalt */
+  }
+}
+/* MÜŞTERİ KARTI */
+.musteri-kart .card {
+  border: none;
+  border-radius: 2rem;
+  box-shadow: 0 8px 32px 0 rgba(60,72,88,0.13);
+  background: #fff;
+  transition: transform 0.18s, box-shadow 0.18s;
+  position: relative;
+  overflow: visible;
+  margin-top: 2.5rem;
+}
+.musteri-kart .card:hover {
+  transform: translateY(-8px) scale(1.025);
+  box-shadow: 0 16px 48px 0 rgba(60,72,88,0.18);
+}
+.musteri-avatar {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #6a1b9a 60%, #3b82f6 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.0rem;
+  color: #fff;
+  position: absolute;
+  top: -25px;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 4px solid #fff;
+  box-shadow: 0 2px 12px 0 rgba(60,72,88,0.10);
+  z-index: 2;
+}
+.musteri-kart .card-body {
+  margin-top: 1.5rem;
+  padding-top: 0.2rem;
+  padding-bottom: 0.2rem;
+}
+.musteri-info-box {
+  color: #3b82f6;
+  background: #f0f4ff;
+  border-radius: 1rem;
+  padding: 0.4rem 0.7rem;
+  margin-bottom: 0.4rem;
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  font-size: 0.98rem;
+}
+.musteri-kart .card-title {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #6a1b9a;
+  margin-bottom: 0.2rem;
+  letter-spacing: 0.5px;
+}
+.musteri-kart .card-footer {
+  background: transparent;
+  border: none;
+  padding-top: 0.5rem;
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+}
+.musteri-kart .card-footer .btn,
+.musteri-kart .card-footer form {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+}
+
+.musteri-kart .card-footer .btn {
+  width: 100%;
+  justify-content: center;
+  align-items: center;
+}
+
+.musteri-kart .card-footer form {
+  padding: 0;
+  margin: 0;
+}
+
+.musteri-kart .card-footer form button.btn {
+  width: 100%;
+  justify-content: center;
+  align-items: center;
+}
+.musteri-kart .btn {
+  border-radius: 1.5rem;
+  font-size: 0.97rem;
+  font-weight: 500;
+  min-width: 90px;
+}
+.musteri-kart ul li i {
+  font-size: 1.1rem;
+}
+.musteri-info-box:last-child {
+  margin-bottom: 0 !important;
+}
+
+/* Büyük ekranlar için (>= 992px) - Varsayılan stiller */
+@media (min-width: 992px) {
+   .container .row.gx-lg-0 > .col-lg-2 .card-header,
+   .container .row.gx-lg-0 > .col-lg-2 .card-body {
+    padding: 0.5rem; /* Varsayılan padding */
+  }
+    .container .row.gx-lg-0 > .col-lg-2 .card-header span {
+     font-size: 1rem; /* Varsayılan başlık metin boyutu */
+   }
+  .container .row.gx-lg-0 > .col-lg-2 .randevu-item {
+    padding: 0.5rem; /* Varsayılan randevu öğesi padding */
+    margin-bottom: 0.5rem; /* Varsayılan randevu öğesi alt boşluk */
+  }
+   .container .row.gx-lg-0 > .col-lg-2 .randevu-item .fw-bold {
+      font-size: 1rem; /* Varsayılan kalın metin boyutu */
+  }
+  .container .row.gx-lg-0 > .col-lg-2 .randevu-item .small {
+    font-size: 0.875em; /* Varsayılan küçük metin boyutu */
+  }
+}
