@@ -1406,6 +1406,26 @@ def tahsilat_ekle(musteri_id):
                 
                 # Satış ve taksit durumu kontrolleri
                 if satis_id and not taksit_id:
+                    # Taksitsiz satış için kısmi ödeme kontrolü
+                    if kismi_odeme and satis_id:
+                        # Satışın toplam tutarını çek
+                        satis_bilgisi = conn.execute('SELECT fiyat FROM satislar WHERE id = ?', (satis_id,)).fetchone()
+                        if satis_bilgisi and 'fiyat' in satis_bilgisi.keys():
+                            satis_tutari = satis_bilgisi['fiyat']
+                            if tutar < satis_tutari:
+                                # Kısmi ödeme yapıldı, satışı ödendi olarak işaretleme
+                                kalan_tutar = satis_tutari - tutar
+                                son_odeme = (datetime.now() + timedelta(days=30)).strftime('%Y-%m-%d')
+                                
+                                # Kalan tutar için taksit oluştur
+                                conn.execute(
+                                    '''INSERT INTO taksitler (satis_id, tutar, tarih, son_odeme_tarihi, aciklama, odendi, sira)
+                                    VALUES (?, ?, ?, ?, ?, ?, ?)''',
+                                    (satis_id, kalan_tutar, datetime.now().strftime('%Y-%m-%d'), son_odeme, 
+                                     f"Taksitsiz Satış - Kalan Tutar (Kısmi Ödeme: {tutar:.0f}₺/{satis_tutari:.0f}₺)", 0, 1)
+                                )
+                    
+                    # Tam ödeme yapıldığında satışı ödendi olarak işaretle
                     conn.execute('UPDATE satislar SET odendi = 1 WHERE id = ?', (satis_id,))
                 
                 if satis_id:
@@ -2035,6 +2055,10 @@ def online_randevu():
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?)''',
                     (musteri_id, hizmet_id, 1, fiyat, 'Online randevu ile otomatik satış', tarih, seans, seans)
                 )
+                
+                # Müşteri bakiyesini güncelle
+                if fiyat > 0:
+                    conn.execute('UPDATE müşteriler SET bakiye = bakiye - ? WHERE id = ?', (fiyat, musteri_id))
 
 
                 conn.commit()
