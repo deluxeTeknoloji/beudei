@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Çalışan Yönetimi</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+</head>
+<body class="bg-light">
+  <header class="header-section text-center">
+    <div class="container">
+      <div class="d-flex justify-content-between align-items-center">
+        <h2 class="h4 mb-0"><i class="bi bi-scissors me-2"></i>Kuaför Yönetim</h2>
+        <div>
+          {% if current_user.is_authenticated %}
+            {% if current_user.rol == 'admin' %}
+              <a href="{{ url_for('sadece_admin') }}" class="btn btn-sm btn-outline-light me-1">
+                <i class="bi bi-gear"></i>
+              </a>
+            {% endif %}
+            <a href="{{ url_for('logout') }}" class="btn btn-sm btn-light">
+              <i class="bi bi-box-arrow-right"></i>
+            </a>
+          {% else %}
+            <a href="{{ url_for('login') }}" class="btn btn-sm btn-light">
+              <i class="bi bi-box-arrow-in-right"></i> Giriş
+            </a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="container">
+    <!-- Mobil Menü -->
+    <div class="d-md-none mobile-menu-container">
+      <ul class="nav nav-tabs nav-fill mb-3">
+        <li class="nav-item">
+          <a class="nav-link active" data-bs-toggle="tab" href="#menu-tab">Menü</a>
+        </li>
+      </ul>
+      
+      <div class="tab-content">
+        <div class="tab-pane fade show active" id="menu-tab">
+          <div class="list-group compact-menu mb-3">
+            <a href="{{ url_for('index') }}" class="list-group-item list-group-item-action">
+              <i class="bi bi-house-door"></i> Anasayfa
+            </a>
+            <a href="{{ url_for('randevu_al') }}" class="list-group-item list-group-item-action">
+              <i class="bi bi-calendar-plus"></i> Randevu Al
+            </a>
+            <a href="{{ url_for('randevular') }}" class="list-group-item list-group-item-action">
+              <i class="bi bi-list-ul"></i> Randevuları Gör
+            </a>
+            <a href="{{ url_for('musteri_kayit') }}" class="list-group-item list-group-item-action">
+              <i class="bi bi-person-plus"></i> Müşteri Ekle
+            </a>
+            <a href="{{ url_for('musteri_listesi') }}" class="list-group-item list-group-item-action">
+              <i class="bi bi-people"></i> Müşteriler
+            </a>
+            <a href="{{ url_for('gelir_gider_defteri') }}" class="list-group-item list-group-item-action">
+              <i class="bi bi-cash-stack"></i> Kasa Defteri
+            </a>
+            <a href="{{ url_for('stoklar') }}" class="list-group-item list-group-item-action">
+              <i class="bi bi-box-seam"></i> Stok
+            </a>
+            <a href="{{ url_for('dashboard') }}" class="list-group-item list-group-item-action">
+              <i class="bi bi-bar-chart"></i> Dashboard
+            </a>
+            <a href="{{ url_for('calisan_yonetimi') }}" class="list-group-item list-group-item-action active">
+              <i class="bi bi-person-badge"></i> Çalışanlar
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <!-- Sol Menü -->
+      <div class="col-lg-3 d-none d-lg-block">
+        <!-- Admin Menü Kartları -->
+        <div class="card shadow-sm mb-3">
+          <div class="card-header bg-white">
+            <h6 class="mb-0 text-primary"><i class="bi bi-people me-2"></i>Personel</h6>
+          </div>
+          <div class="card-body p-2">
+            <div class="d-grid gap-2">
+              <a href="{{ url_for('kullanici_yonetimi') }}" class="btn btn-sm btn-outline-primary">
+                <i class="bi bi-people me-1"></i>Kullanıcılar
+              </a>
+              <a href="{{ url_for('calisan_yonetimi') }}" class="btn btn-sm btn-primary">
+                <i class="bi bi-person-badge me-1"></i>Çalışanlar
+              </a>
+              <a href="{{ url_for('yetki_yonetimi') }}" class="btn btn-sm btn-outline-primary">
+                <i class="bi bi-shield-lock me-1"></i>Yetkiler
+              </a>
+            </div>
+          </div>
+        </div>
+        
+        <div class="card shadow-sm mb-3">
+          <div class="card-header bg-white">
+            <h6 class="mb-0 text-primary"><i class="bi bi-gear me-2"></i>Sistem</h6>
+          </div>
+          <div class="card-body p-2">
+            <div class="d-grid gap-2">
+              <a href="{{ url_for('sistem_ayarlar') }}" class="btn btn-sm btn-outline-secondary">
+                <i class="bi bi-sliders me-1"></i>Ayarlar
+              </a>
+              <a href="{{ url_for('yedekleme') }}" class="btn btn-sm btn-outline-secondary">
+                <i class="bi bi-hdd-stack me-1"></i>Yedekleme
+              </a>
+              <a href="{{ url_for('log_kayitlari') }}" class="btn btn-sm btn-outline-secondary">
+                <i class="bi bi-journal-text me-1"></i>Loglar
+              </a>
+            </div>
+          </div>
+        </div>
+        
+        <div class="card shadow-sm">
+          <div class="card-header bg-white">
+            <h6 class="mb-0 text-primary"><i class="bi bi-pencil-square me-2"></i>İçerik</h6>
+          </div>
+          <div class="card-body p-2">
+            <div class="d-grid gap-2">
+              <a href="{{ url_for('hizmet_tanimlari') }}" class="btn btn-sm btn-outline-info">
+                <i class="bi bi-list-check me-1"></i>Hizmetler
+              </a>
+              <a href="{{ url_for('bildirim_ayarlar') }}" class="btn btn-sm btn-outline-info">
+                <i class="bi bi-bell me-1"></i>Bildirimler
+              </a>
+              <a href="{{ url_for('destek') }}" class="btn btn-sm btn-outline-info">
+                <i class="bi bi-question-circle me-1"></i>Destek
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Ana İçerik -->
+      <div class="col-md-9 col-lg-9">
+        <div class="card shadow-sm">
+          <div class="card-header bg-white d-flex justify-content-between align-items-center">
+            <h5 class="mb-0 text-primary"><i class="bi bi-person-badge me-2"></i>Çalışan Yönetimi</h5>
+            <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#yeniCalisanModal">
+              <i class="bi bi-person-plus me-1"></i>Yeni Çalışan
+            </button>
+          </div>
+          <div class="card-body">
+            {% include '_flash_messages.html' %}
+            
+            <!-- Arama -->
+            <div class="row mb-4">
+              <div class="col-md-8">
+                <div class="input-group">
+                  <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+                  <input type="text" class="form-control" id="aramaKutusu" placeholder="Çalışan adına göre ara..." onkeyup="aramaFonksiyonu()">
+                </div>
+              </div>
+              <div class="col-md-4">
+                <select class="form-select" id="siralama" onchange="siralaFonksiyonu()">
+                  <option value="isim-asc">İsim (A-Z)</option>
+                  <option value="isim-desc">İsim (Z-A)</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Çalışan Sayısı Bilgisi -->
+            <div class="mb-3">
+              <p class="mb-0"><span id="calisanSayisi">{{ calisanlar|length }}</span> çalışan bulundu</p>
+            </div>
+
+            {% if calisanlar|length > 0 %}
+            <div class="table-responsive">
+              <table class="table table-hover align-middle">
+                <thead>
+                  <tr>
+                    <th class="text-start"><i class="bi bi-person-badge me-2"></i>Çalışan Bilgileri</th>
+                    <th class="text-center"><i class="bi bi-gear me-2"></i>İşlemler</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for c in calisanlar %}
+                  <tr class="calisan-item" data-isim="{{ c.ad|lower }}">
+                    <td class="text-start">
+                      <div class="d-flex align-items-center">
+                        <div class="avatar-circle bg-primary text-white me-3" style="width: 40px; height: 40px; font-size: 16px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;">
+                          {{ c.ad[0]|upper }}
+                        </div>
+                        <div>
+                          <div class="fw-bold mb-1">{{ c.ad }}</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td class="text-center">
+                      <div class="btn-group" role="group">
+                        <button class="btn btn-sm btn-outline-warning" onclick="duzenleModal({{ c.id }}, '{{ c.ad }}')" title="Düzenle">
+                          <i class="bi bi-pencil-fill"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger" onclick="silOnay({{ c.id }}, '{{ c.ad }}')" title="Sil">
+                          <i class="bi bi-trash-fill"></i>
+                        </button>
+                      </div>
+                      <form id="silForm{{ c.id }}" method="POST" action="/calisan_sil/{{ c.id }}" style="display:none;">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                      </form>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Sonuç Bulunamadı -->
+            <div id="sonucYok" class="alert alert-info text-center my-5" style="display: none;" role="alert">
+              <i class="bi bi-search me-2"></i>Arama kriterlerine uygun çalışan bulunamadı.
+            </div>
+
+            {% else %}
+            <div class="alert alert-info text-center my-5" role="alert">
+              <i class="bi bi-person-x me-2"></i>Kayıtlı çalışan bulunamadı.
+              <div class="mt-3">
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#yeniCalisanModal">
+                  <i class="bi bi-person-plus me-1"></i> İlk Çalışanı Ekle
+                </button>
+              </div>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Yeni Çalışan Modal -->
+  <div class="modal fade" id="yeniCalisanModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title text-white"><i class="bi bi-person-plus me-2"></i>Yeni Çalışan Ekle</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <form method="POST" action="/calisan_ekle">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <div class="modal-body">
+            <div class="mb-3">
+              <label for="yeni_ad" class="form-label">Çalışan Adı</label>
+              <input type="text" class="form-control" id="yeni_ad" name="ad" required>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+            <button type="submit" class="btn btn-success">
+              <i class="bi bi-check-lg me-1"></i>Kaydet
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Düzenle Modal -->
+  <div class="modal fade" id="duzenleModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title text-white"><i class="bi bi-pencil me-2"></i>Çalışan Düzenle</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <form method="POST" id="duzenleForm">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <div class="modal-body">
+            <div class="mb-3">
+              <label for="duzenle_ad" class="form-label">Çalışan Adı</label>
+              <input type="text" class="form-control" id="duzenle_ad" name="ad" required>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+            <button type="submit" class="btn btn-warning">
+              <i class="bi bi-check-lg me-1"></i>Güncelle
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <footer class="bg-dark text-white py-2 mt-3">
+    <div class="container text-center">
+      <small>&copy; {{ current_year|default(2024) }} Kuaför Yönetim Sistemi</small>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Arama fonksiyonu
+    function aramaFonksiyonu() {
+      const aramaMetni = document.getElementById('aramaKutusu').value.toLowerCase();
+      const calisanOgeleri = document.querySelectorAll('.calisan-item');
+      let bulunanSayisi = 0;
+      
+      calisanOgeleri.forEach(function(oge) {
+        const isim = oge.dataset.isim;
+        
+        if (isim.includes(aramaMetni)) {
+          oge.style.display = '';
+          bulunanSayisi++;
+        } else {
+          oge.style.display = 'none';
+        }
+      });
+      
+      document.getElementById('calisanSayisi').textContent = bulunanSayisi;
+      document.getElementById('sonucYok').style.display = bulunanSayisi === 0 ? 'block' : 'none';
+    }
+    
+    // Sıralama fonksiyonu
+    function siralaFonksiyonu() {
+      const siralama = document.getElementById('siralama').value;
+      const calisanListe = document.querySelector('tbody');
+      const calisanOgeleri = Array.from(document.querySelectorAll('.calisan-item'));
+      
+      calisanOgeleri.sort(function(a, b) {
+        if (siralama === 'isim-asc') {
+          return a.dataset.isim.localeCompare(b.dataset.isim);
+        } else if (siralama === 'isim-desc') {
+          return b.dataset.isim.localeCompare(a.dataset.isim);
+        }
+      });
+      
+      // Liste görünümünü güncelle
+      calisanListe.innerHTML = '';
+      calisanOgeleri.forEach(function(oge) {
+        calisanListe.appendChild(oge);
+      });
+    }
+
+    function duzenleModal(id, ad) {
+      document.getElementById('duzenle_ad').value = ad;
+      document.getElementById('duzenleForm').action = '/calisan_duzenle/' + id;
+      new bootstrap.Modal(document.getElementById('duzenleModal')).show();
+    }
+    
+    function silOnay(id, ad) {
+      if (confirm(ad + ' isimli çalışanı silmek istediğinize emin misiniz?')) {
+        document.getElementById('silForm' + id).submit();
+      }
+    }
+
+    // Avatar dairesi için CSS
+    const style = document.createElement('style');
+    style.textContent = `
+      .avatar-circle {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+      }
+    `;
+    document.head.appendChild(style);
+  </script>
+</body>
+</html>
