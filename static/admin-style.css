@@ -1,0 +1,45 @@
+/* Admin sayfaları için özel stil */
+.card-header.bg-light h5 {
+  color: #333 !important; /* Başlık yazılarını koyu renk yap */
+}
+
+/* Admin menüsü için özel stil */
+.admin-menu .list-group-item {
+  border-radius: 0;
+  border-left: 3px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.admin-menu .list-group-item:hover {
+  background-color: #f8f9fa;
+  border-left: 3px solid #6f42c1;
+}
+
+.admin-menu .list-group-item.active {
+  background-color: #6f42c1;
+  border-color: #6f42c1;
+  color: white;
+  border-left: 3px solid #6f42c1;
+}
+
+.admin-menu .list-group-item i {
+  width: 20px;
+  text-align: center;
+  margin-right: 8px;
+}
+
+/* Kart başlıkları için özel stil */
+.card .card-header.bg-light {
+  background-color: #f8f9fa !important;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.card .card-header.bg-light h5 {
+  color: #333 !important;
+  font-weight: 600;
+}
+
+/* Kart gövdesi için özel stil */
+.card .card-body {
+  background-color: #ffffff !important;
+}
