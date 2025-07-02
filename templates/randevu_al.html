@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Randevu Oluştur</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"> 
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <meta name="csrf-token" content="{{ csrf_token() }}">
+
+</head>
+<body class="bg-light">
+  <header class="header-section text-center">
+    <div class="container">
+      <div class="d-flex justify-content-between align-items-center">
+        <h2 class="h4 mb-0"><i class="bi bi-scissors me-2"></i>Kuaför Yönetim</h2>
+        <div>
+          {% if current_user.is_authenticated %}
+            {% if current_user.rol == 'admin' %}
+              <a href="{{ url_for('sadece_admin') }}" class="btn btn-sm btn-outline-light me-1">
+                <i class="bi bi-gear"></i>
+              </a>
+            {% endif %}
+            <a href="{{ url_for('logout') }}" class="btn btn-sm btn-light">
+              <i class="bi bi-box-arrow-right"></i>
+            </a>
+          {% else %}
+            <a href="{{ url_for('login') }}" class="btn btn-sm btn-light">
+              <i class="bi bi-box-arrow-in-right"></i> Giriş
+            </a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="container">
+    <!-- Mobil Menü -->
+    <div class="d-md-none mobile-menu-container">
+      <ul class="nav nav-tabs nav-fill mb-3">
+        <li class="nav-item">
+          <a class="nav-link active" data-bs-toggle="tab" href="#menu-tab">Menü</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" data-bs-toggle="tab" href="#stats-tab">Özet</a>
+        </li>
+      </ul>
+      
+      <div class="tab-content">
+        <div class="tab-pane fade show active" id="menu-tab">
+          <div class="list-group compact-menu mb-3">
+            <a href="{{ url_for('index') }}" class="list-group-item list-group-item-action">
+              <i class="bi bi-house-door"></i> Anasayfa
+            </a>
+            <a href="{{ url_for('randevu_al') }}" class="list-group-item list-group-item-action active">
+              <i class="bi bi-calendar-plus"></i> Randevu Al
+            </a>
+            <a href="{{ url_for('randevular') }}" class="list-group-item list-group-item-action">
+              <i class="bi bi-list-ul"></i> Randevuları Gör
+            </a>
+            <a href="{{ url_for('musteri_kayit') }}" class="list-group-item list-group-item-action">
+              <i class="bi bi-person-plus"></i> Müşteri Ekle
+            </a>
+            <a href="{{ url_for('musteri_listesi') }}" class="list-group-item list-group-item-action">
+              <i class="bi bi-people"></i> Müşteriler
+            </a>
+            <a href="{{ url_for('gelir_gider_defteri') }}" class="list-group-item list-group-item-action">
+              <i class="bi bi-cash-stack"></i> Kasa Defteri
+            </a>
+            <a href="{{ url_for('stoklar') }}" class="list-group-item list-group-item-action">
+              <i class="bi bi-box-seam"></i> Stok
+            </a>
+            <a href="{{ url_for('dashboard') }}" class="list-group-item list-group-item-action">
+              <i class="bi bi-bar-chart"></i> Dashboard
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <!-- Masaüstü Sol Menü -->
+      <div class="col-md-3 d-none d-md-block">
+        <div class="list-group compact-menu mb-3">
+          <a href="{{ url_for('index') }}" class="list-group-item list-group-item-action">
+            <i class="bi bi-house-door"></i> Anasayfa
+          </a>
+          <a href="{{ url_for('randevu_al') }}" class="list-group-item list-group-item-action active">
+            <i class="bi bi-calendar-plus"></i> Randevu Al
+          </a>
+          <a href="{{ url_for('randevular') }}" class="list-group-item list-group-item-action">
+            <i class="bi bi-list-ul"></i> Randevuları Gör
+          </a>
+          <a href="{{ url_for('musteri_kayit') }}" class="list-group-item list-group-item-action">
+            <i class="bi bi-person-plus"></i> Müşteri Ekle
+          </a>
+          <a href="{{ url_for('musteri_listesi') }}" class="list-group-item list-group-item-action">
+            <i class="bi bi-people"></i> Müşteriler
+          </a>
+          <a href="{{ url_for('gelir_gider_defteri') }}" class="list-group-item list-group-item-action">
+            <i class="bi bi-cash-stack"></i> Kasa Defteri
+          </a>
+          <a href="{{ url_for('stoklar') }}" class="list-group-item list-group-item-action">
+            <i class="bi bi-box-seam"></i> Stok
+          </a>
+          <a href="{{ url_for('dashboard') }}" class="list-group-item list-group-item-action">
+            <i class="bi bi-bar-chart"></i> Dashboard
+          </a>
+        </div>
+      </div>
+
+      <!-- Ana İçerik -->
+      <div class="col-md-9">
+        <div class="card shadow-sm">
+          <div class="card-header bg-white">
+          <div class="d-flex justify-content-between align-items-center">
+            <h5 class="mb-0 text-primary"><i class="bi bi-calendar-plus me-2"></i>Randevu Oluştur</h5>
+          </div>
+          <div class="card-body">
+            <!-- Başarı / Hata Bildirimleri -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+              {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                  {{ message }}
+                  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+              {% endfor %}
+            {% endif %}
+            {% endwith %}
+
+            <form method="POST" id="randevuForm" novalidate onsubmit="return validateForm()">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <input type="hidden" name="hizmet_id" id="hizmet_id" value="">
+              <div class="row">
+                <!-- Müşteri Bilgileri -->
+                <div class="col-12 col-lg-6 border-end mb-4 mb-lg-0">
+                  <h5 class="text-purple mb-3"><i class="bi bi-person me-2"></i> Müşteri Bilgileri</h5>
+                  <div class="mb-3">
+                    <label class="form-label">Müşteri Seçin <span class="text-danger">*</span></label>
+                    <select class="form-select" name="musteri_id" id="musteri_id" required>
+                      <option value="">Müşteri Seçin</option>
+                      {% for musteri in tum_musteriler %}
+                        <option value="{{ musteri.id }}" {% if musteri and musteri.id == musteri_id %}selected{% endif %}>
+                          {{ musteri.ad }} - {{ musteri.telefon }}
+                        </option>
+                      {% endfor %}
+                    </select>
+                  </div>
+                  <div class="mb-3">
+                    <label class="form-label">Ad Soyad <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" name="ad" id="ad" value="{{ musteri.ad if musteri else '' }}" required>
+                  </div>
+                  <div class="mb-3">
+                    <label class="form-label">Telefon <span class="text-danger">*</span></label>
+                    <input type="tel" class="form-control phone-input" name="telefon" id="telefon" required
+                           value="{{ musteri.telefon if musteri else '' }}"
+                           placeholder="5XX XXX XX XX" maxlength="11">
+                    <div class="invalid-feedback">Geçerli bir telefon numarası giriniz</div>
+                  </div>
+                  <div class="mb-3">
+                    <label class="form-label">Adres</label>
+                    <input type="text" class="form-control" name="adres" id="adres" value="{{ musteri.adres if musteri else '' }}">
+                  </div>
+                </div>
+                <!-- Randevu Detayları -->
+                <div class="col-12 col-lg-6">
+                  <h5 class="text-purple mb-3"><i class="bi bi-clock-history me-2"></i> Randevu Detayları</h5>
+                  <div class="mb-3">
+                    <label class="form-label">Tarih <span class="text-danger">*</span></label>
+                    <input type="date" class="form-control" name="tarih" required min="{{ min_tarih }}">
+                  </div>
+                  <div class="mb-3">
+                    <label class="form-label">Saat <span class="text-danger">*</span></label>
+                    <select class="form-select" name="saat" required>
+                      <option value="">Saat Seçin</option>
+                      {% for saat in ['09:00', '10:00', '11:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00'] %}
+                        <option value="{{ saat }}">{{ saat }}</option>
+                      {% endfor %}
+                    </select>
+                  </div>
+                  <div class="mb-3">
+                    <label class="form-label">Hizmet <span class="text-danger">*</span></label>
+                    <select name="hizmet" id="hizmet" class="form-select" required>
+                      <option value="">Hizmet Seçiniz</option>
+                      {% if musteri_id %}
+                        {% set has_services = false %}
+                        {% for h in hizmetler %}
+                          {% if h.id|string in kalan_seanslar and kalan_seanslar.get(h.id|string, 0) > 0 %}
+                            {% set has_services = true %}
+                            <option value="{{ h.hizmet_adi }}" data-id="{{ h.id }}" data-seans="1" data-kalan="{{ kalan_seanslar.get(h.id|string, 0) }}">
+                              {{ h.hizmet_adi }} (Kalan: {{ kalan_seanslar.get(h.id|string, 0) }} seans)
+                            </option>
+                          {% endif %}
+                        {% endfor %}
+                        {% if not has_services %}
+                          <option value="" disabled>Kullanılabilir seans bulunamadı</option>
+                        {% endif %}
+                      {% else %}
+                        {% for h in hizmetler %}
+                          <option value="{{ h.hizmet_adi }}" data-id="{{ h.id }}" data-seans="1">
+                            {{ h.hizmet_adi }}
+                          </option>
+                        {% endfor %}
+                      {% endif %}
+                    </select>
+                  </div>
+                  <input type="hidden" name="seans" id="seans" value="1">
+                  
+                </div>
+              </div>
+              <!-- Butonlar -->
+              <div class="d-flex flex-column flex-lg-row gap-2 mt-4">
+                <button type="submit" class="btn btn-purple flex-fill">
+                  <i class="bi bi-check-circle"></i> Randevu Oluştur
+                </button>
+                <a href="{{ url_for('randevular') }}" class="btn btn-secondary flex-fill">
+                  <i class="bi bi-list-ul"></i> Randevu Listesi
+                </a>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="bg-dark text-white py-2 mt-3">
+    <div class="container text-center">
+      <small>&copy; {{ current_year|default(2024) }} Kuaför Yönetim Sistemi</small>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Müşteri seçildiğinde sayfayı yeniden yükle
+    document.getElementById('musteri_id').addEventListener('change', function () {
+      var musteriId = this.value;
+      if (musteriId) {
+        // window.location.replace kullanarak tarayıcı geçmişini güncelle
+        window.location.replace("{{ url_for('randevu_al') }}?musteri_id=" + musteriId);
+      } else {
+        // Müşteri seçilmediğinde form alanlarını temizle
+        document.getElementById('ad').value = '';
+        document.getElementById('telefon').value = '';
+        document.getElementById('adres').value = '';
+        
+        // Hizmet seçimini temizle
+        const hizmetSelect = document.getElementById('hizmet');
+        hizmetSelect.innerHTML = '<option value="">Hizmet Seçiniz</option>';
+        
+        // Müşteri seçilmediğinde URL'yi temizle
+        window.location.replace("{{ url_for('randevu_al') }}");
+      }
+    });
+
+    // Sayfa ilk yüklendiğinde bugünün tarihini varsayılan olarak ayarla
+    document.addEventListener('DOMContentLoaded', function () {
+      // Bugünün tarihini varsayılan olarak ayarla
+      const today = new Date().toISOString().split('T')[0];
+      document.querySelector('input[name="tarih"]').value = today;
+      
+      // Sayfa yüklendiğinde hizmet listesini otomatik olarak doldur
+      const hizmetSelect = document.getElementById('hizmet');
+      
+      {% if musteri_id %}
+        // Müşteri seçiliyse, hizmetleri doldur
+        hizmetSelect.innerHTML = '<option value="">Hizmet Seçiniz</option>';
+        
+        {% for h in hizmetler %}
+          {% if h.id|string in kalan_seanslar %}
+            const kalanSeans = {{ kalan_seanslar.get(h.id|string, 0) }};
+            if (kalanSeans > 0) {
+              hizmetSelect.innerHTML += `<option value="{{ h.hizmet_adi }}" data-id="{{ h.id }}" data-seans="{{ h.seans }}">{{ h.hizmet_adi }} (Kalan: ${kalanSeans} seans)</option>`;
+            }
+          {% endif %}
+        {% endfor %}
+        
+        // Eğer hiç hizmet eklenmemişse
+        if (hizmetSelect.options.length <= 1) {
+          hizmetSelect.innerHTML = '<option value="Satın alınmış hizmet bulunamadı">Satın alınmış hizmet bulunamadı</option>';
+        }
+      {% endif %}
+    });
+
+    // Hizmet seçildiğinde yapılacak işlemler
+    document.getElementById('hizmet').addEventListener('change', function () {
+      var hizmetAdi = this.value;
+      if (!hizmetAdi) return;
+      
+      // Seçilen hizmetin seans bilgisini gizli alana ata
+      var seansValue = this.options[this.selectedIndex].getAttribute('data-seans') || 1;
+      document.getElementById('seans').value = 1; // Her zaman 1 seans ile başla
+      
+      // Hizmet ID'sini gizli alana ata
+      var hizmetId = this.options[this.selectedIndex].getAttribute('data-id');
+      document.getElementById('hizmet_id').value = hizmetId || '';
+    });
+    
+    // Form gönderilmeden önce doğrulama yap
+    function validateForm() {
+      var musteriId = document.getElementById('musteri_id').value;
+      var ad = document.getElementById('ad').value;
+      var telefon = document.getElementById('telefon').value;
+      var hizmet = document.getElementById('hizmet').value;
+      var tarih = document.querySelector('input[name="tarih"]').value;
+      var saat = document.querySelector('select[name="saat"]').value;
+      
+      // Müşteri seçilmemişse, yeni müşteri bilgileri kontrol edilir
+      if (!musteriId && (!ad || !telefon)) {
+        alert("Lütfen bir müşteri seçin veya yeni müşteri bilgilerini girin!");
+        return false;
+      }
+      
+      if (!hizmet) {
+        alert("Lütfen bir hizmet seçin!");
+        return false;
+      }
+      
+      if (!tarih) {
+        alert("Lütfen bir tarih seçin!");
+        return false;
+      }
+      
+      if (!saat) {
+        alert("Lütfen bir saat seçin!");
+        return false;
+      }
+      
+      return true;
+    }
+  </script>
+</body>
+</html>
