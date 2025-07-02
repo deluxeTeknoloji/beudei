@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Randevu Düzenle</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="style.css"> <!-- Özel tema CSS dosyan -->
+    <style>
+        body {
+            background-color: #f7f7f7; /* Açık gri arka plan */
+        }
+        .card {
+            background-color: #ffffff; /* Beyaz kartlar */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Hafif gölge efekti */
+        }
+        .card-header {
+            background-color: #6f42c1; /* Mor başlık */
+            color: white;
+        }
+        .btn-primary {
+            background-color: #6f42c1; /* Mor butonlar */
+            border-color: #6f42c1;
+        }
+        .btn-primary:hover {
+            background-color: #5a32a3; /* Hover efekti */
+            border-color: #5a32a3;
+        }
+        .btn-outline-primary {
+            border-color: #6f42c1; /* Kenar rengi mor */
+            color: #6f42c1;
+        }
+        .btn-outline-primary:hover {
+            background-color: #6f42c1;
+            color: white;
+        }
+        .form-label {
+            font-weight: 600; /* Etkileyici yazı tipi */
+            color: #333; /* Daha koyu yazı rengi */
+        }
+        .form-control {
+            border: 1px solid #ddd;
+        }
+        .form-select {
+            border: 1px solid #ddd;
+        }
+        .text-purple {
+            color: #6f42c1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container py-5">
+        <div class="card shadow-lg rounded-4 mx-auto" style="max-width: 600px;">
+            <div class="card-header text-center">
+                <h2 class="h4 mb-0"><i class="bi bi-calendar-plus me-2"></i>Randevu Düzenle</h2>
+            </div>
+            <div class="card-body p-4">
+                <form method="POST" novalidate>
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                    <!-- Müşteri Bilgileri -->
+                    <div class="mb-3">
+                        <label class="form-label">Ad Soyad</label>
+                        <input type="text" class="form-control" value="{{ randevu.ad }}" readonly>
+                    </div>
+
+                    <!-- Randevu Detayları -->
+                    <div class="mb-3">
+                        <label class="form-label">Tarih <span class="text-danger">*</span></label>
+                        <input type="date" class="form-control" name="tarih" value="{{ randevu.tarih }}" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Saat <span class="text-danger">*</span></label>
+                        <select class="form-select" name="saat" required>
+                            <option value="">Saat Seçin</option>
+                            {% for saat in ['09:00', '10:00', '11:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00'] %}
+                                <option value="{{ saat }}" {% if saat == randevu.saat %}selected{% endif %}>{{ saat }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Hizmet <span class="text-danger">*</span></label>
+                           <input type="text" class="form-control" name="hizmet" value="{{ randevu.hizmet }}" readonly>
+                    </div>
+
+                    <!-- Butonlar -->
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-circle"></i> Güncelle
+                        </button>
+                        <a href="{{ url_for('randevular') }}" class="btn btn-outline-primary">
+                            <i class="bi bi-arrow-left"></i> Randevulara Dön
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
