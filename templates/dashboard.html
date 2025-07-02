@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+</head>
+<body class="bg-light">
+  <header class="header-section text-center">
+    <div class="container">
+      <div class="d-flex justify-content-between align-items-center">
+        <h2 class="h4 mb-0"><i class="bi bi-scissors me-2"></i>Kuaför Yönetim</h2>
+        <div>
+          {% if current_user.is_authenticated %}
+            {% if current_user.rol == 'admin' %}
+              <a href="{{ url_for('sadece_admin') }}" class="btn btn-sm btn-outline-light me-1">
+                <i class="bi bi-gear"></i>
+              </a>
+            {% endif %}
+            <a href="{{ url_for('logout') }}" class="btn btn-sm btn-light">
+              <i class="bi bi-box-arrow-right"></i>
+            </a>
+          {% else %}
+            <a href="{{ url_for('login') }}" class="btn btn-sm btn-light">
+              <i class="bi bi-box-arrow-in-right"></i> Giriş
+            </a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="container">
+    <!-- Mobil Menü -->
+    <div class="d-md-none mobile-menu-container">
+      <ul class="nav nav-tabs nav-fill mb-3">
+        <li class="nav-item">
+          <a class="nav-link active" data-bs-toggle="tab" href="#menu-tab">Menü</a>
+        </li>
+      </ul>
+      
+      <div class="tab-content">
+        <div class="tab-pane fade show active" id="menu-tab">
+          <div class="list-group compact-menu mb-3">
+            <a href="{{ url_for('index') }}" class="list-group-item list-group-item-action">
+              <i class="bi bi-house-door"></i> Anasayfa
+            </a>
+            <a href="{{ url_for('randevu_al') }}" class="list-group-item list-group-item-action">
+              <i class="bi bi-calendar-plus"></i> Randevu Al
+            </a>
+            <a href="{{ url_for('randevular') }}" class="list-group-item list-group-item-action">
+              <i class="bi bi-list-ul"></i> Randevuları Gör
+            </a>
+            <a href="{{ url_for('musteri_kayit') }}" class="list-group-item list-group-item-action">
+              <i class="bi bi-person-plus"></i> Müşteri Ekle
+            </a>
+            <a href="{{ url_for('musteri_listesi') }}" class="list-group-item list-group-item-action">
+              <i class="bi bi-people"></i> Müşteriler
+            </a>
+            <a href="{{ url_for('gelir_gider_defteri') }}" class="list-group-item list-group-item-action">
+              <i class="bi bi-cash-stack"></i> Kasa Defteri
+            </a>
+            <a href="{{ url_for('stoklar') }}" class="list-group-item list-group-item-action">
+              <i class="bi bi-box-seam"></i> Stok
+            </a>
+            <a href="{{ url_for('dashboard') }}" class="list-group-item list-group-item-action active">
+              <i class="bi bi-bar-chart"></i> Dashboard
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <!-- Masaüstü Sol Menü -->
+      <div class="col-md-3 d-none d-md-block">
+        <div class="list-group compact-menu mb-3">
+          <a href="{{ url_for('index') }}" class="list-group-item list-group-item-action">
+            <i class="bi bi-house-door"></i> Anasayfa
+          </a>
+          <a href="{{ url_for('randevu_al') }}" class="list-group-item list-group-item-action">
+            <i class="bi bi-calendar-plus"></i> Randevu Al
+          </a>
+          <a href="{{ url_for('randevular') }}" class="list-group-item list-group-item-action">
+            <i class="bi bi-list-ul"></i> Randevuları Gör
+          </a>
+          <a href="{{ url_for('musteri_kayit') }}" class="list-group-item list-group-item-action">
+            <i class="bi bi-person-plus"></i> Müşteri Ekle
+          </a>
+          <a href="{{ url_for('musteri_listesi') }}" class="list-group-item list-group-item-action">
+            <i class="bi bi-people"></i> Müşteriler
+          </a>
+          <a href="{{ url_for('gelir_gider_defteri') }}" class="list-group-item list-group-item-action">
+            <i class="bi bi-cash-stack"></i> Kasa Defteri
+          </a>
+          <a href="{{ url_for('stoklar') }}" class="list-group-item list-group-item-action">
+            <i class="bi bi-box-seam"></i> Stok
+          </a>
+          <a href="{{ url_for('dashboard') }}" class="list-group-item list-group-item-action active">
+            <i class="bi bi-bar-chart"></i> Dashboard
+          </a>
+        </div>
+      </div>
+
+      <!-- Ana İçerik -->
+      <div class="col-md-9">
+        <!-- İstatistik Kartları -->
+        <div class="row g-4 mb-4">
+            <div class="col-6 col-md-4 col-lg-2">
+                <div class="card stat-card text-center">
+                    <div class="card-body">
+                        <div class="stat-icon text-primary"><i class="bi bi-people-fill"></i></div>
+                        <div class="stat-title">Müşteri</div>
+                        <div class="stat-value">{{ toplam_musteri|default(0) }}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md-4 col-lg-2">
+                <div class="card stat-card text-center">
+                    <div class="card-body">
+                        <div class="stat-icon text-secondary"><i class="bi bi-calendar2-week"></i></div>
+                        <div class="stat-title">Randevu</div>
+                        <div class="stat-value">{{ toplam_randevu|default(0) }}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md-4 col-lg-2">
+                <div class="card stat-card text-center">
+                    <div class="card-body">
+                        <div class="stat-icon text-warning"><i class="bi bi-hourglass-split"></i></div>
+                        <div class="stat-title">Bekleyen</div>
+                        <div class="stat-value">{{ bekleyen_randevu|default(0) }}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md-4 col-lg-2">
+                <div class="card stat-card text-center">
+                    <div class="card-body">
+                        <div class="stat-icon text-success"><i class="bi bi-check-circle"></i></div>
+                        <div class="stat-title">Gelen</div>
+                        <div class="stat-value">{{ gelen_randevu|default(0) }}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md-4 col-lg-2">
+                <div class="card stat-card text-center">
+                    <div class="card-body">
+                        <div class="stat-icon text-danger"><i class="bi bi-x-circle"></i></div>
+                        <div class="stat-title">Gelmedi</div>
+                        <div class="stat-value">{{ gelmeyen_randevu|default(0) }}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md-4 col-lg-2">
+                <div class="card stat-card text-center">
+                    <div class="card-body">
+                        <div class="stat-icon text-info"><i class="bi bi-cash-coin"></i></div>
+                        <div class="stat-title">Net Bakiye</div>
+                        <div class="stat-value">{{ net_bakiye|default(0) }} ₺</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Grafikler -->
+        <div class="row g-4 mb-4">
+            <div class="col-md-6">
+                <div class="card chart-card p-4">
+                    <div class="chart-title"><i class="bi bi-pie-chart"></i> Gelir / Gider Dağılımı</div>
+                    <canvas id="pieChart"></canvas>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card chart-card p-4">
+                    <div class="chart-title"><i class="bi bi-bar-chart"></i> Randevu Durumları</div>
+                    <canvas id="barChart"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Gelir/Gider Kartları -->
+        <div class="row g-4">
+            <div class="col-md-6">
+                <div class="card stat-card text-center">
+                    <div class="card-body">
+                        <div class="stat-icon text-success"><i class="bi bi-arrow-down-circle"></i></div>
+                        <div class="stat-title">Toplam Gelir</div>
+                        <div class="stat-value">{{ toplam_gelir|default(0) }} ₺</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card stat-card text-center">
+                    <div class="card-body">
+                        <div class="stat-icon text-danger"><i class="bi bi-arrow-up-circle"></i></div>
+                        <div class="stat-title">Toplam Gider</div>
+                        <div class="stat-value">{{ toplam_gider|default(0) }} ₺</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="bg-dark text-white py-2 mt-3">
+    <div class="container text-center">
+      <small>&copy; {{ current_year|default(2024) }} Kuaför Yönetim Sistemi</small>
+    </div>
+  </footer>
+
+<script>
+    // Pie Chart (Gelir/Gider)
+    const gelir = {{ toplam_gelir|default(0) }};
+    const gider = {{ toplam_gider|default(0) }};
+    const ctxPie = document.getElementById('pieChart').getContext('2d');
+    new Chart(ctxPie, {
+        type: 'pie',
+        data: {
+            labels: ['Gelir', 'Gider'],
+            datasets: [{
+                data: [gelir, gider],
+                backgroundColor: [
+                    'rgba(54, 162, 235, 0.7)',
+                    'rgba(255, 99, 132, 0.7)'
+                ],
+                borderColor: [
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 99, 132, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { position: 'bottom' },
+                title: { display: false }
+            }
+        }
+    });
+
+    // Bar Chart (Randevu Durumları)
+    const ctxBar = document.getElementById('barChart').getContext('2d');
+    new Chart(ctxBar, {
+        type: 'bar',
+        data: {
+            labels: ['Bekleyen', 'Gelen', 'Gelmedi'],
+            datasets: [{
+                label: 'Randevu Sayısı',
+                data: [
+                    {{ bekleyen_randevu|default(0) }},
+                    {{ gelen_randevu|default(0) }},
+                    {{ gelmeyen_randevu|default(0) }}
+                ],
+                backgroundColor: [
+                    'rgba(255, 205, 86, 0.7)',   // Bekleyen (sarı)
+                    'rgba(75, 192, 192, 0.7)',   // Gelen (yeşil)
+                    'rgba(255, 99, 132, 0.7)'    // Gelmedi (kırmızı)
+                ],
+                borderColor: [
+                    'rgba(255, 205, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(255, 99, 132, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: false },
+                title: { display: false }
+            },
+            scales: {
+                y: { beginAtZero: true }
+            }
+        }
+    });
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
