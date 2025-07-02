@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kuaför Yönetim Sistemi</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.10.0/main.min.css' rel='stylesheet' />
+  <style>
+    :root {
+      --primary-color: #6f42c1;
+      --secondary-color: #b197fc;
+    }
+    
+    body {
+      background-color: #f8f9fa;
+    }
+    
+    .header-section {
+      background-color: var(--primary-color);
+      color: white;
+      padding: 1rem 0;
+      margin-bottom: 1rem;
+    }
+    
+    .calendar-container {
+      background-color: white;
+      border-radius: 0.5rem;
+      padding: 0.75rem;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      margin-bottom: 1rem;
+    }
+    
+    .stats-container {
+      background-color: white;
+      border-radius: 0.5rem;
+      padding: 0.75rem;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      margin-bottom: 1rem;
+    }
+    
+    .stat-value {
+      font-size: 1.25rem;
+      font-weight: bold;
+      color: var(--primary-color);
+    }
+    
+    .stat-label {
+      color: #6c757d;
+      font-size: 0.9rem;
+    }
+    
+    .nav-tabs .nav-link {
+      color: #495057;
+    }
+    
+    .nav-tabs .nav-link.active {
+      color: var(--primary-color);
+      font-weight: bold;
+    }
+    
+    .compact-menu .list-group-item {
+      padding: 0.5rem 0.75rem;
+    }
+    
+    .compact-menu .list-group-item i {
+      width: 20px;
+    }
+    
+    @media (max-width: 767.98px) {
+      .mobile-menu-container {
+        margin-bottom: 1rem;
+      }
+      
+      .calendar-container {
+        height: calc(100vh - 250px);
+        overflow-y: auto;
+      }
+      
+      .stats-row {
+        display: flex;
+        flex-wrap: wrap;
+      }
+      
+      .stats-item {
+        flex: 1 0 50%;
+        padding: 0.25rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="header-section">
+    <div class="container">
+      <div class="d-flex justify-content-between align-items-center">
+        <h2 class="h4 mb-0"><i class="bi bi-scissors me-2"></i>Kuaför Yönetim</h2>
+        <div>
+          {% if current_user.is_authenticated %}
+            {% if current_user.rol == 'admin' %}
+              <a href="{{ url_for('sadece_admin') }}" class="btn btn-sm btn-outline-light me-1">
+                <i class="bi bi-gear"></i>
+              </a>
+            {% endif %}
+            <a href="{{ url_for('logout') }}" class="btn btn-sm btn-light">
+              <i class="bi bi-box-arrow-right"></i>
+            </a>
+          {% else %}
+            <a href="{{ url_for('login') }}" class="btn btn-sm btn-light">
+              <i class="bi bi-box-arrow-in-right"></i> Giriş
+            </a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="container">
+    <!-- Mobil Menü -->
+    <div class="d-md-none mobile-menu-container">
+      <ul class="nav nav-tabs nav-fill mb-3">
+        <li class="nav-item">
+          <a class="nav-link active" data-bs-toggle="tab" href="#menu-tab">Menü</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" data-bs-toggle="tab" href="#stats-tab">Özet</a>
+        </li>
+      </ul>
+      
+      <div class="tab-content">
+        <div class="tab-pane fade show active" id="menu-tab">
+          <div class="list-group compact-menu mb-3">
+            <a href="{{ url_for('index') }}" class="list-group-item list-group-item-action active">
+              <i class="bi bi-house-door"></i> Anasayfa
+            </a>
+            <a href="{{ url_for('randevu_al') }}" class="list-group-item list-group-item-action">
+              <i class="bi bi-calendar-plus"></i> Randevu Al
+            </a>
+            <a href="{{ url_for('randevular') }}" class="list-group-item list-group-item-action">
+              <i class="bi bi-list-ul"></i> Randevuları Gör
+            </a>
+            <a href="{{ url_for('musteri_kayit') }}" class="list-group-item list-group-item-action">
+              <i class="bi bi-person-plus"></i> Müşteri Ekle
+            </a>
+            <a href="{{ url_for('musteri_listesi') }}" class="list-group-item list-group-item-action">
+              <i class="bi bi-people"></i> Müşteriler
+            </a>
+            <a href="{{ url_for('gelir_gider_defteri') }}" class="list-group-item list-group-item-action">
+              <i class="bi bi-cash-stack"></i> Kasa Defteri
+            </a>
+            <a href="{{ url_for('stoklar') }}" class="list-group-item list-group-item-action">
+              <i class="bi bi-box-seam"></i> Stok
+            </a>
+            <a href="{{ url_for('dashboard') }}" class="list-group-item list-group-item-action">
+              <i class="bi bi-bar-chart"></i> Dashboard
+            </a>
+          </div>
+        </div>
+        <div class="tab-pane fade" id="stats-tab">
+          <div class="stats-container mb-3">
+            <h6 class="mb-2">Günlük Özet</h6>
+            <div class="stats-row">
+              <div class="stats-item">
+                <small class="stat-label">Bugünkü Randevu:</small>
+                <div class="stat-value">{{ bugun_randevu|default(0) }}</div>
+              </div>
+              <div class="stats-item">
+                <small class="stat-label">Bekleyen Randevu:</small>
+                <div class="stat-value">{{ bekleyen_randevu|default(0) }}</div>
+              </div>
+              <div class="stats-item">
+                <small class="stat-label">Günlük Gelir:</small>
+                <div class="stat-value">{{ gunluk_gelir|default(0) }} ₺</div>
+              </div>
+              <div class="stats-item">
+                <small class="stat-label">Toplam Müşteri:</small>
+                <div class="stat-value">{{ musteri_sayisi|default(0) }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <!-- Masaüstü Sol Menü -->
+      <div class="col-md-3 d-none d-md-block">
+        <div class="list-group compact-menu mb-3">
+          <a href="{{ url_for('index') }}" class="list-group-item list-group-item-action active">
+            <i class="bi bi-house-door"></i> Anasayfa
+          </a>
+          <a href="{{ url_for('randevu_al') }}" class="list-group-item list-group-item-action">
+            <i class="bi bi-calendar-plus"></i> Randevu Al
+          </a>
+          <a href="{{ url_for('randevular') }}" class="list-group-item list-group-item-action">
+            <i class="bi bi-list-ul"></i> Randevuları Gör
+          </a>
+          <a href="{{ url_for('musteri_kayit') }}" class="list-group-item list-group-item-action">
+            <i class="bi bi-person-plus"></i> Müşteri Ekle
+          </a>
+          <a href="{{ url_for('musteri_listesi') }}" class="list-group-item list-group-item-action">
+            <i class="bi bi-people"></i> Müşteriler
+          </a>
+          <a href="{{ url_for('gelir_gider_defteri') }}" class="list-group-item list-group-item-action">
+            <i class="bi bi-cash-stack"></i> Kasa Defteri
+          </a>
+          <a href="{{ url_for('stoklar') }}" class="list-group-item list-group-item-action">
+            <i class="bi bi-box-seam"></i> Stok
+          </a>
+          <a href="{{ url_for('dashboard') }}" class="list-group-item list-group-item-action">
+            <i class="bi bi-bar-chart"></i> Dashboard
+          </a>
+        </div>
+
+        <!-- İstatistikler -->
+        <div class="stats-container">
+          <h6 class="mb-2">Günlük Özet</h6>
+          <div class="d-flex justify-content-between mb-1">
+            <small class="stat-label">Bugünkü Randevu:</small>
+            <span class="stat-value">{{ bugun_randevu|default(0) }}</span>
+          </div>
+          <div class="d-flex justify-content-between mb-1">
+            <small class="stat-label">Bekleyen Randevu:</small>
+            <span class="stat-value">{{ bekleyen_randevu|default(0) }}</span>
+          </div>
+          <div class="d-flex justify-content-between mb-1">
+            <small class="stat-label">Günlük Gelir:</small>
+            <span class="stat-value">{{ gunluk_gelir|default(0) }} ₺</span>
+          </div>
+          <div class="d-flex justify-content-between">
+            <small class="stat-label">Toplam Müşteri:</small>
+            <span class="stat-value">{{ musteri_sayisi|default(0) }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Takvim -->
+      <div class="col-md-9">
+        <div class="calendar-container">
+          <div id="calendar"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="bg-dark text-white py-2 mt-3">
+    <div class="container text-center">
+      <small>&copy; {{ current_year|default(2024) }} Kuaför Yönetim Sistemi</small>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.10.0/main.min.js'></script>
+  <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.10.0/locales/tr.js'></script>
+  <script>
+// Bildirim gösterme fonksiyonu
+function showNotification(title, message, type = 'info', options = {}) {
+  // Varsayılan seçenekler
+  const settings = {
+    showBrowserNotification: false,  // Tarayıcı bildirimi gösterme
+    showToast: true,                // Toast bildirimi gösterme
+    playSound: true                 // Ses çalma
+  };
+  
+  // Kullanıcı seçeneklerini birleştir
+  Object.assign(settings, options);
+  
+  // Ses çalma
+  if (settings.playSound) {
+    const audio = new Audio('/static/notification.mp3');
+    audio.play();
+  }
+  
+  // Tarayıcı bildirimi
+  if (settings.showBrowserNotification) {
+    if (Notification.permission === 'granted') {
+      new Notification(title, {
+        body: message,
+        icon: '/static/favicon.ico'
+      });
+    } else if (Notification.permission !== 'denied') {
+      Notification.requestPermission();
+    }
+  }
+  
+  // Toast bildirimi
+  if (settings.showToast) {
+    const toast = document.createElement('div');
+    toast.className = 'position-fixed bottom-0 end-0 p-3';
+    toast.style.zIndex = '5';
+    
+    let bgColor = 'bg-info';
+    if (type === 'success') bgColor = 'bg-success';
+    if (type === 'warning') bgColor = 'bg-warning';
+    if (type === 'danger') bgColor = 'bg-danger';
+    
+    toast.innerHTML = `
+      <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header ${bgColor} text-white">
+          <strong class="me-auto">${title}</strong>
+          <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body">
+          ${message}
+        </div>
+      </div>
+    `;
+    document.body.appendChild(toast);
+    
+    // 5 saniye sonra toast'ı kaldır
+    setTimeout(() => {
+      toast.remove();
+    }, 5000);
+  }
+}
+
+// Yaklaşan randevuları kontrol et
+function checkUpcomingAppointments() {
+  fetch('/api/yaklasan_randevular')
+    .then(response => response.json())
+    .then(data => {
+      if (data.length > 0) {
+        data.forEach(randevu => {
+          showNotification(
+            'Yaklaşan Randevu!', 
+            `${randevu.ad} - ${randevu.saat} - ${randevu.hizmet}`, 
+            'warning',
+            {
+              showBrowserNotification: true,
+              showToast: true
+            }
+          );
+        });
+      }
+    })
+    .catch(error => console.error('Yaklaşan randevular kontrol hatası:', error));
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  // Bildirim izni iste
+  if (Notification.permission !== 'granted' && Notification.permission !== 'denied') {
+    Notification.requestPermission();
+  }
+  
+  // Her 5 dakikada bir yaklaşan randevuları kontrol et
+  checkUpcomingAppointments();
+  setInterval(checkUpcomingAppointments, 5 * 60 * 1000);
+  
+  var calendarEl = document.getElementById('calendar');
+  var calendar = new FullCalendar.Calendar(calendarEl, {
+    initialView: window.innerWidth < 768 ? 'listWeek' : 'dayGridMonth',
+    locale: 'tr',
+    headerToolbar: {
+      left: 'prev,next today',
+      center: 'title',
+      right: window.innerWidth < 768 ? 'listWeek,dayGridWeek' : 'dayGridMonth,timeGridWeek,timeGridDay'
+    },
+    events: '/api/randevular',
+    eventClick: function(info) {
+      window.location.href = '/randevu_duzenle/' + info.event.id;
+    },
+    eventTimeFormat: {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false
+    },
+    height: window.innerWidth < 768 ? 'auto' : 650,
+    // Sürükle-bırak için gerekli ayarlar
+    editable: true,
+    eventDrop: function(info) {
+    try {
+        var randevuId = info.event.id;
+        
+        // Tarih formatını düzelt (YYYY-MM-DD)
+        var date = info.event.start;
+        var yeniTarih = date.getFullYear() + '-' + 
+                        String(date.getMonth() + 1).padStart(2, '0') + '-' + 
+                        String(date.getDate()).padStart(2, '0');
+        
+        // Saat formatını düzelt (HH:MM)
+        var yeniSaat = String(date.getHours()).padStart(2, '0') + ':' + 
+                       String(date.getMinutes()).padStart(2, '0');
+        
+        console.log('Randevu güncelleniyor:', randevuId, yeniTarih, yeniSaat);
+        
+        // Randevu tarih ve saatini güncelle
+        fetch('/api/randevu_tarih_guncelle/' + randevuId, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                tarih: yeniTarih,
+                saat: yeniSaat
+            })
+        })
+        .then(response => {
+            console.log('API yanıtı:', response.status);
+            if (!response.ok) {
+                info.revert(); // Hata durumunda değişikliği geri al
+                throw new Error('Randevu güncellenemedi (HTTP ' + response.status + ')');
+            }
+            // Yanıtın JSON olup olmadığını kontrol et
+            const contentType = response.headers.get('content-type');
+            if (contentType && contentType.includes('application/json')) {
+                return response.json();
+            } else {
+                // JSON olmayan yanıt için
+                return response.text().then(text => {
+                    console.error('JSON olmayan yanıt:', text);
+                    throw new Error('Sunucu geçersiz yanıt döndürdü');
+                });
+            }
+        })
+        .then(data => {
+            console.log('Başarılı güncelleme:', data);
+            showNotification('Başarılı', 'Randevu başarıyla güncellendi.', 'success', {
+                showBrowserNotification: false,
+                showToast: true
+            });
+        })
+        .catch(error => {
+            console.error('Fetch hatası:', error);
+            info.revert(); // Hata durumunda değişikliği geri al
+            
+            showNotification('Hata', 'Randevu güncellenirken bir hata oluştu: ' + error.message, 'danger', {
+                showBrowserNotification: false,
+                showToast: true
+            });
+        });
+    } catch (err) {
+        console.error('Genel hata:', err);
+        info.revert(); // Hata durumunda değişikliği geri al
+        
+        showNotification('Hata', 'Beklenmeyen bir hata oluştu: ' + err.message, 'danger', {
+            showBrowserNotification: false,
+            showToast: true
+        });
+    }
+}
+  });
+  calendar.render();
+  
+  // Ekran boyutu değiştiğinde takvimi güncelle
+  window.addEventListener('resize', function() {
+    calendar.setOption('initialView', window.innerWidth < 768 ? 'listWeek' : 'dayGridMonth');
+    calendar.setOption('headerToolbar', {
+      left: 'prev,next today',
+      center: 'title',
+      right: window.innerWidth < 768 ? 'listWeek,dayGridWeek' : 'dayGridMonth,timeGridWeek,timeGridDay'
+    });
+    calendar.setOption('height', window.innerWidth < 768 ? 'auto' : 650);
+    calendar.render();
+  });
+});
+
+  </script>
+</body>
+</html>
