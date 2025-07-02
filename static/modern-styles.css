@@ -1,0 +1,70 @@
+/* Modern Müşteri Listesi Stilleri */
+.modern-table {
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+  border: none;
+}
+
+.modern-table thead {
+  background: linear-gradient(135deg, #6a1b9a 0%, #8e24aa 100%);
+  color: white;
+}
+
+.modern-table thead th {
+  padding: 1.2rem 1rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  border: none;
+}
+
+.modern-table tbody tr {
+  transition: all 0.3s ease;
+  border: none;
+}
+
+.modern-table tbody tr:hover {
+  background: linear-gradient(135deg, #f8f9ff 0%, #f0f4ff 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(106,27,154,0.1);
+}
+
+.modern-table tbody td {
+  padding: 1rem;
+  border: none;
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+
+.modern-btn-group {
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.modern-action-btn {
+  border-radius: 0;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(0,0,0,0.1);
+}
+
+.modern-action-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  z-index: 2;
+}
+
+.pulse {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(220, 53, 69, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(220, 53, 69, 0);
+  }
+}
