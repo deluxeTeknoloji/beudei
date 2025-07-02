@@ -1,0 +1,999 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ musteri.ad }} - Müşteri Detay</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+</head>
+<body class="bg-light">
+  <header class="header-section text-center">
+    <div class="container">
+      <div class="d-flex justify-content-between align-items-center">
+        <h2 class="h4 mb-0"><i class="bi bi-scissors me-2"></i>Kuaför Yönetim</h2>
+        <div>
+          {% if current_user.is_authenticated %}
+            {% if current_user.rol == 'admin' %}
+              <a href="{{ url_for('sadece_admin') }}" class="btn btn-sm btn-outline-light me-1">
+                <i class="bi bi-gear"></i>
+              </a>
+            {% endif %}
+            <a href="{{ url_for('logout') }}" class="btn btn-sm btn-light">
+              <i class="bi bi-box-arrow-right"></i>
+            </a>
+          {% else %}
+            <a href="{{ url_for('login') }}" class="btn btn-sm btn-light">
+              <i class="bi bi-box-arrow-in-right"></i> Giriş
+            </a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </header>
+  <div class="container py-4">
+    <div class="card shadow-lg border-0" style="border-radius:1.5rem;">
+      <div class="card-header bg-white d-flex justify-content-between align-items-center" style="border-radius:1.5rem 1.5rem 0 0;">
+        <span class="h5 mb-0 text-primary"><i class="bi bi-person-badge"></i> {{ musteri.ad }}</span>
+        <div>
+          <button id="exportExcel" class="btn btn-outline-success btn-sm me-2">
+            <i class="bi bi-file-earmark-excel me-1"></i> Dökümü İndir
+          </button>
+          {% if current_user.is_authenticated and current_user.rol == 'admin' %}
+          <a href="{{ url_for('tahsilat_listesi') }}" class="btn btn-outline-primary btn-sm me-2">
+            <i class="bi bi-receipt"></i> Tüm Tahsilatlar
+          </a>
+          {% endif %}
+          <a href="{{ url_for('musteri_listesi') }}" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left"></i> Geri
+          </a>
+        </div>
+      </div>
+      <div class="card-body" style="background:#f8f9fa; border-radius:0 0 1.5rem 1.5rem;">
+        {% include '_flash_messages.html' %}
+
+        <!-- Temel Bilgiler -->
+<div class="row g-4 mb-4">
+  <div class="col-12">
+    <div class="card border-0 shadow-sm" style="border-radius: 1.2rem; background: #f0f4ff;">
+      <div class="card-body py-3">
+        <div class="row g-3">
+          <div class="col-12 col-md-6 col-lg-4">
+            <div class="d-flex align-items-center p-3 rounded-3 mb-2" style="background: #fff; box-shadow: 0 2px 8px rgba(60,72,88,0.06);">
+              <span class="me-3" style="font-size:1.5rem; color:#6a1b9a;">
+                <i class="bi bi-telephone"></i>
+              </span>
+              <div>
+                <div class="fw-semibold text-secondary small">Telefon</div>
+                <div class="fs-6 text-dark">{{ musteri.telefon }}</div>
+              </div>
+            </div>
+          </div>
+          <div class="col-12 col-md-6 col-lg-4">
+            <div class="d-flex align-items-center p-3 rounded-3 mb-2" style="background: #fff; box-shadow: 0 2px 8px rgba(60,72,88,0.06);">
+              <span class="me-3" style="font-size:1.5rem; color:#6a1b9a;">
+                <i class="bi bi-calendar-heart"></i>
+              </span>
+              <div>
+                <div class="fw-semibold text-secondary small">Doğum Tarihi</div>
+                <div class="fs-6 text-dark">{{ musteri.dogum_tarihi | tarih_format if musteri.dogum_tarihi else '-' }}</div>
+              </div>
+            </div>
+          </div>
+          <div class="col-12 col-md-6 col-lg-4">
+            <div class="d-flex align-items-center p-3 rounded-3 mb-2" style="background: #fff; box-shadow: 0 2px 8px rgba(60,72,88,0.06);">
+              <span class="me-3" style="font-size:1.5rem; color:#6a1b9a;">
+                <i class="bi bi-gender-ambiguous"></i>
+              </span>
+              <div>
+                <div class="fw-semibold text-secondary small">Cinsiyet</div>
+                <div class="fs-6 text-dark">{{ musteri.cinsiyet or '-' }}</div>
+              </div>
+            </div>
+          </div>
+          <div class="col-12 col-md-6 col-lg-4">
+            <div class="d-flex align-items-center p-3 rounded-3 mb-2" style="background: #fff; box-shadow: 0 2px 8px rgba(60,72,88,0.06);">
+              <span class="me-3" style="font-size:1.5rem; color:#6a1b9a;">
+                <i class="bi bi-geo-alt"></i>
+              </span>
+              <div>
+                <div class="fw-semibold text-secondary small">Adres</div>
+                <div class="fs-6 text-dark">{{ musteri.adres or '-' }}</div>
+              </div>
+            </div>
+          </div>
+          <div class="col-12 col-md-6 col-lg-4">
+            <div class="d-flex align-items-center p-3 rounded-3 mb-2" style="background: #fff; box-shadow: 0 2px 8px rgba(60,72,88,0.06);">
+              <span class="me-3" style="font-size:1.5rem; color:#6a1b9a;">
+                <i class="bi bi-wallet2"></i>
+              </span>
+              <div>
+                <div class="fw-semibold text-secondary small">Bakiye</div>
+                <div class="fs-6 text-dark">₺{{ musteri.bakiye }}</div>
+              </div>
+            </div>
+          </div>
+          <div class="col-12 col-md-6 col-lg-4">
+            <div class="d-flex align-items-center p-3 rounded-3 mb-2" style="background: #fff; box-shadow: 0 2px 8px rgba(60,72,88,0.06);">
+              <span class="me-3" style="font-size:1.5rem; color:#6a1b9a;">
+                <i class="bi bi-calendar-plus"></i>
+              </span>
+              <div>
+                <div class="fw-semibold text-secondary small">Kayıt Tarihi</div>
+                <div class="fs-6 text-dark">{{ musteri.kayit_tarihi | tarih_format if musteri.kayit_tarihi else '-' }}</div>
+              </div>
+            </div>
+          </div>
+          <div class="col-12 col-md-6 col-lg-4">
+            <div class="d-flex align-items-center p-3 rounded-3 mb-2" style="background: #fff; box-shadow: 0 2px 8px rgba(60,72,88,0.06);">
+              <span class="me-3" style="font-size:1.5rem; color:#6a1b9a;">
+                <i class="bi bi-person-check"></i>
+              </span>
+              <div>
+                <div class="fw-semibold text-secondary small">Referans</div>
+                <div class="fs-6 text-dark">
+{# Referans ismini bulmak için filter kullan #}
+{% set referans = mevcut_musteriler | selectattr('id', 'equalto', musteri.referans_id) | list %}
+{{ referans[0].ad if referans and musteri.referans_id else '-' }}
+</div>
+              </div>
+            </div>
+          </div>
+          <div class="col-12 col-md-6 col-lg-4">
+            <div class="d-flex align-items-center p-3 rounded-3 mb-2" style="background: #fff; box-shadow: 0 2px 8px rgba(60,72,88,0.06);">
+              <span class="me-3" style="font-size:1.5rem; color:#6a1b9a;">
+                <i class="bi bi-briefcase"></i>
+              </span>
+              <div>
+                <div class="fw-semibold text-secondary small">Meslek</div>
+                <div class="fs-6 text-dark">{{ musteri.meslek or '-' }}</div>
+              </div>
+            </div>
+          </div>
+          <div class="col-12 col-md-6 col-lg-4">
+            <div class="d-flex align-items-center p-3 rounded-3 mb-2" style="background: #fff; box-shadow: 0 2px 8px rgba(60,72,88,0.06);">
+              <span class="me-3" style="font-size:1.5rem; color:#6a1b9a;">
+                <i class="bi bi-card-text"></i>
+              </span>
+              <div>
+                <div class="fw-semibold text-secondary small">Notlar</div>
+                <div class="fs-6 text-dark">{{ musteri.notlar or '-' }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>  
+  </div>
+</div>
+        <!-- Randevu Geçmişi -->
+        <div class="card mb-4 shadow-sm border-0">
+          <div class="card-header bg-purple text-white d-flex justify-content-between align-items-center">
+            <h5 class="mb-0"><i class="bi bi-calendar-check"></i> Randevu Geçmişi</h5>
+            <a href="{{ url_for('randevu_al') }}?musteri_id={{ musteri.id }}" class="btn btn-success">
+              <i class="bi bi-plus-circle"></i> Yeni Randevu
+            </a>
+          </div>
+          <div class="card-body p-0">
+            <div class="table-responsive">
+<table class="table table-hover align-middle text-center mb-0">
+  <thead>
+    <tr>
+      <th>Tarih</th>
+      <th>Saat</th>
+      <th>Hizmet</th>
+      <th>Çalışan</th>
+      <th>Durum</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for randevu in randevular %}
+    <tr>
+      <td>{{ randevu.tarih | tarih_format }}</td>
+      <td>{{ randevu.saat | saat_format }}</td>
+      <td>{{ randevu.hizmet }}</td>
+      <td>{{ randevu.calisan_ad if randevu.calisan_ad else 'Belirtilmedi' }}</td>
+      <td>
+        {% if randevu.durum == 'Geldi' %}
+          Geldi
+          {% if randevu.durum_guncelleme_zamani %}
+            ({{ randevu.durum_guncelleme_zamani | tarih_format }})
+          {% endif %}
+        {% else %}
+          {{ randevu.durum or 'Beklemede' }}
+        {% endif %}
+      </td>
+    </tr>
+    {% else %}
+    <tr>
+      <td colspan="5" class="text-center text-muted">
+        Kayıtlı randevu bulunamadı
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+            </div>
+          </div>
+        </div>
+        
+<!-- Tahsilat Geçmişi -->
+<div class="card mb-4 shadow-sm border-0">
+  <div class="card-header bg-purple text-white d-flex justify-content-between align-items-center">
+    <h5 class="mb-0"><i class="bi bi-receipt"></i> Tahsilat Geçmişi</h5>
+    <button class="btn btn-warning" data-bs-toggle="collapse" data-bs-target="#tahsilatEklemeForm" aria-expanded="false" aria-controls="tahsilatEklemeForm">
+      <i class="bi bi-plus-circle"></i> Manuel Tahsilat Ekle
+    </button>
+  </div>
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle text-center mb-0">
+        <thead>
+          <tr>
+            <th>Tahsilat Tarihi</th>
+            <th>Son Ödeme Tarihi</th>
+            <th>Tutar</th>
+            <th>Durum</th>
+            <th>Açıklama</th>
+            <th>İşlem</th>
+          </tr>
+        </thead>
+        <tbody>
+
+          <!-- Taksitsiz satışlar -->
+          {% for satis in satislar %}
+            {% set ilgili_taksitler = taksitler | selectattr('satis_id', 'equalto', satis.id) | list %}
+            {% if ilgili_taksitler|length == 0 %}
+              {% set tahsilat = tahsilatlar | selectattr('satis_id', 'equalto', satis.id) | first %}
+              <tr class="{% if satis.odendi == 1 %}table-success{% endif %}">
+              {% if tahsilat and tahsilat.tarih %}
+                    {{ tahsilat.tarih | tarih_format }}
+                  {% else %}
+                    -
+                  {% endif %}
+                </td>
+                <td>-</td>
+                <td>{{ "₺{:.2f}".format(satis.fiyat) }}</td>
+                <td>{% if satis.odendi == 1 %}Ödendi{% else %}Ödenmedi{% endif %}</td>
+                <td class="text-start">{{ satis.hizmet_adi or '-' }} (Taksitsiz Satış)</td>
+                <td>
+                  {% if satis.odendi == 0 %}
+                    <button
+                      type="button"
+                      class="btn btn-sm btn-outline-success"
+                      data-bs-toggle="modal"
+                      data-bs-target="#taksitTahsilatModal"
+                      data-tutar="{{ satis.fiyat }}"
+                      data-aciklama="{{ satis.hizmet_adi }} - Taksitsiz Satış"
+                      data-satis_id="{{ satis.id }}"
+                    >
+                      Tahsilat Gir
+                    </button>
+                  {% endif %}
+                </td>
+              </tr>
+            {% endif %}
+          {% endfor %}
+
+          <!-- Taksitli satışlar -->
+          {% set sayac = 1 %}
+          {% for ana_taksit in taksitler if not ana_taksit.orijinal_taksit_id %}
+            {% set tahsilat = tahsilatlar | selectattr('taksit_id', 'equalto', ana_taksit.id) | first %}
+            {% set kismi_odeme_var = taksitler | selectattr('orijinal_taksit_id', 'equalto', ana_taksit.id) | list %}
+            {% set kalan_taksit = kismi_odeme_var | first if kismi_odeme_var else None %}
+            {% set odenen_tutar = tahsilat.tutar if tahsilat else 0 %}
+            <tr 
+            class="{% if ana_taksit.odendi and kismi_odeme_var %}table-info{% elif ana_taksit.odendi %}table-success{% else %}table-danger{% endif %} {% if ana_taksit.son_odeme_tarihi and not ana_taksit.odendi and ana_taksit.son_odeme_tarihi < now_date %}overdue{% endif %}">
+            <td>
+                {% if tahsilat and tahsilat.tarih %}
+                  {{ tahsilat.tarih | tarih_format }}
+                {% else %}
+                  -
+                {% endif %}
+              </td>
+              <td>
+                {% if ana_taksit.son_odeme_tarihi %}
+                  {{ ana_taksit.son_odeme_tarihi | tarih_format }}
+                {% else %}
+                  -
+                {% endif %}
+              </td>
+              <td>
+                {% if kismi_odeme_var %}
+                  {{ "₺{:.2f}".format(odenen_tutar) }} / {{ "₺{:.2f}".format(ana_taksit.tutar) }}
+                {% else %}
+                  {{ "₺{:.2f}".format(ana_taksit.tutar) }}
+                {% endif %}
+              </td>
+              <td>{% if ana_taksit.odendi %}{% if kismi_odeme_var %}Kısmi Ödendi{% else %}Ödendi{% endif %}{% else %}Ödenmedi{% endif %}</td>
+              <td class="text-start">
+                {{ ana_taksit.hizmet_adi or 'Satış Adı Yok' }}
+                {% if ana_taksit.aciklama %}
+  {{ ana_taksit.aciklama }}
+{% else %}
+  {% if ana_taksit.sira == 0 %}
+    Peşinat
+  {% else %}
+    {{ ana_taksit.sira }}. Taksit
+  {% endif %}
+{% endif %}
+
+                {% if kismi_odeme_var %}
+                  <div class="small text-muted mt-1">
+                    <i class="bi bi-arrow-return-right"></i> Kalan: {{ "₺{:.2f}".format(kalan_taksit.tutar) }} 
+                    (Son Ödeme: {{ kalan_taksit.son_odeme_tarihi | tarih_format if kalan_taksit.son_odeme_tarihi else '-' }})
+                  </div>
+                {% endif %}
+              </td>
+              <td>
+                {% if not ana_taksit.odendi %}
+                
+                <button
+                  type="button"
+                  class="btn btn-sm btn-outline-success"
+                  data-bs-toggle="modal"
+                  data-bs-target="#taksitTahsilatModal"
+                  data-tutar="{{ ana_taksit.tutar }}"
+                  data-aciklama="{{ ana_taksit.hizmet_adi }}"
+                  data-taksit_tipi="{% if ana_taksit.sira == 0 %}Peşinat{% else %}{{ ana_taksit.sira }}. Taksit{% endif %}"
+                  data-taksit_id="{{ ana_taksit.id }}"
+                >
+                Tahsilat Gir
+                </button>
+
+                {% endif %}
+              </td>
+            </tr>
+
+            <!-- Kısmi ödemeler -->
+            {% for kalan_taksit in taksitler if kalan_taksit.orijinal_taksit_id == ana_taksit.id %}
+              {% set tahsilat = tahsilatlar | selectattr('taksit_id', 'equalto', kalan_taksit.id) | first %}
+              <tr class="{% if kalan_taksit.odendi %}table-success{% else %}table-warning{% endif %}">
+                <td>
+                  {% if tahsilat and tahsilat.tarih %}
+                    {{ tahsilat.tarih | tarih_format }}
+                  {% else %}
+                    -
+                  {% endif %}
+                </td>
+                <td>
+                  {% if kalan_taksit.son_odeme_tarihi %}
+                    {{ kalan_taksit.son_odeme_tarihi | tarih_format }}
+                  {% else %}
+                    -
+                  {% endif %}
+                </td>
+                <td>{{ "₺{:.2f}".format(kalan_taksit.tutar) }}</td>
+                <td>{% if kalan_taksit.odendi %}Ödendi{% else %}Ödenmedi{% endif %}</td>
+                <td class="text-start ps-4 border-start border-warning">
+                  <span class="text-warning">↳ <strong>Kalan:</strong> {{ kalan_taksit.aciklama }}</span>
+                </td>
+                <td>
+                  {% if not kalan_taksit.odendi %}
+                    <button
+  type="button"
+  class="btn btn-sm btn-outline-success"
+  data-bs-toggle="modal"
+  data-bs-target="#taksitTahsilatModal"
+  data-tutar="{{ kalan_taksit.tutar }}"
+  data-aciklama="{{ ana_taksit.hizmet_adi or 'Satış Adı Yok' }} - Kalan Taksit"
+  data-taksit_id="{{ kalan_taksit.id }}"
+>
+  Tahsilat Gir
+</button>
+
+                  {% endif %}
+                </td>
+              </tr>
+            {% endfor %}
+            {% set sayac = sayac + 1 %}
+          {% endfor %}
+          
+          <!-- Manuel tahsilatlar -->
+          {% for tahsilat in tahsilatlar if not tahsilat.taksit_id and not tahsilat.satis_id %}
+            <tr class="table-info">
+              <td>{{ tahsilat.tarih | tarih_format }}</td>
+              <td>-</td>
+              <td>{{ "₺{:.2f}".format(tahsilat.tutar) }}</td>
+              <td>Manuel Tahsilat</td>
+              <td class="text-start">
+                <i class="bi bi-hand-thumbs-up text-info"></i> 
+                <strong>Manuel:</strong> {{ tahsilat.aciklama or 'Manuel tahsilat' }}
+                {% if tahsilat.odeme_sekli %}
+                  <small class="text-muted"> ({{ tahsilat.odeme_sekli }})</small>
+                {% endif %}
+              </td>
+              <td>-</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  
+  <!-- Manuel Tahsilat Ekleme Formu (Collapse) -->
+  <div class="collapse" id="tahsilatEklemeForm">
+    <div class="card-body border-top">
+      <h6 class="text-muted mb-3">Manuel Tahsilat Ekle</h6>
+      <form method="POST" action="{{ url_for('tahsilat_ekle', musteri_id=musteri.id) }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="hidden" name="kasa_gelir" value="1">
+        <div class="row">
+          <div class="col-md-3">
+            <label for="manuel_tutar" class="form-label">Tutar</label>
+            <input type="number" class="form-control" id="manuel_tutar" name="tutar" step="0.01" required>
+          </div>
+          <div class="col-md-3">
+            <label for="manuel_odeme_sekli" class="form-label">Ödeme Şekli</label>
+            <select class="form-select" id="manuel_odeme_sekli" name="odeme_sekli" required>
+              <option value="">Seçiniz</option>
+              <option value="Nakit">Nakit</option>
+              <option value="Banka">Banka</option>
+              <option value="Kredi Kartı">Kredi Kartı</option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <label for="manuel_aciklama" class="form-label">Açıklama</label>
+            <input type="text" class="form-control" id="manuel_aciklama" name="aciklama" placeholder="Tahsilat açıklaması">
+          </div>
+          <div class="col-md-2 d-flex align-items-center">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="manuel_bakiye_guncelle" name="bakiye_guncelle" value="1">
+              <label class="form-check-label" for="manuel_bakiye_guncelle">
+                Bakiyeden düş
+              </label>
+            </div>
+          </div>
+          <div class="col-md-1 d-flex align-items-end">
+            <button type="submit" class="btn btn-success w-100">Kaydet</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+
+<!-- Taksit Tahsilat Ödeme SeçeneğiModalı -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  var modal = document.getElementById('taksitTahsilatModal');
+  if (modal) {
+    
+  }
+  modal.addEventListener('show.bs.modal', function (event) {
+  var button = event.relatedTarget;
+  var originalTutar = button.getAttribute('data-tutar');
+  var hizmetAdi = button.getAttribute('data-aciklama');
+  var taksitTipi = button.getAttribute('data-taksit_tipi');
+  
+  document.getElementById('modal_tutar').value = originalTutar;
+  document.getElementById('modal_aciklama').value = hizmetAdi + (taksitTipi ? ' - ' + taksitTipi : '');
+  document.getElementById('modal_taksit_id').value = button.getAttribute('data-taksit_id');
+  document.getElementById('modal_satis_id').value = button.getAttribute('data-satis_id') || '';
+  document.getElementById('taksitTahsilatForm').action = "{{ url_for('tahsilat_ekle', musteri_id=musteri.id) }}";
+  
+  // Kısmi ödeme checkbox'ını sıfırla
+  var kismiOdemeCheckbox = document.getElementById('kismi_odeme');
+  if (kismiOdemeCheckbox) {
+    kismiOdemeCheckbox.checked = false;
+  }
+  
+  // Tutar değiştiğinde kontrol et
+  var tutarInput = document.getElementById('modal_tutar');
+  tutarInput.addEventListener('input', function() {
+    var currentTutar = parseFloat(this.value) || 0;
+    var originalTutarValue = parseFloat(originalTutar) || 0;
+    
+    // Eğer girilen tutar orijinal tutardan küçükse ve kısmi ödeme seçili değilse uyarı ver
+    if (currentTutar < originalTutarValue && !kismiOdemeCheckbox.checked) {
+      kismiOdemeCheckbox.classList.add('border', 'border-danger');
+      alert('Girilen tutar orijinal tutardan küçük! Kısmi ödeme yapmak için lütfen "Kısmi Ödeme" seçeneğini işaretleyin.');
+    } else {
+      kismiOdemeCheckbox.classList.remove('border', 'border-danger');
+    }
+  });
+});
+
+// Tahsilat işlemi tamamlandığında sayfayı yenile
+var tahsilatForm = document.getElementById('taksitTahsilatForm');
+if (tahsilatForm) {
+  tahsilatForm.addEventListener('submit', function(e) {
+    var tutarInput = document.getElementById('modal_tutar');
+    var originalTutar = parseFloat(e.target.getAttribute('data-original-tutar')) || 0;
+    var currentTutar = parseFloat(tutarInput.value) || 0;
+    var kismiOdemeCheckbox = document.getElementById('kismi_odeme');
+    
+    // Eğer girilen tutar orijinal tutardan küçükse ve kısmi ödeme seçili değilse engelle
+    if (currentTutar < originalTutar && !kismiOdemeCheckbox.checked) {
+      e.preventDefault();
+      alert('Girilen tutar orijinal tutardan küçük! Kısmi ödeme yapmak için lütfen "Kısmi Ödeme" seçeneğini işaretleyin.');
+      return false;
+    }
+    
+    // Form gönderildiğinde sayfayı yenile
+    tahsilatForm.onsubmit = function() {
+      setTimeout(function() {
+        window.location.reload();
+      }, 1000);
+    };
+  });
+}
+
+
+
+});
+</script>
+
+<!-- Taksit Tahsilat Modalı -->
+<div class="modal fade" id="taksitTahsilatModal" tabindex="-1" aria-labelledby="taksitTahsilatModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <form method="POST" id="taksitTahsilatForm">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <input type="hidden" name="musteri_id" value="{{ musteri.id }}">
+
+      <!-- Açıklama burada hidden olarak tutuluyor, JS ile güncellenecek -->
+      <input type="hidden" name="aciklama" id="modal_aciklama">
+      <input type="hidden" name="taksit_id" id="modal_taksit_id">
+      <input type="hidden" name="satis_id" id="modal_satis_id">
+      <input type="hidden" name="kasa_gelir" value="1">
+
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="taksitTahsilatModalLabel">Taksit Tahsilatı</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+        </div>
+
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="modal_tutar" class="form-label">Tutar</label>
+            <input type="number" class="form-control" name="tutar" id="modal_tutar" step="0.01" required>
+            <small class="form-text text-muted">Tutarı değiştirebilirsiniz</small>
+          </div>
+
+          <div class="mb-3">
+            <label for="modal_odeme_sekli" class="form-label">Ödeme Şekli</label>
+            <select class="form-select" name="odeme_sekli" id="modal_odeme_sekli" required>
+              <option value="">Seçiniz</option>
+              <option value="Nakit">Nakit</option>
+              <option value="Banka">Banka</option>
+              <option value="Kredi Kartı">Kredi Kartı</option>
+            </select>
+          </div>
+
+          <div class="form-check mb-3">
+            <input class="form-check-input" type="checkbox" id="kismi_odeme" name="kismi_odeme" value="1">
+            <label class="form-check-label" for="kismi_odeme">
+              Kısmi Ödeme (Kalan tutar için yeni taksit oluşturulacak)
+            </label>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-success">Tahsilatı Kaydet</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  var modal = document.getElementById('taksitTahsilatModal');
+  var tahsilatForm = document.getElementById('taksitTahsilatForm');
+
+  if (modal) {
+    modal.addEventListener('show.bs.modal', function (event) {
+  var button = event.relatedTarget;
+
+  // Butondan data attribute'ları al
+  var aciklama = button.getAttribute('data-aciklama') || '';
+  var originalTutar = button.getAttribute('data-tutar') || '';
+
+  // Açıklamayı doğrudan kullan
+  document.getElementById('modal_aciklama').value = aciklama;
+
+  document.getElementById('modal_tutar').value = originalTutar;
+  document.getElementById('modal_taksit_id').value = button.getAttribute('data-taksit_id');
+  document.getElementById('modal_satis_id').value = button.getAttribute('data-satis_id') || '';
+
+  // Form action (url_for ile otomatik oluşturuluyor)
+  tahsilatForm.action = "{{ url_for('tahsilat_ekle', musteri_id=musteri.id) }}";
+
+  // Kısmi ödeme checkbox'ını sıfırla ve uyarı stilini kaldır
+  var kismiOdemeCheckbox = document.getElementById('kismi_odeme');
+  if (kismiOdemeCheckbox) {
+    kismiOdemeCheckbox.checked = false;
+    kismiOdemeCheckbox.classList.remove('border', 'border-danger');
+  }
+
+  // Tutar inputunda değişiklik olursa uyarı kontrolü
+  var tutarInput = document.getElementById('modal_tutar');
+  tutarInput.addEventListener('input', function() {
+    var currentTutar = parseFloat(this.value) || 0;
+    var originalTutarValue = parseFloat(originalTutar) || 0;
+
+    if (currentTutar < originalTutarValue && !kismiOdemeCheckbox.checked) {
+      kismiOdemeCheckbox.classList.add('border', 'border-danger');
+      alert('Girilen tutar orijinal tutardan küçük! Kısmi ödeme yapmak için lütfen "Kısmi Ödeme" seçeneğini işaretleyin.');
+    } else {
+      kismiOdemeCheckbox.classList.remove('border', 'border-danger');
+    }
+  });
+});
+
+  }
+
+    if (tahsilatForm) {
+  tahsilatForm.addEventListener('submit', function(e) {
+    var tutarInput = document.getElementById('modal_tutar');
+    var originalTutar = parseFloat(tutarInput.getAttribute('value')) || 0;
+    var currentTutar = parseFloat(tutarInput.value) || 0;
+    var kismiOdemeCheckbox = document.getElementById('kismi_odeme');
+
+    // Kısmi ödeme ve tutar kontrolü
+    if (currentTutar < originalTutar && !kismiOdemeCheckbox.checked) {
+      e.preventDefault();
+      alert('Girilen tutar orijinal tutardan küçük! Kısmi ödeme yapmak için lütfen "Kısmi Ödeme" seçeneğini işaretleyin.');
+      return false;
+    }
+
+    // Ödeme şekli ekleme kodunu kaldır
+    // var odemeAciklama = document.getElementById('modal_aciklama');
+    // var odemeSekli = document.getElementById('modal_odeme_sekli').value;
+    // if (odemeSekli && !odemeAciklama.value.includes(' - ' + odemeSekli)) {
+    //   odemeAciklama.value = odemeAciklama.value + ' - ' + odemeSekli;
+    // }
+
+    // Form gönderildikten sonra 1 saniye sonra sayfayı yenile
+    setTimeout(function() {
+      window.location.reload();
+    }, 1000);
+  });
+}
+
+});
+</script>
+
+
+
+        
+<!-- Satış Geçmişi -->
+<div class="card mb-4 shadow-sm border-0">
+  <div class="card-header bg-purple text-white d-flex justify-content-between align-items-center">
+    <h5 class="mb-0"><i class="bi bi-cart-check"></i> Satış Geçmişi</h5>
+    <button class="btn btn-warning" data-bs-toggle="collapse" data-bs-target="#satisYapForm" aria-expanded="false" aria-controls="satisYapForm">
+      <i class="bi bi-cart-plus"></i> Satış Yap
+    </button>
+  </div>
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle text-center mb-0">
+        <thead>
+          <tr>
+            <th>Tarih</th>
+            <th>Ürün</th>
+            <th>Miktar</th>
+            <th>Fiyat</th>
+            <th>Açıklama</th>
+            <th>Toplam Seans</th>
+            <th>Kalan Seans</th>
+            <th>Ödeme Durumu</th>
+          </tr>
+        </thead>
+<tbody>
+{% for satis in satislar %}
+<tr class="{% if satis.odendi == 1 %}table-success{% endif %}">
+  <td>{{ satis.tarih | tarih_format }}</td>
+  <td>{{ satis.hizmet_adi }}</td>
+  <td>{{ satis.miktar }}</td>
+  <td>{{ satis.fiyat }}</td>
+  <td>{{ satis.aciklama or '-' }}</td>
+  <td>{{ satis.toplam_seans }}</td>
+  <td>{{ satis.kalan_seans }}</td>
+  <td>
+    {% if satis.odendi == 1 %}
+      <span class="badge bg-success">Ödendi</span>
+    {% else %}
+      <span class="badge bg-warning text-dark">Ödenmedi</span>
+    {% endif %}
+  </td>
+</tr>
+  {# Taksitler bölümü kaldırıldı #}
+{% else %}
+<tr>
+  <td colspan="7" class="text-center text-muted">
+    Kayıtlı satış bulunamadı
+  </td>
+</tr>
+{% endfor %}
+</tbody>
+
+<tbody>
+  {% set sayac = 1 %}
+    <!-- Taksitli satışlar -->
+  {% for ana_taksit in taksitler if not ana_taksit.orijinal_taksit_id %}
+    <!-- Mevcut taksit kodu buraya -->
+  {% endfor %}
+</tbody>
+
+
+      </table>
+    </div>
+  </div>
+</div>
+
+
+        <!-- Satış Yap formu -->
+        <div class="collapse" id="satisYapForm">
+          <div class="card mb-4 shadow-sm border-0">
+            <div class="card-header">
+              <h5 class="mb-0">Satış Yap</h5>
+            </div>
+            <div class="card-body">
+              <form method="POST" action="{{ url_for('hizmet_satis', musteri_id=musteri.id) }}">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+  <div class="mb-3">
+    <label for="hizmet_id" class="form-label">Hizmet</label>
+    <select class="form-select" id="hizmet_id" name="hizmet_id" required>
+      <option value="" disabled selected>Hizmet seçiniz</option>
+      {% for hizmet in hizmetler %}
+      <option value="{{ hizmet.id }}" data-fiyat="{{ hizmet.fiyat|default(0) }}">{{ hizmet.hizmet_adi }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="mb-3">
+    <label for="seans" class="form-label">Seans Sayısı</label>
+    <input type="number" class="form-control" id="seans" name="seans" min="1" value="1" required>
+  </div>
+  <div class="mb-3">
+    <label for="toplam_ucret" class="form-label">Toplam Ücret (₺)</label>
+    <input type="number" class="form-control" id="toplam_ucret" name="toplam_ucret" min="0" step="0.01" required>
+  </div>
+                <div class="form-check mb-3">
+                  <input class="form-check-input" type="checkbox" id="taksit_var" name="taksit_var">
+                  <label class="form-check-label" for="taksit_var">Taksitlendir</label>
+                </div>
+                
+                <div id="taksitler" style="display:none;" class="mb-3"></div>
+                <div class="mb-3">
+                  <label for="aciklama" class="form-label">Açıklama</label>
+                  <input type="text" class="form-control" id="aciklama" name="aciklama" placeholder="Satış açıklaması (isteğe bağlı)">
+                </div>
+                <button type="submit" class="btn btn-success">Satışı Tamamla</button>
+              </form>
+            </div>
+          </div>
+        </div>
+
+<script>
+  // Taksit sayısı aralığını buradan değiştirebilirsiniz
+  const TAKSIT_MIN = 2;
+  const TAKSIT_MAX = 12;
+
+  document.getElementById('hizmet_id').addEventListener('change', function() {
+    var fiyat = this.selectedOptions[0].getAttribute('data-fiyat') || 0;
+    document.getElementById('toplam_ucret').value = fiyat;
+    if(document.getElementById('taksit_var').checked) taksitKutulariniOlustur();
+  });
+  document.getElementById('seans').addEventListener('input', function() {
+    if(document.getElementById('taksit_var').checked) taksitKutulariniOlustur();
+  });
+  document.getElementById('toplam_ucret').addEventListener('input', function() {
+    if(document.getElementById('taksit_var').checked) taksitKutulariniOlustur();
+  });
+  document.getElementById('taksit_var').addEventListener('change', function() {
+    document.getElementById('taksitler').style.display = this.checked ? 'block' : 'none';
+    if(this.checked) taksitKutulariniOlustur();
+    else document.getElementById('taksitler').innerHTML = '';
+  });
+
+  function taksitKutulariniOlustur() {
+    var taksitlerDiv = document.getElementById('taksitler');
+    taksitlerDiv.innerHTML = '';
+
+    // Taksit sayısı seçimi
+    let selectHTML = `<label class="form-label">Taksit Sayısı</label>
+      <select id="taksit_sayisi" class="form-select mb-2" style="max-width:150px;display:inline-block;">
+        <option value="" selected disabled>Seçiniz</option>
+        ${Array.from({length: TAKSIT_MAX - TAKSIT_MIN + 1}, (_, i) => `<option value="${i+TAKSIT_MIN}">${i+TAKSIT_MIN}</option>`).join('')}
+      </select>
+      <br>`;
+    taksitlerDiv.innerHTML += selectHTML;
+    taksitlerDiv.innerHTML += `<div class="row" id="taksit-row"></div>`;
+
+    document.getElementById('taksit_sayisi').addEventListener('change', function() {
+      taksitKutulariniOlusturWithCount(parseInt(this.value));
+    });
+  }
+
+  function taksitKutulariniOlusturWithCount(taksit_sayisi) {
+    var toplam = parseFloat(document.getElementById('toplam_ucret').value) || 0;
+    var taksitlerDiv = document.getElementById('taksitler');
+    // Select kutusunu tekrar oluştur
+    let selectHTML = `<label class="form-label">Taksit Sayısı</label>
+      <select id="taksit_sayisi" class="form-select mb-2" style="max-width:150px;display:inline-block;">`;
+    selectHTML += `<option value="" disabled>Seçiniz</option>`;
+    for(var i=TAKSIT_MIN; i<=TAKSIT_MAX; i++) {
+      selectHTML += `<option value="${i}"${i===taksit_sayisi?' selected':''}>${i}</option>`;
+    }
+    selectHTML += `</select><br>`;
+    taksitlerDiv.innerHTML = selectHTML;
+    taksitlerDiv.innerHTML += `<div class="row" id="taksit-row"></div>`;
+    var taksitRow = taksitlerDiv.querySelector('#taksit-row');
+    var taksitTutari = taksit_sayisi ? Math.round((toplam / taksit_sayisi) * 100) / 100 : 0;
+    
+    
+  for (var i = 1; i <= taksit_sayisi; i++) {
+  let labelText = (i === 1) ? "Peşinat" : `${i - 1}. Taksit`;
+  taksitRow.innerHTML += `
+    <div class="col-6 col-md-3 col-lg-2 col-xl-1 mb-2 text-center">
+      <label class="form-label">${labelText}</label>
+      <input type="number" class="form-control taksit-tutar" name="taksit_tutar" step="0.01" value="${taksitTutari}" required>
+    </div>
+  `;
+}
+    // Tekrar event ekle
+    document.getElementById('taksit_sayisi').addEventListener('change', function() {
+      taksitKutulariniOlusturWithCount(parseInt(this.value));
+    });
+    Array.from(document.getElementsByClassName('taksit-tutar')).forEach(function(input, idx, arr){
+      input.addEventListener('input', function() {
+        var yeniTutar = parseFloat(this.value) || 0;
+        var toplamTutar = 0;
+        arr.forEach(function(inp){ toplamTutar += parseFloat(inp.value) || 0; });
+        if (toplamTutar !== toplam) {
+          var kalan = toplam - yeniTutar;
+          var kalanAdet = arr.length - 1;
+          if (kalanAdet > 0) {
+            var yeniKalanTutar = Math.round((kalan / kalanAdet) * 100) / 100;
+            arr.forEach(function(inp, i){
+              if(i !== idx) inp.value = yeniKalanTutar;
+            });
+          }
+        }
+      });
+    });
+  }
+</script>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
+  <script>
+    document.getElementById('exportExcel').addEventListener('click', function() {
+      // Excel çalışma kitabı oluştur
+      const wb = XLSX.utils.book_new();
+      
+      // Müşteri bilgileri
+      const musteriData = [
+        ['Müşteri Bilgileri', ''],
+        ['Ad', '{{ musteri.ad }}'],
+        ['Telefon', '{{ musteri.telefon }}'],
+        ['Doğum Tarihi', '{{ musteri.dogum_tarihi | tarih_format if musteri.dogum_tarihi else "-" }}'],
+        ['Cinsiyet', '{{ musteri.cinsiyet or "-" }}'],
+        ['Adres', '{{ musteri.adres or "-" }}'],
+        ['Bakiye', '₺{{ musteri.bakiye }}'],
+        ['Kayıt Tarihi', '{{ musteri.kayit_tarihi | tarih_format if musteri.kayit_tarihi else "-" }}'],
+        ['Meslek', '{{ musteri.meslek or "-" }}'],
+        ['Notlar', '{{ musteri.notlar or "-" }}'],
+        ['', '']
+      ];
+      
+      // Randevu geçmişi
+      const randevuData = [
+        ['Randevu Geçmişi', '', '', '', ''],
+        ['Tarih', 'Saat', 'Hizmet', 'Çalışan', 'Durum']
+      ];
+      
+      {% for randevu in randevular %}
+      randevuData.push([
+        '{{ randevu.tarih | tarih_format }}',
+        '{{ randevu.saat | saat_format }}',
+        '{{ randevu.hizmet }}',
+        '{{ randevu.calisan_ad if randevu.calisan_ad else "Belirtilmedi" }}',
+        '{{ randevu.durum or "Beklemede" }}'
+      ]);
+      {% endfor %}
+      
+      if (randevuData.length === 2) {
+        randevuData.push(['Kayıtlı randevu bulunamadı', '', '', '', '']);
+      }
+      
+      randevuData.push(['', '', '', '', '']);
+      
+      // Tahsilat geçmişi
+      const tahsilatData = [
+        ['Tahsilat Geçmişi', '', '', '', '', ''],
+        ['Tahsilat Tarihi', 'Son Ödeme Tarihi', 'Tutar', 'Durum', 'Açıklama', '']
+      ];
+      
+      // Taksitsiz satışlar
+      {% for satis in satislar %}
+        {% set ilgili_taksitler = taksitler | selectattr('satis_id', 'equalto', satis.id) | list %}
+        {% if ilgili_taksitler|length == 0 %}
+          {% set tahsilat = tahsilatlar | selectattr('satis_id', 'equalto', satis.id) | first %}
+          tahsilatData.push([
+            '{% if tahsilat and tahsilat.tarih %}{{ tahsilat.tarih | tarih_format }}{% else %}-{% endif %}',
+            '-',
+            '{{ "₺{:.2f}".format(satis.fiyat) }}',
+            '{% if satis.odendi == 1 %}Ödendi{% else %}Ödenmedi{% endif %}',
+            '{{ satis.hizmet_adi or "-" }} (Taksitsiz Satış)',
+            ''
+          ]);
+        {% endif %}
+      {% endfor %}
+      
+      // Taksitli satışlar
+      {% for ana_taksit in taksitler if not ana_taksit.orijinal_taksit_id %}
+        {% set tahsilat = tahsilatlar | selectattr('taksit_id', 'equalto', ana_taksit.id) | first %}
+        {% set kismi_odeme_var = taksitler | selectattr('orijinal_taksit_id', 'equalto', ana_taksit.id) | list %}
+        {% set kalan_taksit = kismi_odeme_var | first if kismi_odeme_var else None %}
+        {% set odenen_tutar = tahsilat.tutar if tahsilat else 0 %}
+        tahsilatData.push([
+          '{% if tahsilat and tahsilat.tarih %}{{ tahsilat.tarih | tarih_format }}{% else %}-{% endif %}',
+          '{% if ana_taksit.son_odeme_tarihi %}{{ ana_taksit.son_odeme_tarihi | tarih_format }}{% else %}-{% endif %}',
+          '{% if kismi_odeme_var %}{{ "₺{:.2f}".format(odenen_tutar) }} / {{ "₺{:.2f}".format(ana_taksit.tutar) }}{% else %}{{ "₺{:.2f}".format(ana_taksit.tutar) }}{% endif %}',
+          '{% if ana_taksit.odendi %}{% if kismi_odeme_var %}Kısmi Ödendi{% else %}Ödendi{% endif %}{% else %}Ödenmedi{% endif %}',
+          '{{ ana_taksit.hizmet_adi or "Satış Adı Yok" }} {% if ana_taksit.aciklama %}{{ ana_taksit.aciklama }}{% else %}{% if ana_taksit.sira == 0 %}Peşinat{% else %}{{ ana_taksit.sira }}. Taksit{% endif %}{% endif %}',
+          ''
+        ]);
+      {% endfor %}
+      
+      // Manuel tahsilatlar
+      {% for tahsilat in tahsilatlar if not tahsilat.taksit_id and not tahsilat.satis_id %}
+        tahsilatData.push([
+          '{{ tahsilat.tarih | tarih_format }}',
+          '-',
+          '{{ "₺{:.2f}".format(tahsilat.tutar) }}',
+          'Manuel Tahsilat',
+          'Manuel: {{ tahsilat.aciklama or "Manuel tahsilat" }} {% if tahsilat.odeme_sekli %}({{ tahsilat.odeme_sekli }}){% endif %}',
+          ''
+        ]);
+      {% endfor %}
+      
+      if (tahsilatData.length === 2) {
+        tahsilatData.push(['Kayıtlı tahsilat bulunamadı', '', '', '', '', '']);
+      }
+      
+      tahsilatData.push(['', '', '', '', '', '']);
+      
+      // Satış geçmişi
+      const satisData = [
+        ['Satış Geçmişi', '', '', '', '', '', '', ''],
+        ['Tarih', 'Ürün', 'Miktar', 'Fiyat', 'Açıklama', 'Toplam Seans', 'Kalan Seans', 'Ödeme Durumu']
+      ];
+      
+      {% for satis in satislar %}
+        satisData.push([
+          '{{ satis.tarih | tarih_format }}',
+          '{{ satis.hizmet_adi }}',
+          '{{ satis.miktar }}',
+          '{{ satis.fiyat }}',
+          '{{ satis.aciklama or "-" }}',
+          '{{ satis.toplam_seans }}',
+          '{{ satis.kalan_seans }}',
+          '{% if satis.odendi == 1 %}Ödendi{% else %}Ödenmedi{% endif %}'
+        ]);
+      {% endfor %}
+      
+      if (satisData.length === 2) {
+        satisData.push(['Kayıtlı satış bulunamadı', '', '', '', '', '', '', '']);
+      }
+      
+      // Tüm verileri birleştir
+      const allData = [...musteriData, ...randevuData, ...tahsilatData, ...satisData];
+      
+      // Excel sayfası oluştur ve verileri ekle
+      const ws = XLSX.utils.aoa_to_sheet(allData);
+      XLSX.utils.book_append_sheet(wb, ws, "Müşteri Dökümü");
+      
+      // Excel dosyasını indir
+      const fileName = '{{ musteri.ad }}_dokum.xlsx';
+      XLSX.writeFile(wb, fileName);
+    });
+  </script>
+</body>
+</html>
