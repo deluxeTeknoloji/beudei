@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Prim Raporu</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+</head>
+<body class="bg-light">
+    <header class="main-header text-center position-relative mb-4">
+        <h1 class="fw-bold mb-1"><i class="bi bi-cash-coin"></i> Prim Raporu</h1>
+        <p class="lead mb-0">Çalışan prim ödemeleri ve raporları</p>
+        {% if current_user.is_authenticated %}
+        <a href="{{ url_for('logout', next=request.path) }}" class="btn btn-outline-secondary position-absolute top-0 end-0 m-3">
+            <i class="bi bi-box-arrow-right"></i> Çıkış Yap
+        </a>
+        {% endif %}
+        <a href="{{ url_for('sadece_admin') }}" class="btn btn-outline-primary position-absolute top-0 start-0 m-3">
+            <i class="bi bi-arrow-left"></i> Yönetici Paneli
+        </a>
+    </header>
+    <div class="container">
+        <nav class="top-menu-bar d-flex flex-wrap gap-2 mb-4">
+            <a href="{{ url_for('index') }}" class="btn btn-outline-secondary"><i class="bi bi-house-door me-1"></i> Anasayfa</a>
+            <a href="{{ url_for('calisan_yonetimi') }}" class="btn btn-outline-primary"><i class="bi bi-person-badge"></i> Çalışan Yönetimi</a>
+            <a href="{{ url_for('prim_raporu') }}" class="btn btn-primary"><i class="bi bi-cash-coin"></i> Prim Raporu</a>
+            <a href="{{ url_for('raporlar') }}" class="btn btn-outline-info"><i class="bi bi-bar-chart-line"></i> Genel Raporlar</a>
+        </nav>
+
+        <!-- Filtre Formu -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-white">
+                <h5 class="mb-0"><i class="bi bi-funnel"></i> Prim Raporu Filtreleme</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" class="row g-3">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <div class="col-md-3">
+                        <label class="form-label">Başlangıç Tarihi</label>
+                        <input type="date" class="form-control" name="baslangic_tarihi" value="{{ baslangic_tarihi }}">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Bitiş Tarihi</label>
+                        <input type="date" class="form-control" name="bitis_tarihi" value="{{ bitis_tarihi }}">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Çalışan</label>
+                        <select class="form-select" name="calisan_id">
+                            <option value="">Tüm Çalışanlar</option>
+                            {% for calisan in calisanlar %}
+                                <option value="{{ calisan.id }}" {% if secili_calisan_id == calisan.id|string %}selected{% endif %}>{{ calisan.ad }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-2 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="bi bi-search"></i> Filtrele
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Çalışan Bazında Özet -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-white">
+                <h5 class="mb-0"><i class="bi bi-pie-chart"></i> Çalışan Bazında Prim Özeti</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Çalışan</th>
+                                <th>Toplam Prim</th>
+                                <th>Ödenen</th>
+                                <th>Bekleyen</th>
+                                <th>İşlemler</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for cp in calisan_primleri %}
+                            <tr>
+                                <td>{{ cp.ad }}</td>
+                                <td>{{ "%.2f"|format(cp.toplam_prim|float) }} ₺</td>
+                                <td>{{ "%.2f"|format(cp.odenen_prim|float) }} ₺</td>
+                                <td>{{ "%.2f"|format(cp.bekleyen_prim|float) }} ₺</td>
+                                <td>
+                                    <a href="{{ url_for('prim_raporu', calisan_id=cp.id) }}" class="btn btn-sm btn-outline-primary">
+                                        <i class="bi bi-eye"></i> Detay
+                                    </a>
+                                    {% if cp.bekleyen_prim > 0 %}
+                                    <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#topluOdemeModal{{ cp.id }}">
+                                        <i class="bi bi-cash"></i> Toplu Öde
+                                    </button>
+                                    <!-- Toplu Ödeme Modal -->
+                                    <div class="modal fade" id="topluOdemeModal{{ cp.id }}" tabindex="-1">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title">{{ cp.ad }} - Toplu Prim Ödemesi</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <p>{{ cp.ad }} için toplam <strong>{{ "%.2f"|format(cp.bekleyen_prim|float) }} ₺</strong> tutarında bekleyen prim ödemesi bulunmaktadır.</p>
+                                                    <p>Tüm bekleyen primleri ödemek istediğinize emin misiniz?</p>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                                                    <form action="{{ url_for('toplu_prim_ode', calisan_id=cp.id) }}" method="POST">
+                                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                        <button type="submit" class="btn btn-success">Toplu Ödeme Yap</button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="5" class="text-center">Prim kaydı bulunamadı.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Prim Detayları -->
+        <div class="card shadow-sm">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="bi bi-list-ul"></i> Prim Detayları</h5>
+                <span class="badge bg-primary">Toplam: {{ primler|length }} kayıt</span>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Tarih</th>
+                                <th>Çalışan</th>
+                                <th>Tutar</th>
+                                <th>Açıklama</th>
+                                <th>Durum</th>
+                                <th>İşlemler</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for prim in primler %}
+                            <tr>
+                                <td>{{ prim.tarih|tarih_format }}</td>
+                                <td>{{ prim.calisan_adi }}</td>
+                                <td>{{ "%.2f"|format(prim.tutar|float) }} ₺</td>
+                                <td>{{ prim.aciklama }}</td>
+                                <td>
+                                    {% if prim.odendi %}
+                                    <span class="badge bg-success">Ödendi</span>
+                                    {% else %}
+                                    <span class="badge bg-warning">Bekliyor</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if not prim.odendi %}
+                                    <form action="{{ url_for('prim_ode', prim_id=prim.id) }}" method="POST" class="d-inline">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <button type="submit" class="btn btn-sm btn-success">
+                                            <i class="bi bi-cash"></i> Öde
+                                        </button>
+                                    </form>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="6" class="text-center">Prim kaydı bulunamadı.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
