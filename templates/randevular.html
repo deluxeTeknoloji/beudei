@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Randevular - Kuaför Yönetim Sistemi</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <meta name="csrf-token" content="{{ csrf_token() }}">
+  <style>
+    :root {
+      --primary-color: #6f42c1;
+      --secondary-color: #b197fc;
+    }
+    
+    body {
+      background-color: #f8f9fa;
+    }
+    
+    .header-section {
+      background-color: var(--primary-color);
+      color: white;
+      padding: 1rem 0;
+      margin-bottom: 1rem;
+    }
+    
+    .bg-purple {
+      background-color: var(--primary-color);
+    }
+    
+    .nav-tabs .nav-link {
+      color: #495057;
+    }
+    
+    .nav-tabs .nav-link.active {
+      color: var(--primary-color);
+      font-weight: bold;
+    }
+    
+    .compact-menu .list-group-item {
+      padding: 0.5rem 0.75rem;
+    }
+    
+    .compact-menu .list-group-item i {
+      width: 20px;
+    }
+    
+    .table-container {
+      background-color: white;
+      border-radius: 0.5rem;
+      padding: 0.75rem;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      margin-bottom: 1rem;
+    }
+    
+    @media (max-width: 767.98px) {
+      .mobile-menu-container {
+        margin-bottom: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="header-section">
+    <div class="container">
+      <div class="d-flex justify-content-between align-items-center">
+        <h2 class="h4 mb-0"><i class="bi bi-scissors me-2"></i>Kuaför Yönetim</h2>
+        <div>
+          {% if current_user.is_authenticated %}
+            {% if current_user.rol == 'admin' %}
+              <a href="{{ url_for('sadece_admin') }}" class="btn btn-sm btn-outline-light me-1">
+                <i class="bi bi-gear"></i>
+              </a>
+            {% endif %}
+            <a href="{{ url_for('logout') }}" class="btn btn-sm btn-light">
+              <i class="bi bi-box-arrow-right"></i>
+            </a>
+          {% else %}
+            <a href="{{ url_for('login') }}" class="btn btn-sm btn-light">
+              <i class="bi bi-box-arrow-in-right"></i> Giriş
+            </a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="container">
+    <!-- Mobil Menü -->
+    <div class="d-md-none mobile-menu-container">
+      <ul class="nav nav-tabs nav-fill mb-3">
+        <li class="nav-item">
+          <a class="nav-link active" data-bs-toggle="tab" href="#menu-tab">Menü</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" data-bs-toggle="tab" href="#stats-tab">Özet</a>
+        </li>
+      </ul>
+      
+      <div class="tab-content">
+        <div class="tab-pane fade show active" id="menu-tab">
+          <div class="list-group compact-menu mb-3">
+            <a href="{{ url_for('index') }}" class="list-group-item list-group-item-action">
+              <i class="bi bi-house-door"></i> Anasayfa
+            </a>
+            <a href="{{ url_for('randevu_al') }}" class="list-group-item list-group-item-action">
+              <i class="bi bi-calendar-plus"></i> Randevu Al
+            </a>
+            <a href="{{ url_for('randevular') }}" class="list-group-item list-group-item-action active">
+              <i class="bi bi-list-ul"></i> Randevuları Gör
+            </a>
+            <a href="{{ url_for('musteri_kayit') }}" class="list-group-item list-group-item-action">
+              <i class="bi bi-person-plus"></i> Müşteri Ekle
+            </a>
+            <a href="{{ url_for('musteri_listesi') }}" class="list-group-item list-group-item-action">
+              <i class="bi bi-people"></i> Müşteriler
+            </a>
+            <a href="{{ url_for('gelir_gider_defteri') }}" class="list-group-item list-group-item-action">
+              <i class="bi bi-cash-stack"></i> Kasa Defteri
+            </a>
+            <a href="{{ url_for('stoklar') }}" class="list-group-item list-group-item-action">
+              <i class="bi bi-box-seam"></i> Stok
+            </a>
+            <a href="{{ url_for('dashboard') }}" class="list-group-item list-group-item-action">
+              <i class="bi bi-bar-chart"></i> Dashboard
+            </a>
+          </div>
+        </div>
+        <div class="tab-pane fade" id="stats-tab">
+          <div class="stats-container mb-3">
+            <h6 class="mb-2">Günlük Özet</h6>
+            <div class="stats-row">
+              <div class="stats-item">
+                <small class="stat-label">Bugün Bekleyen:</small>
+                <div class="stat-value">{{ bugun_bekleyen|default(0) }}</div>
+              </div>
+              <div class="stats-item">
+                <small class="stat-label">Bugün Gelen:</small>
+                <div class="stat-value">{{ bugun_gelen|default(0) }}</div>
+              </div>
+              <div class="stats-item">
+                <small class="stat-label">Günlük Gelir:</small>
+                <div class="stat-value">{{ gunluk_gelir|default(0) }} ₺</div>
+              </div>
+            </div>
+            <hr class="my-2">
+            <h6 class="mb-2">Bugünkü Hizmetler</h6>
+            {% for hizmet in bugun_hizmetler %}
+            <div class="d-flex justify-content-between mb-1">
+              <small class="stat-label">{{ hizmet.ad }}:</small>
+              <span class="stat-value">{{ hizmet.adet }}</span>
+            </div>
+            {% else %}
+            <div class="text-center text-muted">
+              <small>Bugün hizmet yok</small>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <!-- Masaüstü Sol Menü -->
+      <div class="col-md-3 d-none d-md-block">
+        <div class="list-group compact-menu mb-3">
+          <a href="{{ url_for('index') }}" class="list-group-item list-group-item-action">
+            <i class="bi bi-house-door"></i> Anasayfa
+          </a>
+          <a href="{{ url_for('randevu_al') }}" class="list-group-item list-group-item-action">
+            <i class="bi bi-calendar-plus"></i> Randevu Al
+          </a>
+          <a href="{{ url_for('randevular') }}" class="list-group-item list-group-item-action active">
+            <i class="bi bi-list-ul"></i> Randevuları Gör
+          </a>
+          <a href="{{ url_for('musteri_kayit') }}" class="list-group-item list-group-item-action">
+            <i class="bi bi-person-plus"></i> Müşteri Ekle
+          </a>
+          <a href="{{ url_for('musteri_listesi') }}" class="list-group-item list-group-item-action">
+            <i class="bi bi-people"></i> Müşteriler
+          </a>
+          <a href="{{ url_for('gelir_gider_defteri') }}" class="list-group-item list-group-item-action">
+            <i class="bi bi-cash-stack"></i> Kasa Defteri
+          </a>
+          <a href="{{ url_for('stoklar') }}" class="list-group-item list-group-item-action">
+            <i class="bi bi-box-seam"></i> Stok
+          </a>
+          <a href="{{ url_for('dashboard') }}" class="list-group-item list-group-item-action">
+            <i class="bi bi-bar-chart"></i> Dashboard
+          </a>
+        </div>
+
+        <!-- İstatistikler -->
+        <div class="stats-container">
+          <h6 class="mb-2">Günlük Özet</h6>
+          <div class="d-flex justify-content-between mb-1">
+            <small class="stat-label">Bugün Bekleyen:</small>
+            <span class="stat-value">{{ bugun_bekleyen|default(0) }}</span>
+          </div>
+          <div class="d-flex justify-content-between mb-1">
+            <small class="stat-label">Bugün Gelen:</small>
+            <span class="stat-value">{{ bugun_gelen|default(0) }}</span>
+          </div>
+
+          <hr class="my-2">
+          <h6 class="mb-2">Bugünkü Hizmetler</h6>
+          {% for hizmet in bugun_hizmetler %}
+          <div class="d-flex justify-content-between mb-1">
+            <small class="stat-label">{{ hizmet.ad }}:</small>
+            <span class="stat-value">{{ hizmet.adet }}</span>
+          </div>
+          {% else %}
+          <div class="text-center text-muted">
+            <small>Bugün hizmet yok</small>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+
+<!-- Randevu İçeriği -->
+      <div class="col-md-9">
+        <div class="card shadow-sm">
+          <div class="card-header bg-white">
+      <div class="d-flex justify-content-between align-items-center">
+        <h5 class="mb-0 text-primary"><i class="bi bi-calendar-check me-2"></i>Randevular</h5>
+        <a href="{{ url_for('randevu_al') }}" class="btn btn-light btn-sm">
+          <i class="bi bi-plus-circle me-1"></i>Yeni Randevu
+        </a>
+      </div>
+    </div>
+    <div class="card-body">
+
+      <!-- Arama ve Filtreleme -->
+      <div class="row mb-4">
+        <div class="col-12">
+          <div class="d-flex flex-column flex-md-row align-items-stretch justify-content-between gap-2 mb-3">
+            <div class="input-group">
+              <span class="input-group-text bg-light"><i class="bi bi-search"></i></span>
+              <input type="text" class="form-control" placeholder="Randevu Ara..." id="searchInput">
+            </div>
+            <div class="input-group">
+              <span class="input-group-text bg-light"><i class="bi bi-filter"></i></span>
+              <select class="form-select" id="statusFilter">
+                <option value="">Tüm Durumlar</option>
+                <option value="Bekleniyor">Bekleniyor</option>
+                <option value="Geldi">Geldi</option>
+                <option value="Gelmedi">Gelmedi</option>
+              </select>
+            </div>
+          </div>
+          
+          <div class="d-flex flex-column flex-md-row align-items-center gap-2">
+            <div class="input-group">
+              <span class="input-group-text bg-light">Başlangıç</span>
+              <input type="date" class="form-control" id="startDate">
+            </div>
+            <div class="input-group">
+              <span class="input-group-text bg-light">Bitiş</span>
+              <input type="date" class="form-control" id="endDate">
+            </div>
+            <button class="btn btn-primary" id="dateFilterBtn">Filtrele</button>
+            <button class="btn btn-outline-secondary" id="clearDateFilterBtn">Temizle</button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Randevu Listesi Tablosu -->
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="table-light">
+            <tr>
+              <th>Ad</th>
+              <th id="sortDateBtn" style="cursor: pointer;" title="Tarihe göre sırala">
+                <div class="d-flex align-items-center">
+                  Tarih <i class="bi bi-sort-down ms-1"></i>
+                </div>
+              </th>
+              <th>Saat</th>
+              <th>Hizmet</th>
+              <th>Durum</th>
+              <th>İşlemler</th>
+            </tr>
+          </thead>
+          <tbody id="randevuTableBody">
+            {% for randevu in randevular %}
+            <tr>
+              <td class="fw-bold">{{ randevu.ad }}</td>
+              <td>{{ randevu.tarih | tarih_format }}</td>
+              <td>{{ randevu.saat }}</td>
+              <td>{{ randevu.hizmet }}</td>
+              <td>
+                <select class="form-select form-select-sm status-select" data-randevu-id="{{ randevu.id }}" onchange="handleStatusChange(this)">
+                  <option value="Bekleniyor" {% if randevu.durum == 'Bekleniyor' %}selected{% endif %}>Bekleniyor</option>
+                  <option value="Geldi" {% if randevu.durum == 'Geldi' %}selected{% endif %}>Geldi</option>
+                  <option value="Gelmedi" {% if randevu.durum == 'Gelmedi' %}selected{% endif %}>Gelmedi</option>
+                </select>
+              </td>
+              <td>
+                <div class="d-flex gap-1 align-items-center justify-content-start flex-wrap">
+                  <a href="{{ url_for('randevu_duzenle', randevu_id=randevu.id) }}" class="btn btn-warning btn-sm"><i class="bi bi-pencil-square me-1"></i>Düzenle</a>
+                  <button class="btn btn-danger btn-sm btn-delete" data-bs-toggle="modal" data-bs-target="#silModal" data-randevu-id="{{ randevu.id }}"><i class="bi bi-trash-fill me-1"></i>Sil</button>
+                  {% if randevu.durum == 'Bekleniyor' %}
+                  <a href="{{ url_for('whatsapp_gonder_randevu', randevu_id=randevu.id) }}" class="btn btn-success btn-sm" title="WhatsApp'tan Bildir">
+                    <i class="bi bi-whatsapp"></i> WhatsApp
+                  </a>
+                  {% endif %}
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+    <!-- Çalışan Seçimi Modalı -->
+    <div class="modal fade" id="calisanSecModal" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Çalışan Seç</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form id="calisanSecForm">
+              <input type="hidden" id="modalRandevuId">
+              <div class="mb-3">
+                <label for="calisanSelect" class="form-label">Çalışan</label>
+                <select id="calisanSelect" class="form-select" required>
+                  <option value="">Çalışan Seçin</option>
+                  {% for calisan in calisanlar %}
+                  <option value="{{ calisan.id }}">{{ calisan.ad }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+            <button type="button" class="btn btn-primary" id="calisanSecKaydet">Kaydet</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Randevu Silme Modalı -->
+    <div class="modal fade" id="silModal" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <form method="POST" action="{{ url_for('randevu_sil') }}" id="silForm">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="randevu_id" id="silModalRandevuId">
+            <div class="modal-header">
+              <h5 class="modal-title">Randevuyu Sil</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <div class="mb-3">
+                <label class="form-label">Silme Sebebi:</label>
+                <textarea class="form-control" name="sebep" required></textarea>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+              <button type="submit" class="btn btn-danger">Sil</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="bg-dark text-white py-2 mt-3">
+    <div class="container text-center">
+      <small>&copy; {{ current_year|default(2024) }} Kuaför Yönetim Sistemi</small>
+    </div>
+  </footer>
+
+  <script>
+  // Silme butonuna tıklanınca ilgili randevu_id'yi modal inputuna aktar
+  document.querySelectorAll('.btn-delete').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var randevuId = this.getAttribute('data-randevu-id');
+      document.getElementById('silModalRandevuId').value = randevuId;
+    });
+  });
+
+// Arama ve filtreleme
+document.getElementById('searchInput').addEventListener('input', function() {
+  const searchValue = this.value.toLowerCase();
+  const rows = document.querySelectorAll('#randevuTableBody tr');
+  rows.forEach(row => {
+    const ad = row.children[0].textContent.toLowerCase();
+    row.style.display = ad.includes(searchValue) ? '' : 'none';
+  });
+});
+
+document.getElementById('statusFilter').addEventListener('change', function() {
+  const filterValue = this.value;
+  const rows = document.querySelectorAll('#randevuTableBody tr');
+  rows.forEach(row => {
+    const durum = row.querySelector('.status-select').value;
+    row.style.display = filterValue === '' || durum === filterValue ? '' : 'none';
+  });
+});
+
+document.getElementById('statusFilter').addEventListener('change', function() {
+  const filterValue = this.value;
+  const rows = document.querySelectorAll('#randevuTableBody tr');
+  rows.forEach(row => {
+    const durum = row.querySelector('.status-select').value;
+    row.style.display = filterValue === '' || durum === filterValue ? '' : 'none';
+  });
+});
+
+    
+    // Tarihe göre sıralama
+    let sortDirection = 'desc'; // Başlangıçta en yeni tarihler üstte
+    
+    document.getElementById('sortDateBtn').addEventListener('click', function() {
+      const rows = Array.from(document.querySelectorAll('#randevuTableBody tr'));
+      const tbody = document.getElementById('randevuTableBody');
+      
+      // Sıralama yönünü değiştir
+      sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
+      
+      // İkonu güncelle
+      const icon = this.querySelector('i');
+      icon.className = sortDirection === 'asc' ? 'bi bi-sort-up ms-1' : 'bi bi-sort-down ms-1';
+      
+      // Tarihleri sırala
+      rows.sort((a, b) => {
+        // Tarih formatı: DD.MM.YYYY
+        const dateTextA = a.children[1].textContent.trim();
+        const dateTextB = b.children[1].textContent.trim();
+        
+        // Tarih parçalarını ayır
+        const partsA = dateTextA.split('.');
+        const partsB = dateTextB.split('.');
+        
+        // Yıl-Ay-Gün formatına çevir
+        const dateA = partsA.length === 3 ? new Date(partsA[2], partsA[1]-1, partsA[0]) : new Date(0);
+        const dateB = partsB.length === 3 ? new Date(partsB[2], partsB[1]-1, partsB[0]) : new Date(0);
+        
+        return sortDirection === 'asc' 
+          ? dateA - dateB  // Eskiden yeniye
+          : dateB - dateA; // Yeniden eskiye
+      });
+      
+      // DOM'u güncelle
+      rows.forEach(row => tbody.appendChild(row));
+    });
+// Tarih aralığı filtreleme
+document.getElementById('dateFilterBtn').addEventListener('click', function() {
+  const startDateValue = document.getElementById('startDate').value;
+  const endDateValue = document.getElementById('endDate').value;
+  
+  if (!startDateValue && !endDateValue) {
+    alert('Lütfen en az bir tarih seçin');
+    return;
+  }
+  
+  const startDate = startDateValue ? new Date(startDateValue) : new Date(0);
+  const endDate = endDateValue ? new Date(endDateValue) : new Date('2099-12-31');
+  
+  const rows = document.querySelectorAll('#randevuTableBody tr');
+  rows.forEach(row => {
+    const dateText = row.children[1].textContent.trim();
+    const parts = dateText.split('.');
+    const rowDate = parts.length === 3 ? new Date(parts[2], parts[1]-1, parts[0]) : new Date(0);
+    const inRange = rowDate >= startDate && rowDate <= endDate;
+    row.style.display = inRange ? '' : 'none';
+  });
+});
+
+document.getElementById('clearDateFilterBtn').addEventListener('click', function() {
+  document.getElementById('startDate').value = '';
+  document.getElementById('endDate').value = '';
+  
+  const rows = document.querySelectorAll('#randevuTableBody tr');
+  rows.forEach(row => row.style.display = '');
+});
+    // Durum değişikliği
+    function handleStatusChange(selectElement) {
+      const randevuId = selectElement.getAttribute('data-randevu-id');
+      const yeniDurum = selectElement.value;
+
+      if (yeniDurum === "Geldi") {
+        // Çalışan seçimi modalını göster
+        document.getElementById('modalRandevuId').value = randevuId;
+        const calisanSecModal = new bootstrap.Modal(document.getElementById('calisanSecModal'));
+        calisanSecModal.show();
+      } else {
+        // Diğer durumlar için direkt güncelleme yap
+        guncelleDurum(randevuId, yeniDurum);
+      }
+    }
+
+    document.getElementById('calisanSecKaydet').addEventListener('click', function () {
+      const randevuId = document.getElementById('modalRandevuId').value;
+      const calisanId = document.getElementById('calisanSelect').value;
+
+      if (!calisanId) {
+        alert("Lütfen bir çalışan seçin.");
+        return;
+      }
+
+      // "Geldi" durumunu ve çalışan ID'sini gönder
+      guncelleDurum(randevuId, "Geldi", calisanId);
+
+      // Modalı kapat
+      const calisanSecModal = bootstrap.Modal.getInstance(document.getElementById('calisanSecModal'));
+      calisanSecModal.hide();
+    });
+
+    function guncelleDurum(randevuId, yeniDurum, calisanId = null) {
+      fetch(`/api/randevu_durum_guncelle/${randevuId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        },
+        body: JSON.stringify({ durum: yeniDurum, calisan_id: calisanId })
+      })
+      .then(response => {
+        if (response.ok) {
+          return response.json();
+        } else {
+          throw new Error('Durum güncellenemedi.');
+        }
+      })
+      .then(data => {
+        alert(data.message || 'Durum başarıyla güncellendi.');
+        location.reload(); // Sayfayı yenileyerek güncellenmiş verileri göster
+      })
+      .catch(error => {
+        alert('Bir hata oluştu: ' + error.message);
+      });
+    }
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
