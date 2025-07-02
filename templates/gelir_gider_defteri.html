@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kasa Defteri</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <meta name="csrf-token" content="{{ csrf_token() }}">
+</head>
+<body class="bg-light">
+  <header class="header-section text-center">
+    <div class="container">
+      <div class="d-flex justify-content-between align-items-center">
+        <h2 class="h4 mb-0"><i class="bi bi-scissors me-2"></i>Kuaför Yönetim</h2>
+        <div>
+          {% if current_user.is_authenticated %}
+            {% if current_user.rol == 'admin' %}
+              <a href="{{ url_for('sadece_admin') }}" class="btn btn-sm btn-outline-light me-1">
+                <i class="bi bi-gear"></i>
+              </a>
+            {% endif %}
+            <a href="{{ url_for('logout') }}" class="btn btn-sm btn-light">
+              <i class="bi bi-box-arrow-right"></i>
+            </a>
+          {% else %}
+            <a href="{{ url_for('login') }}" class="btn btn-sm btn-light">
+              <i class="bi bi-box-arrow-in-right"></i> Giriş
+            </a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="container">
+    <!-- Mobil Menü -->
+    <div class="d-md-none mobile-menu-container">
+      <ul class="nav nav-tabs nav-fill mb-3">
+        <li class="nav-item">
+          <a class="nav-link active" data-bs-toggle="tab" href="#menu-tab">Menü</a>
+        </li>
+      </ul>
+      
+      <div class="tab-content">
+        <div class="tab-pane fade show active" id="menu-tab">
+          <div class="list-group compact-menu mb-3">
+            <a href="{{ url_for('index') }}" class="list-group-item list-group-item-action">
+              <i class="bi bi-house-door"></i> Anasayfa
+            </a>
+            <a href="{{ url_for('randevu_al') }}" class="list-group-item list-group-item-action">
+              <i class="bi bi-calendar-plus"></i> Randevu Al
+            </a>
+            <a href="{{ url_for('randevular') }}" class="list-group-item list-group-item-action">
+              <i class="bi bi-list-ul"></i> Randevuları Gör
+            </a>
+            <a href="{{ url_for('musteri_kayit') }}" class="list-group-item list-group-item-action">
+              <i class="bi bi-person-plus"></i> Müşteri Ekle
+            </a>
+            <a href="{{ url_for('musteri_listesi') }}" class="list-group-item list-group-item-action">
+              <i class="bi bi-people"></i> Müşteriler
+            </a>
+            <a href="{{ url_for('gelir_gider_defteri') }}" class="list-group-item list-group-item-action active">
+              <i class="bi bi-cash-stack"></i> Kasa Defteri
+            </a>
+            <a href="{{ url_for('stoklar') }}" class="list-group-item list-group-item-action">
+              <i class="bi bi-box-seam"></i> Stok
+            </a>
+            <a href="{{ url_for('dashboard') }}" class="list-group-item list-group-item-action">
+              <i class="bi bi-bar-chart"></i> Dashboard
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <!-- Masaüstü Sol Menü -->
+      <div class="col-md-3 d-none d-md-block">
+        <div class="list-group compact-menu mb-3">
+          <a href="{{ url_for('index') }}" class="list-group-item list-group-item-action">
+            <i class="bi bi-house-door"></i> Anasayfa
+          </a>
+          <a href="{{ url_for('randevu_al') }}" class="list-group-item list-group-item-action">
+            <i class="bi bi-calendar-plus"></i> Randevu Al
+          </a>
+          <a href="{{ url_for('randevular') }}" class="list-group-item list-group-item-action">
+            <i class="bi bi-list-ul"></i> Randevuları Gör
+          </a>
+          <a href="{{ url_for('musteri_kayit') }}" class="list-group-item list-group-item-action">
+            <i class="bi bi-person-plus"></i> Müşteri Ekle
+          </a>
+          <a href="{{ url_for('musteri_listesi') }}" class="list-group-item list-group-item-action">
+            <i class="bi bi-people"></i> Müşteriler
+          </a>
+          <a href="{{ url_for('gelir_gider_defteri') }}" class="list-group-item list-group-item-action active">
+            <i class="bi bi-cash-stack"></i> Kasa Defteri
+          </a>
+          <a href="{{ url_for('stoklar') }}" class="list-group-item list-group-item-action">
+            <i class="bi bi-box-seam"></i> Stok
+          </a>
+          <a href="{{ url_for('dashboard') }}" class="list-group-item list-group-item-action">
+            <i class="bi bi-bar-chart"></i> Dashboard
+          </a>
+        </div>
+      </div>
+
+      <!-- Ana İçerik -->
+      <div class="col-md-9">
+        <div class="card shadow-sm">
+          <div class="card-header bg-white d-flex justify-content-between align-items-center">
+            <h5 class="mb-0 text-primary"><i class="bi bi-cash-stack me-2"></i>Kasa Defteri</h5>
+            <div>
+              <button id="exportExcel" class="btn btn-sm btn-outline-success me-2">
+                <i class="bi bi-file-earmark-excel me-1"></i> Excel'e Aktar
+              </button>
+              <a href="{{ url_for('gelir_gider_ekle') }}" class="btn btn-success">
+                <i class="bi bi-plus-circle me-1"></i> Kayıt Ekle
+              </a>
+            </div>
+          </div>
+          <div class="card-body">
+            <!-- Özet Bilgiler -->
+            <div class="row mb-4">
+              <div class="col-md-4">
+                <div class="card bg-purple text-purple">
+                  <div class="toplam-gelir text-white">
+                    <h5 class="card-title">Toplam Gelir</h5>
+                    <p class="card-text fs-4">{{ toplam_gelir }} TL</p>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="card bg-danger text-purple">
+                  <div class="toplam-gider text-white">
+                    <h5 class="card-title">Toplam Gider</h5>
+                    <p class="card-text fs-4">{{ toplam_gider }} TL</p>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="card bg-primary text-purple">
+                  <div class="net-bakiye text-white">
+                    <h5 class="card-title">Net Bakiye</h5>
+                    <p class="card-text fs-4">{{ net_bakiye }} TL</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Filtreleme Formu -->
+            <form method="POST" class="row g-3 mb-4">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <div class="col-md-4">
+                <label for="tarih_baslangic" class="form-label">Başlangıç Tarihi</label>
+                <input type="date" id="tarih_baslangic" name="tarih_baslangic" class="form-control" value="{{ tarih_baslangic }}">
+              </div>
+              <div class="col-md-4">
+                <label for="tarih_bitis" class="form-label">Bitiş Tarihi</label>
+                <input type="date" id="tarih_bitis" name="tarih_bitis" class="form-control" value="{{ tarih_bitis }}">
+              </div>
+              <div class="col-md-4">
+                <label for="tur" class="form-label">Tür</label>
+                <select id="tur" name="tur" class="form-select">
+                  <option value="" {% if not tur_filtre %}selected{% endif %}>Tümü</option>
+                  <option value="Gelir" {% if tur_filtre == 'Gelir' %}selected{% endif %}>Gelir</option>
+                  <option value="Gider" {% if tur_filtre == 'Gider' %}selected{% endif %}>Gider</option>
+                </select>
+              </div>
+              <div class="col-12 text-end">
+                <button type="submit" class="btn btn-primary">Filtrele</button>
+              </div>
+            </form>
+
+            <!-- Gelir/Gider Tablosu -->
+            <div class="table-responsive">
+              <table class="table table-striped table-bordered">
+                <thead class="table-header">
+                  <tr>
+                    <th>Tarih</th>
+                    <th>Tür</th>
+                    <th>Tutar</th>
+                    <th>Ödeme Şekli</th>
+                    <th>Açıklama</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for transaction in transactions %}
+                  <tr>
+                    <td class="text-nowrap">{{ transaction['tarih']|tarih_format }}</td>
+                    <td>{{ transaction['tur'] }}</td>
+                    <td>{{ transaction['tutar'] }} TL</td>
+                    <td>{{ transaction['odeme_sekli'] }}</td>
+                    <td>{% if transaction['musteri_id'] and transaction['musteri_adi'] %}{{ transaction['musteri_adi'] }} - {% endif %}{{ transaction['aciklama'] }}</td>
+
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="bg-dark text-white py-2 mt-3">
+    <div class="container text-center">
+      <small>&copy; {{ current_year|default(2024) }} Kuaför Yönetim Sistemi</small>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script>
+    document.getElementById('exportExcel').addEventListener('click', function() {
+      // Tabloyu seç
+      const table = document.querySelector('table');
+      
+      // Başlık satırını al
+      const headers = [];
+      table.querySelectorAll('thead th').forEach(th => {
+        headers.push(th.textContent.trim());
+      });
+      
+      // Veri satırlarını al
+      const rows = [];
+      table.querySelectorAll('tbody tr').forEach(tr => {
+        const row = [];
+        tr.querySelectorAll('td').forEach(td => {
+          row.push(td.textContent.trim());
+        });
+        rows.push(row);
+      });
+      
+      // Tüm verileri birleştir
+      const data = [headers, ...rows];
+      
+      // Excel dosyası oluştur
+      const ws = XLSX.utils.aoa_to_sheet(data);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Kasa_Defteri");
+      
+      // Dosyayı indir
+      const fileName = `Kasa_Defteri_${new Date().toISOString().slice(0,10)}.xlsx`;
+      XLSX.writeFile(wb, fileName);
+    });
+  </script>
+</body>
+</html>
