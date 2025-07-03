@@ -11,6 +11,7 @@
 
     <!-- Hizmet Ekleme Formu -->
     <form class="row g-3 mb-4" method="post" action="{{ url_for('hizmet_ekle') }}">
+        {{ csrf_token() }}
         <div class="col-md-6">
             <input type="text" name="hizmet_adi" class="form-control" placeholder="Hizmet Adı" required>
         </div>
@@ -38,6 +39,7 @@
             {% for h in hizmetler %}
             <tr>
                 <form method="post" action="{{ url_for('hizmet_guncelle', id=h.id) }}">
+                    {{ csrf_token() }}
                     <td>
                         <input type="text" name="hizmet_adi" class="form-control" value="{{ h.hizmet_adi }}" required>
                     </td>
@@ -51,6 +53,7 @@
                         <button type="submit" class="btn btn-primary btn-sm">Güncelle</button>
                 </form>
                 <form method="post" action="{{ url_for('hizmet_sil', id=h.id) }}" onsubmit="return confirm('Silmek istediğinize emin misiniz?');">
+                    {{ csrf_token() }}
                     <button type="submit" class="btn btn-danger btn-sm">Sil</button>
                 </form>
                     </td>
@@ -60,4 +63,3 @@
     </table>
 </div>
 </body>
-</html>
