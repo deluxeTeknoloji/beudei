@@ -18,6 +18,9 @@
             <input type="number" name="seans" class="form-control" placeholder="Seans" min="1" value="1" required>
         </div>
         <div class="col-md-3">
+            <input type="number" name="fiyat" class="form-control" placeholder="Fiyat" min="0" step="0.01" required>
+        </div>
+        <div class="col-md-3">
             <button type="submit" class="btn btn-success w-100">Ekle</button>
         </div>
     </form>
@@ -27,6 +30,7 @@
             <tr>
                 <th>Hizmet Adı</th>
                 <th>Seans</th>
+                <th>Fiyat</th>
                 <th>İşlemler</th>
             </tr>
         </thead>
@@ -39,6 +43,9 @@
                     </td>
                     <td>
                         <input type="number" name="seans" class="form-control" value="{{ h.seans }}" min="1" required>
+                    </td>
+                    <td>
+                        <input type="number" name="fiyat" class="form-control" value="{{ h.fiyat }}" min="0" step="0.01" required>
                     </td>
                     <td class="d-flex gap-2">
                         <button type="submit" class="btn btn-primary btn-sm">Güncelle</button>
