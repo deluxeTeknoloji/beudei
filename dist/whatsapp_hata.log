@@ -1,0 +1,63 @@
+Traceback (most recent call last):
+  File "whatsapp_gonder.py", line 26, in whatsapp_mesaj_gonder
+  File "selenium\webdriver\support\wait.py", line 146, in until
+selenium.common.exceptions.TimeoutException: Message: 
+Stacktrace:
+	GetHandleVerifier [0x0xd44553+62419]
+	GetHandleVerifier [0x0xd44594+62484]
+	(No symbol) [0x0xb82133]
+	(No symbol) [0x0xbca8fe]
+	(No symbol) [0x0xbcac9b]
+	(No symbol) [0x0xc13052]
+	(No symbol) [0x0xbef4b4]
+	(No symbol) [0x0xc1087a]
+	(No symbol) [0x0xbef266]
+	(No symbol) [0x0xbbe852]
+	(No symbol) [0x0xbbf6f4]
+	GetHandleVerifier [0x0xfb4833+2619059]
+	GetHandleVerifier [0x0xfafc4a+2599626]
+	GetHandleVerifier [0x0xd6b0fa+221050]
+	GetHandleVerifier [0x0xd5b378+156152]
+	GetHandleVerifier [0x0xd61d2d+183213]
+	GetHandleVerifier [0x0xd4c438+94904]
+	GetHandleVerifier [0x0xd4c5c2+95298]
+	GetHandleVerifier [0x0xd3771a+9626]
+	BaseThreadInitThunk [0x0x74fd5d49+25]
+	RtlInitializeExceptionChain [0x0x7755d09b+107]
+	RtlGetAppContainerNamedObjectPath [0x0x7755d021+561]
+
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "whatsapp_gonder.py", line 31, in whatsapp_mesaj_gonder
+  File "selenium\webdriver\support\wait.py", line 137, in until
+  File "selenium\webdriver\support\expected_conditions.py", line 110, in _predicate
+  File "selenium\webdriver\remote\webdriver.py", line 917, in find_element
+  File "selenium\webdriver\remote\webdriver.py", line 448, in execute
+  File "selenium\webdriver\remote\errorhandler.py", line 232, in check_response
+selenium.common.exceptions.NoSuchWindowException: Message: no such window: target window already closed
+from unknown error: web view not found
+  (Session info: chrome=138.0.7204.97)
+Stacktrace:
+	GetHandleVerifier [0x0xd44553+62419]
+	GetHandleVerifier [0x0xd44594+62484]
+	(No symbol) [0x0xb82133]
+	(No symbol) [0x0xb60fd9]
+	(No symbol) [0x0xbf5b9e]
+	(No symbol) [0x0xc10159]
+	(No symbol) [0x0xbef266]
+	(No symbol) [0x0xbbe852]
+	(No symbol) [0x0xbbf6f4]
+	GetHandleVerifier [0x0xfb4833+2619059]
+	GetHandleVerifier [0x0xfafc4a+2599626]
+	GetHandleVerifier [0x0xd6b0fa+221050]
+	GetHandleVerifier [0x0xd5b378+156152]
+	GetHandleVerifier [0x0xd61d2d+183213]
+	GetHandleVerifier [0x0xd4c438+94904]
+	GetHandleVerifier [0x0xd4c5c2+95298]
+	GetHandleVerifier [0x0xd3771a+9626]
+	BaseThreadInitThunk [0x0x74fd5d49+25]
+	RtlInitializeExceptionChain [0x0x7755d09b+107]
+	RtlGetAppContainerNamedObjectPath [0x0x7755d021+561]
+
