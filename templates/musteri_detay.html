@@ -639,11 +639,18 @@ if (tahsilatForm) {
 </div>
 
 <script>
-
 document.addEventListener('DOMContentLoaded', function() {
   // Manuel Tahsilat Ekle butonu için login kontrolü
   var btn = document.getElementById('manuelTahsilatEkleBtn');
   if (btn) {
+    btn.addEventListener('mousedown', function(e) {
+      if (!isAuthenticated) {
+        btn.removeAttribute('data-bs-toggle');
+        btn.removeAttribute('data-bs-target');
+        btn.removeAttribute('aria-expanded');
+        btn.removeAttribute('aria-controls');
+      }
+    });
     btn.addEventListener('click', function(e) {
       if (!isAuthenticated) {
         e.preventDefault();
@@ -662,10 +669,30 @@ document.addEventListener('DOMContentLoaded', function() {
         alert("Dökümü indirebilmek için giriş yapmalısınız!");
         return false;
       }
-    }, true); // true: önce bu çalışsın, Excel işlemi tetiklenmesin
+    }, true);
+  }
+
+  // Satış Yap butonu için login kontrolü
+  var satisBtn = document.querySelector('button[data-bs-target="#satisYapForm"]');
+  if (satisBtn) {
+    satisBtn.addEventListener('mousedown', function(e) {
+      if (!isAuthenticated) {
+        satisBtn.removeAttribute('data-bs-toggle');
+        satisBtn.removeAttribute('data-bs-target');
+        satisBtn.removeAttribute('aria-expanded');
+        satisBtn.removeAttribute('aria-controls');
+      }
+    });
+    satisBtn.addEventListener('click', function(e) {
+      if (!isAuthenticated) {
+        e.preventDefault();
+        alert("Satış yapabilmek için giriş yapmalısınız!");
+        return false;
+      }
+    });
   }
 });
-  
+
 document.addEventListener('DOMContentLoaded', function() {
   var modal = document.getElementById('taksitTahsilatModal');
   var tahsilatForm = document.getElementById('taksitTahsilatForm');

@@ -1022,6 +1022,8 @@ def whatsapp_gonder_randevu(randevu_id):
         flash(f"Mesaj gönderilemedi: {str(e)}", "danger")
     return redirect(url_for('randevular'))
 
+
+
 @app.route('/randevular')
 def randevular():
     # Bugünün tarihini al
@@ -2017,9 +2019,10 @@ def online_randevu():
                 return render_template('online_randevu.html', hizmetler=hizmetler, current_year=datetime.now().year)
 
             with closing(get_db_connection()) as conn:
-                hizmet_row = conn.execute('SELECT hizmet_adi, seans FROM hizmetler WHERE id = ?', (hizmet_id,)).fetchone()
+                hizmet_row = conn.execute('SELECT hizmet_adi, seans, fiyat FROM hizmetler WHERE id = ?', (hizmet_id,)).fetchone()
                 hizmet_adi = hizmet_row['hizmet_adi'] if hizmet_row else ''
                 seans = hizmet_row['seans'] if hizmet_row else 1
+                fiyat = hizmet_row['fiyat'] if hizmet_row and 'fiyat' in hizmet_row.keys() else 0
                 hizmet_adi_online = hizmet_adi + " (online)"
 
                 var_mi = conn.execute(
@@ -2047,25 +2050,35 @@ def online_randevu():
                 )
 
                 # Satış kaydı (otomatik)
-                # Hizmet bilgisi ve fiyatını çek
-                hizmet_row = conn.execute('SELECT hizmet_adi, seans, fiyat FROM hizmetler WHERE id = ?', (hizmet_id,)).fetchone()
-                fiyat = hizmet_row['fiyat'] if hizmet_row else 0
-
-                # Satış kaydında gerçek fiyatı kullan
                 conn.execute(
                     '''INSERT INTO satislar (musteri_id, urun_id, miktar, fiyat, aciklama, tarih, toplam_seans, kalan_seans)
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?)''',
                     (musteri_id, hizmet_id, 1, fiyat, 'Online randevu ile otomatik satış', tarih, seans, seans)
                 )
-                
-                # Müşteri bakiyesini güncelle
-                if fiyat > 0:
-                    conn.execute('UPDATE müşteriler SET bakiye = bakiye - ? WHERE id = ?', (fiyat, musteri_id))
 
+                # >>> Müşteri bakiyesini güncelle (borçlandır) <<<
+                conn.execute(
+                    'UPDATE müşteriler SET bakiye = bakiye - ? WHERE id = ?', (fiyat, musteri_id)
+                )
 
                 conn.commit()
 
-            flash("Randevunuz başarıyla oluşturuldu!", "success")
+            # WhatsApp mesajı gönder
+            tel = ''.join(filter(str.isdigit, telefon))
+            if len(tel) == 10:
+                tel = '90' + tel
+            elif len(tel) == 11 and tel.startswith('0'):
+                tel = '9' + tel
+
+            mesaj = f"Sayın {ad}, {tarih} {saat} tarihinde randevunuz başarıyla oluşturuldu. Teşekkürler!"
+
+            try:
+                whatsapp_mesaj_gonder(tel, mesaj)
+            except Exception as e:
+                logger.error(f"WhatsApp mesajı gönderilemedi: {e}")
+                flash("WhatsApp mesajı gönderilemedi, lütfen yöneticinize başvurun.", "warning")
+
+            flash("Randevunuz başarıyla oluşturuldu ve WhatsApp bilgilendirme mesajı gönderildi.", "success")
             return redirect(url_for('online_randevu'))
 
         return render_template('online_randevu.html', hizmetler=hizmetler, current_year=datetime.now().year)
@@ -2073,7 +2086,6 @@ def online_randevu():
         logger.error(f"Online randevu hatası: {str(e)}")
         flash(f"Hata oluştu: {str(e)}", "danger")
         return render_template('online_randevu.html', hizmetler=[], current_year=datetime.now().year)
-
 @app.route('/dolu_saatler')
 def dolu_saatler():
     tarih = request.args.get('tarih')
@@ -2086,5 +2098,5 @@ def dolu_saatler():
 
 if __name__ == '__main__':
     init_db()
-    update_payment_status()  # Uygulama başlatıldığında ödeme durumlarını güncelle
-    app.run(debug=True)
+    update_payment_status()
+    app.run(host="0.0.0.0", port=5000, debug=True)
