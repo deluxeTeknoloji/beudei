@@ -301,6 +301,7 @@ def index():
 
 # Müşteri Yönetimi
 @app.route('/musteri_kayit', methods=['GET', 'POST'])
+@login_required
 def musteri_kayit():
     with closing(get_db_connection()) as conn:
         mevcut_musteriler = conn.execute('SELECT id, ad FROM müşteriler ORDER BY ad').fetchall()
@@ -758,6 +759,7 @@ def hizmet_satis(musteri_id):
 
 
 @app.route('/randevu_al', methods=['GET', 'POST'])
+@login_required
 def randevu_al():
     try:
         with closing(get_db_connection()) as conn:
@@ -1021,7 +1023,6 @@ def whatsapp_gonder_randevu(randevu_id):
     return redirect(url_for('randevular'))
 
 @app.route('/randevular')
-@login_required
 def randevular():
     # Bugünün tarihini al
     bugun = datetime.now().strftime('%Y-%m-%d')
@@ -1546,6 +1547,7 @@ def satis_yap(musteri_id):
 
 
 @app.route('/dashboard')
+@login_required
 def dashboard():
     try:
         with closing(get_db_connection()) as conn:

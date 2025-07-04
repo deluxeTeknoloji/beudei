@@ -9,6 +9,9 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='modern-styles.css') }}">
   <meta name="csrf-token" content="{{ csrf_token() }}">
+  <script>
+    const isAuthenticated = {{ 'true' if current_user.is_authenticated else 'false' }};
+  </script>
 </head>
 <body class="bg-light">
   <header class="header-section text-center">
@@ -232,30 +235,34 @@
                         </span>
                       {% endif %}
                     </td>
-                    <td class="text-center">
-                      <div class="btn-group action-buttons" role="group">
-                        <a href="{{ url_for('musteri_detay', musteri_id=musteri.id) }}" class="btn btn-sm btn-outline-primary action-btn" title="Detay">
-                          <i class="bi bi-eye-fill"></i>
-                        </a>
-                        <a href="{{ url_for('randevu_al', musteri_id=musteri.id) }}" class="btn btn-sm btn-outline-success action-btn" title="Randevu">
-                          <i class="bi bi-calendar-plus-fill"></i>
-                        </a>
-                        <a href="{{ url_for('musteri_duzenle', musteri_id=musteri.id) }}" class="btn btn-sm btn-outline-warning action-btn" title="Düzenle">
-                          <i class="bi bi-pencil-fill"></i>
-                        </a>
-                        <button type="button" class="btn btn-sm btn-outline-danger action-btn" onclick="silOnay({{ musteri.id }}, '{{ musteri.ad }}')" title="Sil">
-                          <i class="bi bi-trash-fill"></i>
-                        </button>
-                      </div>
-                      <form id="silForm{{ musteri.id }}" method="POST" action="{{ url_for('musteri_sil', musteri_id=musteri.id) }}" style="display:none;">
-                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                      </form>
-                    </td>
-                  </tr>
-                  {% endfor %}
-                </tbody>
-              </table>
-            </div>
+
+                    
+                      <td class="text-center">
+  <div class="btn-group action-buttons" role="group">
+    <a href="{{ url_for('musteri_detay', musteri_id=musteri.id) }}" class="btn btn-sm btn-outline-primary action-btn" title="Detay">
+      <i class="bi bi-eye-fill"></i>
+    </a>
+    <a href="{{ url_for('randevu_al', musteri_id=musteri.id) }}" class="btn btn-sm btn-outline-success action-btn" title="Randevu">
+      <i class="bi bi-calendar-plus-fill"></i>
+    </a>
+    <a href="#" onclick="duzenleOnay({{ musteri.id }})" class="btn btn-sm btn-outline-warning action-btn" title="Düzenle">
+      <i class="bi bi-pencil-fill"></i>
+    </a>
+    <button type="button" class="btn btn-sm btn-outline-danger action-btn" onclick="silOnay({{ musteri.id }}, '{{ musteri.ad }}')" title="Sil">
+      <i class="bi bi-trash-fill"></i>
+    </button>
+  </div>
+  <form id="silForm{{ musteri.id }}" method="POST" action="{{ url_for('musteri_sil', musteri_id=musteri.id) }}" style="display:none;">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  </form>
+</td>
+
+
+
+                    
+                        </tr>
+                        {% endfor %}
+                      </tbody>
             
             <!-- Sonuç Bulunamadı -->
             <div id="sonucYok" class="alert alert-info text-center my-5" style="display: none;" role="alert">
@@ -362,6 +369,10 @@
     
     // Excel'e aktarma fonksiyonu
     document.getElementById('exportExcel').addEventListener('click', function() {
+      if (!isAuthenticated) {
+        alert("Excel'e aktarabilmek için giriş yapmalısınız!");
+      return;
+      }
       // Görünür müşterileri al (filtrelenmiş olabilir)
       const visibleRows = Array.from(document.querySelectorAll('.musteri-item')).filter(row => row.style.display !== 'none');
       
@@ -407,6 +418,24 @@
       // Excel dosyasını indir
       XLSX.writeFile(wb, 'musteri_listesi.xlsx');
     });
+
+    function silOnay(id, ad) {
+  if (!isAuthenticated) {
+    alert("Bu işlemi yapabilmek için giriş yapmalısınız!");
+    return;
+  }
+  if (confirm(ad + ' isimli müşteriyi silmek istediğinize emin misiniz?')) {
+    document.getElementById('silForm' + id).submit();
+  }
+}
+
+function duzenleOnay(id) {
+  if (!isAuthenticated) {
+    alert("Bu işlemi yapabilmek için giriş yapmalısınız!");
+    return;
+  }
+  window.location.href = "/musteri_duzenle/" + id;
+}
   </script>
 </body>
 </html>
