@@ -132,9 +132,70 @@ def init_db():
                 CREATE TABLE IF NOT EXISTS hizmetler (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     hizmet_adi TEXT NOT NULL UNIQUE,
-                    seans INTEGER NOT NULL DEFAULT 1
+                    seans INTEGER NOT NULL DEFAULT 1,
+                    fiyat REAL DEFAULT 0
                 )
             ''')
+            
+            # Hizmet-Çalışan İlişki Tablosu
+            conn.execute('''
+                CREATE TABLE IF NOT EXISTS calisan_hizmet (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    calisan_id INTEGER NOT NULL,
+                    hizmet_id INTEGER NOT NULL,
+                    FOREIGN KEY (calisan_id) REFERENCES çalışanlar(id),
+                    FOREIGN KEY (hizmet_id) REFERENCES hizmetler(id),
+                    UNIQUE(calisan_id, hizmet_id)
+                )
+            ''')
+            
+            # Mevcut hizmetler tablosuna calisan_id ve fiyat sütunlarını ekle (eğer yoksa)
+            try:
+                conn.execute("SELECT calisan_id FROM hizmetler LIMIT 1")
+            except sqlite3.OperationalError:
+                conn.execute("ALTER TABLE hizmetler ADD COLUMN calisan_id INTEGER REFERENCES çalışanlar(id)")
+                
+            try:
+                conn.execute("SELECT fiyat FROM hizmetler LIMIT 1")
+            except sqlite3.OperationalError:
+                conn.execute("ALTER TABLE hizmetler ADD COLUMN fiyat REAL DEFAULT 0")
+                
+            conn.commit()
+            # Çalışan-Hizmet İlişki Tablosu
+            conn.execute('''
+                CREATE TABLE IF NOT EXISTS calisan_hizmet (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    calisan_id INTEGER NOT NULL,
+                    hizmet_id INTEGER NOT NULL,
+                    FOREIGN KEY (calisan_id) REFERENCES çalışanlar(id),
+                    FOREIGN KEY (hizmet_id) REFERENCES hizmetler(id),
+                    UNIQUE(calisan_id, hizmet_id)
+                )
+            ''')
+            
+            # Eski hizmet_calisan tablosundan verileri yeni calisan_hizmet tablosuna aktar
+            try:
+                # Önce eski tablonun var olup olmadığını kontrol et
+                old_table_exists = conn.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='hizmet_calisan'").fetchone()
+                if old_table_exists:
+                    # Eski tablodan verileri al
+                    old_data = conn.execute("SELECT hizmet_id, calisan_id FROM hizmet_calisan").fetchall()
+                    
+                    # Yeni tabloya aktar
+                    for row in old_data:
+                        try:
+                            conn.execute(
+                                "INSERT OR IGNORE INTO calisan_hizmet (calisan_id, hizmet_id) VALUES (?, ?)",
+                                (row['calisan_id'], row['hizmet_id'])
+                            )
+                        except Exception as e:
+                            logger.error(f"Veri aktarım hatası: {str(e)}")
+                    
+                    # Eski tabloyu sil
+                    conn.execute("DROP TABLE IF EXISTS hizmet_calisan")
+                    logger.info("Eski hizmet_calisan tablosu silindi ve veriler aktarıldı.")
+            except Exception as e:
+                logger.error(f"Tablo kontrolü veya veri aktarımı sırasında hata: {str(e)}")
             # Randevular Tablosu
             conn.execute('''
                 CREATE TABLE IF NOT EXISTS randevular (
@@ -553,6 +614,29 @@ def hizmet_bilgisi(hizmet_adi):
         app.logger.error(f"API hatası: {e}")
         return jsonify({'seans': 1}), 500
 
+@app.route('/api/hizmet_calisanlar/<int:hizmet_id>')
+def hizmet_calisanlar(hizmet_id):
+    try:
+        with closing(get_db_connection()) as conn:
+            # Belirli bir hizmeti verebilen çalışanları getir
+            calisanlar = conn.execute('''
+                SELECT c.id, c.ad
+                FROM çalışanlar c
+                JOIN calisan_hizmet ch ON c.id = ch.calisan_id
+                WHERE ch.hizmet_id = ?
+                ORDER BY c.ad
+            ''', (hizmet_id,)).fetchall()
+            
+            # Sonuçları JSON formatına dönüştür
+            result = {
+                'calisanlar': [{'id': c['id'], 'ad': c['ad']} for c in calisanlar]
+            }
+            
+            return jsonify(result)
+    except Exception as e:
+        logger.error(f"Hizmet çalışanları API hatası: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
 from flask import request, redirect, url_for, flash
 from contextlib import closing
 
@@ -564,16 +648,28 @@ def hizmet_ekle():
         return redirect(url_for('hizmet_tanimlari'))
     hizmet_adi = request.form.get('hizmet_adi', '').strip()
     seans = request.form.get('seans', 1, type=int)
+    fiyat = request.form.get('fiyat', 0, type=float)
+    calisan_ids = request.form.getlist('calisan_ids')
+    
     if not hizmet_adi or seans < 1:
         flash('Hizmet adı ve seans zorunludur.', 'danger')
         return redirect(url_for('hizmet_tanimlari'))
     try:
         with closing(get_db_connection()) as conn:
             with conn:
+                # Önce hizmeti ekle
+                # Çalışan ID'lerini virgülle ayrılmış string olarak birleştir
+                calisan_id_str = ','.join(calisan_ids) if calisan_ids else ''
+                
                 conn.execute(
-                    "INSERT INTO hizmetler (hizmet_adi, seans) VALUES (?, ?)",
-                    (hizmet_adi, seans)
+                    "INSERT INTO hizmetler (hizmet_adi, seans, fiyat, calisan_id) VALUES (?, ?, ?, ?)",
+                    (hizmet_adi, seans, fiyat, calisan_id_str)
                 )
+                
+                # Eklenen hizmetin ID'sini al
+                hizmet_id = conn.execute("SELECT last_insert_rowid()").fetchone()[0]
+                
+                # Çalışan ilişkileri artık calisan_id sütununda virgülle ayrılmış olarak tutuluyor
         flash('Hizmet eklendi.', 'success')
     except Exception as e:
         flash(f'Hata: {str(e)}', 'danger')
@@ -587,16 +683,25 @@ def hizmet_guncelle(id):
         return redirect(url_for('hizmet_tanimlari'))
     hizmet_adi = request.form.get('hizmet_adi', '').strip()
     seans = request.form.get('seans', 1, type=int)
+    fiyat = request.form.get('fiyat', 0, type=float)
+    calisan_ids = request.form.getlist('calisan_ids')
+    
     if not hizmet_adi or seans < 1:
         flash('Hizmet adı ve seans zorunludur.', 'danger')
         return redirect(url_for('hizmet_tanimlari'))
     try:
         with closing(get_db_connection()) as conn:
             with conn:
+                # Önce hizmeti güncelle
+                # Çalışan ID'lerini virgülle ayrılmış string olarak birleştir
+                calisan_id_str = ','.join(calisan_ids) if calisan_ids else ''
+                
                 conn.execute(
-                    "UPDATE hizmetler SET hizmet_adi = ?, seans = ? WHERE id = ?",
-                    (hizmet_adi, seans, id)
+                    "UPDATE hizmetler SET hizmet_adi = ?, seans = ?, fiyat = ?, calisan_id = ? WHERE id = ?",
+                    (hizmet_adi, seans, fiyat, calisan_id_str, id)
                 )
+                
+                # Çalışan ilişkileri artık calisan_id sütununda virgülle ayrılmış olarak tutuluyor
         flash('Hizmet güncellendi.', 'success')
     except Exception as e:
         flash(f'Hata: {str(e)}', 'danger')
@@ -674,7 +779,7 @@ def yaklasan_randevular():
     try:
         # Şu anki tarih ve saat
         simdi = datetime.now()
-        bugun = simdi.strftime('%d-%m-%Y')
+        bugun = simdi.strftime('%Y-%m-%d')
         
         # 30 dakika içindeki randevuları getir
         otuz_dk_sonra = (simdi + timedelta(minutes=30)).strftime('%H:%M')
@@ -685,11 +790,21 @@ def yaklasan_randevular():
                        randevular.hizmet, randevular.durum
                 FROM randevular
                 INNER JOIN müşteriler ON randevular.musteri_id = müşteriler.id
-                WHERE randevular.tarih = ? AND randevular.saat <= ? AND randevular.saat > ? 
-                      AND randevular.durum IN ('Bekleniyor', 'Onaylandı')
+                WHERE randevular.tarih = ? AND randevular.saat <= ? AND randevular.saat >= ? 
+                AND randevular.durum IN ('Bekleniyor', 'Onaylandı')
+                ORDER BY randevular.saat
             ''', (bugun, otuz_dk_sonra, simdi.strftime('%H:%M'))).fetchall()
             
-        return jsonify([dict(r) for r in yaklasan])
+            result = [{
+                'id': r['id'],
+                'musteri': r['ad'],
+                'tarih': r['tarih'],
+                'saat': r['saat'],
+                'hizmet': r['hizmet'],
+                'durum': r['durum']
+            } for r in yaklasan]
+            
+            return jsonify(result)
     except Exception as e:
         logger.error("Yaklaşan randevular API hatası: %s", e)
         return jsonify({'status': 'error', 'message': str(e)}), 500
@@ -764,7 +879,24 @@ def randevu_al():
     try:
         with closing(get_db_connection()) as conn:
             tum_musteriler = conn.execute('SELECT * FROM müşteriler ORDER BY ad').fetchall()
-            hizmetler = conn.execute('SELECT * FROM hizmetler').fetchall()
+            # Hizmetleri getir
+            hizmetler = [dict(row) for row in conn.execute('SELECT * FROM hizmetler').fetchall()]
+            
+            # Çalışanları getir
+            calisanlar = conn.execute('SELECT * FROM çalışanlar').fetchall()
+            
+            # Hizmetlere çalışan adlarını ekle
+            for i in range(len(hizmetler)):
+                h = hizmetler[i]
+                if 'calisan_id' in h and h['calisan_id']:
+                    for c in calisanlar:
+                        if c['id'] == h['calisan_id']:
+                            h['calisan_adi'] = c['ad']
+                            break
+                    if 'calisan_adi' not in h:
+                        h['calisan_adi'] = None
+                else:
+                    h['calisan_adi'] = None
             satislar = conn.execute('SELECT musteri_id, urun_id FROM satislar').fetchall()
     except Exception as e:
         logger.error("Veri çekme hatası: %s", e)
@@ -802,14 +934,20 @@ def randevu_al():
         tarih = request.form.get('tarih', '')
         saat = request.form.get('saat', '')
         hizmet = request.form.get('hizmet', '')
+        calisan_id = request.form.get('calisan_id')
         seans = request.form.get('seans', 1, type=int)
         ucret = request.form.get('ucret')
+        
         # Hizmet id'sini bul
         hizmet_id = None
         for h in hizmetler:
             if h['hizmet_adi'] == hizmet:
                 hizmet_id = str(h['id'])
+                # Eğer calisan_id boşsa, hizmetin sorumlu çalışanını kullan
+                if not calisan_id and h['calisan_id']:
+                    calisan_id = h['calisan_id']
                 break
+                
         # Kalan seans kontrolü - sadece müşteri seçiliyse ve hizmet satın alınmışsa kontrol et
         if musteri_id and hizmet_id and hizmet_id in kalan_seanslar:
             # Kalan seans 0 veya daha az ise hata ver
@@ -847,6 +985,35 @@ def randevu_al():
         try:
             with closing(get_db_connection()) as conn:
                 with conn:
+                    # Seçilen çalışanın bu saatte başka randevusu var mı kontrol et
+                    if calisan_id:
+                        var_mi = conn.execute(
+                            'SELECT id FROM randevular WHERE tarih = ? AND saat = ? AND çalışan_id = ?',
+                            (tarih, saat, calisan_id)
+                        ).fetchone()
+                        
+                        if var_mi:
+                            flash("Seçilen hizmetin sorumlusu bu tarih ve saatte dolu!", "danger")
+                            return render_template('randevu_al.html',
+                                                hizmetler=hizmetler,
+                                                musteri=musteri,
+                                                musteri_id=musteri_id,
+                                                tum_musteriler=tum_musteriler,
+                                                satilmis_hizmet_idler=satilmis_hizmet_idler,
+                                                satislar=satislar,
+                                                kalan_seanslar=kalan_seanslar)
+                    
+                    # Çalışan adını al
+                    calisan_adi = ''
+                    if calisan_id:
+                        calisan_row = conn.execute('SELECT ad FROM çalışanlar WHERE id = ?', (calisan_id,)).fetchone()
+                        calisan_adi = calisan_row['ad'] if calisan_row else ''
+                    
+                    # Hizmet adını güncelle
+                    hizmet_detayli = hizmet
+                    if calisan_adi:
+                        hizmet_detayli = f"{hizmet} - {calisan_adi}"
+                    
                     musteri_check = conn.execute('SELECT id FROM müşteriler WHERE telefon = ?', (telefon,)).fetchone()
                     if musteri_check:
                         musteri_id = musteri_check['id']
@@ -857,8 +1024,8 @@ def randevu_al():
                         )
                         musteri_id = cursor.lastrowid
                     conn.execute(
-                        'INSERT INTO randevular (musteri_id, tarih, saat, hizmet, seans, durum) VALUES (?, ?, ?, ?, ?, ?)',
-                        (musteri_id, tarih, saat, hizmet, seans, 'Bekleniyor')
+                        'INSERT INTO randevular (musteri_id, çalışan_id, tarih, saat, hizmet, seans, durum) VALUES (?, ?, ?, ?, ?, ?, ?)',
+                        (musteri_id, calisan_id, tarih, saat, hizmet_detayli, seans, 'Bekleniyor')
                     )
                     if ucret:
                         ucret = float(ucret)
@@ -1875,6 +2042,101 @@ def calisan_yonetimi():
         calisanlar = conn.execute("SELECT * FROM çalışanlar").fetchall()
     return render_template('calisan_yonetimi.html', calisanlar=calisanlar)
 
+@app.route('/calisan_hizmet_yonetimi')
+@login_required
+def calisan_hizmet_yonetimi():
+    if current_user.rol != 'admin':
+        flash('Bu sayfaya erişim yetkiniz yok!', 'danger')
+        return redirect(url_for('index'))
+    
+    try:
+        with closing(get_db_connection()) as conn:
+            # Tüm çalışanları getir
+            calisanlar = conn.execute("SELECT * FROM çalışanlar ORDER BY ad").fetchall()
+            
+            # Tüm hizmetleri getir
+            hizmetler = conn.execute("SELECT * FROM hizmetler ORDER BY hizmet_adi").fetchall()
+            
+            # Çalışan-hizmet ilişkilerini getir
+            calisan_hizmet_rows = conn.execute('''
+                SELECT ch.calisan_id, ch.hizmet_id, c.ad as calisan_adi, h.hizmet_adi
+                FROM calisan_hizmet ch
+                JOIN çalışanlar c ON ch.calisan_id = c.id
+                JOIN hizmetler h ON ch.hizmet_id = h.id
+                ORDER BY c.ad, h.hizmet_adi
+            ''').fetchall()
+            
+            # Çalışan başına hizmetleri grupla
+            calisanlar_hizmetler = []
+            calisan_hizmet_dict = {}
+            
+            for calisan in calisanlar:
+                calisan_id = calisan['id']
+                calisan_hizmetleri = []
+                calisan_hizmet_ids = []
+                
+                for row in calisan_hizmet_rows:
+                    if row['calisan_id'] == calisan_id:
+                        calisan_hizmetleri.append(row['hizmet_adi'])
+                        calisan_hizmet_ids.append(row['hizmet_id'])
+                
+                calisanlar_hizmetler.append({
+                    'id': calisan_id,
+                    'ad': calisan['ad'],
+                    'hizmetler': calisan_hizmetleri
+                })
+                
+                calisan_hizmet_dict[str(calisan_id)] = calisan_hizmet_ids
+            
+            # JSON formatında çalışan-hizmet ilişkilerini hazırla
+            import json
+            calisan_hizmet_json = json.dumps(calisan_hizmet_dict)
+            
+        return render_template('calisan_hizmet_yonetimi.html', 
+                              calisanlar=calisanlar,
+                              hizmetler=hizmetler,
+                              calisanlar_hizmetler=calisanlar_hizmetler,
+                              calisan_hizmet_json=calisan_hizmet_json)
+    except Exception as e:
+        logger.error(f"Çalışan hizmet yönetimi hatası: {str(e)}")
+        flash(f"Hata oluştu: {str(e)}", "danger")
+        return redirect(url_for('index'))
+
+@app.route('/calisan_hizmet_kaydet', methods=['POST'])
+@login_required
+def calisan_hizmet_kaydet():
+    if current_user.rol != 'admin':
+        flash('Bu işlemi yapmaya yetkiniz yok!', 'danger')
+        return redirect(url_for('index'))
+    
+    calisan_id = request.form.get('calisan_id')
+    hizmet_ids = request.form.getlist('hizmet_ids')
+    
+    if not calisan_id:
+        flash('Çalışan seçilmedi!', 'danger')
+        return redirect(url_for('calisan_hizmet_yonetimi'))
+    
+    try:
+        with closing(get_db_connection()) as conn:
+            # Önce bu çalışanın tüm hizmet ilişkilerini sil
+            conn.execute('DELETE FROM calisan_hizmet WHERE calisan_id = ?', (calisan_id,))
+            
+            # Yeni hizmet ilişkilerini ekle
+            for hizmet_id in hizmet_ids:
+                conn.execute(
+                    'INSERT INTO calisan_hizmet (calisan_id, hizmet_id) VALUES (?, ?)',
+                    (calisan_id, hizmet_id)
+                )
+            
+            conn.commit()
+        
+        flash('Çalışan hizmet atamaları başarıyla güncellendi!', 'success')
+    except Exception as e:
+        logger.error(f"Çalışan hizmet kaydetme hatası: {str(e)}")
+        flash(f"Hata oluştu: {str(e)}", "danger")
+    
+    return redirect(url_for('calisan_hizmet_yonetimi'))
+
 @app.route('/log_kayitlari')
 @login_required
 def log_kayitlari():
@@ -1895,8 +2157,25 @@ def hizmet_tanimlari():
         flash('Bu sayfaya erişim yetkiniz yok!', 'danger')
         return redirect(url_for('index'))
     with closing(get_db_connection()) as conn:
-        hizmetler = conn.execute("SELECT * FROM hizmetler").fetchall()
-    return render_template('hizmet_tanimlari.html', hizmetler=hizmetler)
+        # Hizmetleri getir
+        hizmetler = conn.execute('SELECT * FROM hizmetler').fetchall()
+        
+        # Çalışanları getir
+        calisanlar = conn.execute("SELECT * FROM çalışanlar ORDER BY ad").fetchall()
+        
+        # Hizmetlere çalışan bilgilerini ekle
+        for i in range(len(hizmetler)):
+            h = dict(hizmetler[i])
+            # calisan_id sütunu varsa ve boş değilse, virgülle ayrılmış ID'leri listeye çevir
+            if 'calisan_id' in h and h['calisan_id']:
+                # Önce string'e çevir, çünkü int olabilir
+                calisan_id_str = str(h['calisan_id'])
+                h['calisan_ids'] = calisan_id_str.split(',')
+            else:
+                h['calisan_ids'] = []
+            
+            hizmetler[i] = h
+    return render_template('hizmet_tanimlari.html', hizmetler=hizmetler, calisanlar=calisanlar)
 
 @app.route('/bildirim_ayarlar', methods=['GET', 'POST'])
 @login_required
@@ -2005,7 +2284,24 @@ def yedek():
 def online_randevu():
     try:
         with closing(get_db_connection()) as conn:
-            hizmetler = conn.execute('SELECT * FROM hizmetler').fetchall()
+            # Hizmetleri getir
+            hizmetler = [dict(row) for row in conn.execute('SELECT * FROM hizmetler').fetchall()]
+            
+            # Çalışanları getir
+            calisanlar = conn.execute('SELECT * FROM çalışanlar').fetchall()
+            
+            # Hizmetlere çalışan adlarını ekle
+            for i in range(len(hizmetler)):
+                h = hizmetler[i]
+                if 'calisan_id' in h and h['calisan_id']:
+                    for c in calisanlar:
+                        if c['id'] == h['calisan_id']:
+                            h['calisan_adi'] = c['ad']
+                            break
+                    if 'calisan_adi' not in h:
+                        h['calisan_adi'] = None
+                else:
+                    h['calisan_adi'] = None
 
         if request.method == 'POST':
             ad = request.form.get('ad', '').strip().title()
@@ -2013,26 +2309,81 @@ def online_randevu():
             hizmet_id = request.form.get('hizmet_id')
             tarih = request.form.get('tarih')
             saat = request.form.get('saat')
+            secilen_calisan_id = request.form.get('calisan_id')
 
             if not (ad and telefon and hizmet_id and tarih and saat):
                 flash("Tüm alanlar zorunludur!", "danger")
                 return render_template('online_randevu.html', hizmetler=hizmetler, current_year=datetime.now().year)
 
             with closing(get_db_connection()) as conn:
-                hizmet_row = conn.execute('SELECT hizmet_adi, seans, fiyat FROM hizmetler WHERE id = ?', (hizmet_id,)).fetchone()
-                hizmet_adi = hizmet_row['hizmet_adi'] if hizmet_row else ''
-                seans = hizmet_row['seans'] if hizmet_row else 1
-                fiyat = hizmet_row['fiyat'] if hizmet_row and 'fiyat' in hizmet_row.keys() else 0
-                hizmet_adi_online = hizmet_adi + " (online)"
-
-                var_mi = conn.execute(
-                    'SELECT id FROM randevular WHERE tarih = ? AND saat = ?',
-                    (tarih, saat)
-                ).fetchone()
-                if var_mi:
-                    flash("Bu tarih ve saatte başka bir randevu var!", "danger")
+                # Hizmet bilgilerini al
+                hizmet_row = conn.execute('SELECT * FROM hizmetler WHERE id = ?', (hizmet_id,)).fetchone()
+                
+                if not hizmet_row:
+                    flash("Seçilen hizmet bulunamadı!", "danger")
                     return render_template('online_randevu.html', hizmetler=hizmetler, current_year=datetime.now().year)
+                
+                hizmet_adi = hizmet_row['hizmet_adi']
+                seans = hizmet_row['seans'] if hizmet_row['seans'] else 1
+                fiyat = hizmet_row['fiyat'] if 'fiyat' in hizmet_row.keys() else 0
+                
+                # Çalışan bilgilerini al
+                calisan_id = None
+                calisan_adi = 'Belirtilmemiş'
+                
+                # Eğer formdan çalışan seçilmişse, onu kullan
+                if secilen_calisan_id:
+                    # Seçilen çalışanın müsaitliğini kontrol et
+                    var_mi = conn.execute(
+                        'SELECT id FROM randevular WHERE tarih = ? AND saat = ? AND çalışan_id = ?',
+                        (tarih, saat, secilen_calisan_id)
+                    ).fetchone()
+                    
+                    if var_mi:
+                        flash("Seçtiğiniz çalışan bu tarih ve saatte dolu!", "danger")
+                        return render_template('online_randevu.html', hizmetler=hizmetler, current_year=datetime.now().year)
+                    
+                    # Çalışan adını al
+                    calisan_row = conn.execute('SELECT ad FROM çalışanlar WHERE id = ?', (secilen_calisan_id,)).fetchone()
+                    if calisan_row:
+                        calisan_id = secilen_calisan_id
+                        calisan_adi = calisan_row['ad']
+                    else:
+                        flash("Seçilen çalışan bulunamadı!", "danger")
+                        return render_template('online_randevu.html', hizmetler=hizmetler, current_year=datetime.now().year)
+                
+                # Eğer çalışan seçilmemişse, otomatik olarak müsait bir çalışan bul
+                elif hizmet_row['calisan_id']:
+                    # Virgülle ayrılmış çalışan ID'lerini listeye çevir
+                    calisan_id_str = str(hizmet_row['calisan_id'])
+                    calisan_ids = [cid.strip() for cid in calisan_id_str.split(',') if cid.strip()]
+                    
+                    # Her çalışan için müsaitlik kontrolü yap
+                    for cid in calisan_ids:
+                        # Çalışanın bu saatte başka randevusu var mı kontrol et
+                        var_mi = conn.execute(
+                            'SELECT id FROM randevular WHERE tarih = ? AND saat = ? AND çalışan_id = ?',
+                            (tarih, saat, cid)
+                        ).fetchone()
+                        
+                        if not var_mi:
+                            # Müsait çalışan bulundu
+                            calisan_id = cid
+                            # Çalışan adını al
+                            calisan_row = conn.execute('SELECT ad FROM çalışanlar WHERE id = ?', (cid,)).fetchone()
+                            if calisan_row:
+                                calisan_adi = calisan_row['ad']
+                            break
+                    
+                    # Eğer hiçbir çalışan müsait değilse
+                    if not calisan_id:
+                        flash("Seçtiğiniz hizmetin tüm sorumlu çalışanları bu tarih ve saatte dolu!", "danger")
+                        return render_template('online_randevu.html', hizmetler=hizmetler, current_year=datetime.now().year)
+                
+                # Online randevu olduğunu belirt
+                hizmet_adi_online = f"{hizmet_adi} (online) - {calisan_adi}"
 
+                # Müşteri kaydı
                 musteri = conn.execute('SELECT id FROM müşteriler WHERE telefon = ?', (telefon,)).fetchone()
                 if musteri:
                     musteri_id = musteri['id']
@@ -2043,17 +2394,17 @@ def online_randevu():
                     )
                     musteri_id = conn.execute('SELECT last_insert_rowid()').fetchone()[0]
 
-                # Randevu kaydı
+                # Randevu kaydı - çalışan ID'si ile birlikte
                 conn.execute(
-                    'INSERT INTO randevular (musteri_id, tarih, saat, hizmet, seans, durum) VALUES (?, ?, ?, ?, ?, ?)',
-                    (musteri_id, tarih, saat, hizmet_adi_online, seans, 'Bekleniyor')
+                    'INSERT INTO randevular (musteri_id, çalışan_id, tarih, saat, hizmet, seans, durum) VALUES (?, ?, ?, ?, ?, ?, ?)',
+                    (musteri_id, calisan_id, tarih, saat, hizmet_adi_online, seans, 'Bekleniyor')
                 )
 
                 # Satış kaydı (otomatik)
                 conn.execute(
                     '''INSERT INTO satislar (musteri_id, urun_id, miktar, fiyat, aciklama, tarih, toplam_seans, kalan_seans)
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?)''',
-                    (musteri_id, hizmet_id, 1, fiyat, 'Online randevu ile otomatik satış', tarih, seans, seans)
+                    (musteri_id, hizmet_id, 1, fiyat, f'Online randevu ile otomatik satış - {calisan_adi}', tarih, seans, seans)
                 )
 
                 # >>> Müşteri bakiyesini güncelle (borçlandır) <<<
@@ -2063,40 +2414,146 @@ def online_randevu():
 
                 conn.commit()
 
-            # WhatsApp mesajı gönder
+            # WhatsApp mesajı için telefon numarasını düzenle
             tel = ''.join(filter(str.isdigit, telefon))
             if len(tel) == 10:
                 tel = '90' + tel
             elif len(tel) == 11 and tel.startswith('0'):
                 tel = '9' + tel
 
-            mesaj = f"Sayın {ad}, {tarih} {saat} tarihinde randevunuz başarıyla oluşturuldu. Teşekkürler!"
-
-            try:
-                whatsapp_mesaj_gonder(tel, mesaj)
-            except Exception as e:
-                logger.error(f"WhatsApp mesajı gönderilemedi: {e}")
-                flash("WhatsApp mesajı gönderilemedi, lütfen yöneticinize başvurun.", "warning")
-
-            flash("Randevunuz başarıyla oluşturuldu ve WhatsApp bilgilendirme mesajı gönderildi.", "success")
-            return redirect(url_for('online_randevu'))
+            mesaj = f"Sayın {ad}, {tarih} {saat} tarihinde {hizmet_adi} randevunuz başarıyla oluşturuldu. Uzman: {calisan_adi}. Teşekkürler!"
+            
+            # WhatsApp mesaj URL'ini oluştur
+            import urllib.parse
+            encoded_mesaj = urllib.parse.quote(mesaj)
+            whatsapp_url = f"https://wa.me/{tel}?text={encoded_mesaj}"
+            
+            # Randevu bilgilerini session'a kaydet
+            session['randevu_basarili'] = True
+            session['whatsapp_url'] = whatsapp_url
+            session['randevu_mesaj'] = mesaj
+            
+            flash("Randevunuz başarıyla oluşturuldu!", "success")
+            return redirect(url_for('randevu_basarili'))
 
         return render_template('online_randevu.html', hizmetler=hizmetler, current_year=datetime.now().year)
     except Exception as e:
         logger.error(f"Online randevu hatası: {str(e)}")
         flash(f"Hata oluştu: {str(e)}", "danger")
         return render_template('online_randevu.html', hizmetler=[], current_year=datetime.now().year)
+
+@app.route('/api/hizmet_sorumlu_calisanlar')
+def hizmet_sorumlu_calisanlar():
+    hizmet_id = request.args.get('hizmet_id')
+    
+    if not hizmet_id:
+        return jsonify({'error': 'Hizmet ID parametresi gerekli'}), 400
+        
+    try:
+        with closing(get_db_connection()) as conn:
+            # Hizmetin sorumlu çalışanlarını bul
+            hizmet_row = conn.execute("SELECT calisan_id FROM hizmetler WHERE id = ?", (hizmet_id,)).fetchone()
+            
+            if not hizmet_row or not hizmet_row['calisan_id']:
+                return jsonify({'calisanlar': []})
+            
+            # Virgülle ayrılmış çalışan ID'lerini listeye çevir
+            calisan_id_str = str(hizmet_row['calisan_id'])
+            calisan_ids = [cid.strip() for cid in calisan_id_str.split(',') if cid.strip()]
+            
+            # Çalışan bilgilerini al
+            calisanlar = []
+            for cid in calisan_ids:
+                calisan = conn.execute("SELECT id, ad FROM çalışanlar WHERE id = ?", (cid,)).fetchone()
+                if calisan:
+                    calisanlar.append({
+                        'id': calisan['id'],
+                        'ad': calisan['ad']
+                    })
+            
+            return jsonify({'calisanlar': calisanlar})
+    except Exception as e:
+        logger.error(f"Hizmet çalışanları API hatası: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
 @app.route('/dolu_saatler')
 def dolu_saatler():
     tarih = request.args.get('tarih')
-    with closing(get_db_connection()) as conn:
-        saatler = [row['saat'] for row in conn.execute(
-            'SELECT saat FROM randevular WHERE tarih = ?', (tarih,)
-        ).fetchall()]
-    return jsonify({'dolu_saatler': saatler})
+    hizmet_id = request.args.get('hizmet_id')
+    calisan_id = request.args.get('calisan_id')
+    
+    if not tarih:
+        return jsonify({'error': 'Tarih parametresi gerekli'}), 400
+        
+    try:
+        with closing(get_db_connection()) as conn:
+            calisan_ids = []
+            
+            # Eğer hizmet_id varsa ve calisan_id yoksa, hizmetin sorumlu çalışanlarını bul
+            if hizmet_id and not calisan_id:
+                hizmet_row = conn.execute("SELECT calisan_id FROM hizmetler WHERE id = ?", (hizmet_id,)).fetchone()
+                if hizmet_row and hizmet_row['calisan_id']:
+                    # Virgülle ayrılmış çalışan ID'lerini listeye çevir
+                    calisan_id_str = str(hizmet_row['calisan_id'])
+                    calisan_ids = [cid.strip() for cid in calisan_id_str.split(',') if cid.strip()]
+            elif calisan_id:
+                # Eğer calisan_id doğrudan verilmişse, onu kullan
+                calisan_ids = [calisan_id]
+            
+            # Hizmetin süresini al
+            if hizmet_id:
+                hizmet = conn.execute("SELECT seans FROM hizmetler WHERE id = ?", (hizmet_id,)).fetchone()
+                seans_suresi = hizmet['seans'] if hizmet else 1
+            else:
+                seans_suresi = 1
+                
+            # Tüm çalışanların dolu saatlerini topla
+            dolu_saatler = []
+            
+            if calisan_ids:
+                # Her çalışan için dolu saatleri al
+                for cid in calisan_ids:
+                    query = "SELECT saat FROM randevular WHERE tarih = ? AND durum != 'İptal' AND çalışan_id = ?"
+                    params = [tarih, cid]
+                    dolu_randevular = conn.execute(query, params).fetchall()
+                    dolu_saatler.extend([r['saat'] for r in dolu_randevular])
+            else:
+                # Çalışan belirtilmemişse tüm dolu saatleri al
+                query = "SELECT saat FROM randevular WHERE tarih = ? AND durum != 'İptal'"
+                params = [tarih]
+                dolu_randevular = conn.execute(query, params).fetchall()
+                dolu_saatler = [r['saat'] for r in dolu_randevular]
+            
+            # Tekrar eden saatleri çıkar
+            dolu_saatler = list(set(dolu_saatler))
+            
+            return jsonify({
+                'dolu_saatler': dolu_saatler, 
+                'calisan_ids': calisan_ids
+            })
+    except Exception as e:
+        logger.error(f"Dolu saatler API hatası: {str(e)}")
+        return jsonify({'error': str(e)}), 500
 
+
+@app.route('/randevu_basarili')
+def randevu_basarili():
+    # Session'dan bilgileri al
+    whatsapp_url = session.get('whatsapp_url')
+    randevu_mesaj = session.get('randevu_basarili')
+    
+    if not session.get('randevu_basarili'):
+        return redirect(url_for('online_randevu'))
+    
+    # Session'dan bilgileri temizle
+    session.pop('randevu_basarili', None)
+    
+    return render_template('randevu_basarili.html', 
+                          whatsapp_url=whatsapp_url, 
+                          randevu_mesaj=randevu_mesaj,
+                          current_year=datetime.now().year)
 
 if __name__ == '__main__':
-    init_db()
+    init_db()  # Veritabanı şemasını güncelle
     update_payment_status()
     app.run(host="0.0.0.0", port=5000, debug=True)

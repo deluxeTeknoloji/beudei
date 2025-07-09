@@ -8,46 +8,42 @@ def whatsapp_mesaj_gonder(telefon, mesaj):
     from selenium.webdriver.common.keys import Keys
     from webdriver_manager.chrome import ChromeDriverManager
     from selenium.webdriver.chrome.service import Service
+    import urllib.parse
 
     try:
+        # Mesajı URL-encode yap
+        encoded_mesaj = urllib.parse.quote(mesaj)
+        
+        # Doğrudan WhatsApp API URL'ini kullan
+        whatsapp_url = f"https://web.whatsapp.com/send?phone={telefon}&text={encoded_mesaj}"
+        
         profile_path = os.path.join(os.path.expanduser("~"), "whatsapp_profile")
         options = webdriver.ChromeOptions()
         options.add_argument(f"user-data-dir={profile_path}")
 
         service = Service(ChromeDriverManager().install())
         driver = webdriver.Chrome(service=service, options=options)
-        driver.get("https://web.whatsapp.com/")
-        driver.set_window_size(200, 400)
+        driver.get(whatsapp_url)
+        driver.set_window_size(800, 600)  # Biraz daha büyük pencere
         print("Lütfen ilk seferde QR kodunu okutun. Sonraki çalıştırmalarda gerek kalmayacak.")
 
+        # Mesaj gönderme butonunu bekle
         wait = WebDriverWait(driver, 60)
-        # Arama kutusunu bekle
         try:
-            arama_kutusu = wait.until(
-                EC.presence_of_element_located((By.XPATH, "//div[@contenteditable='true'][@data-tab='3']"))
+            # Mesaj kutusunun yüklenmesini bekle
+            mesaj_kutusu = wait.until(
+                EC.presence_of_element_located((By.XPATH, "//div[@contenteditable='true'][@data-tab='10']"))
             )
-        except:
-            # Alternatif XPATH dene
-            arama_kutusu = wait.until(
-                EC.presence_of_element_located((By.XPATH, "//div[@title='Ara veya yeni sohbet başlat']"))
-            )
-
-        arama_kutusu.click()
-        arama_kutusu.clear()
-        arama_kutusu.send_keys(telefon)
-        time.sleep(2)
-        arama_kutusu.send_keys(Keys.ENTER)
-        time.sleep(2)
-
-        # Mesaj kutusunu bekle
-        mesaj_kutusu = wait.until(
-            EC.presence_of_element_located((By.XPATH, "//div[@contenteditable='true'][@data-tab='10']"))
-        )
-        mesaj_kutusu.click()
-        mesaj_kutusu.send_keys(mesaj)
-        mesaj_kutusu.send_keys(Keys.ENTER)
-        print("Mesaj gönderildi!")
-        time.sleep(5)
+            
+            # Enter tuşuna basarak mesajı gönder
+            mesaj_kutusu.send_keys(Keys.ENTER)
+            print("Mesaj gönderildi!")
+            time.sleep(5)
+        except Exception as inner_e:
+            print(f"Mesaj gönderme hatası: {str(inner_e)}")
+            # Hata durumunda ekran görüntüsü al
+            driver.save_screenshot("whatsapp_error.png")
+            
         driver.quit()
     except Exception as e:
         with open("whatsapp_hata.log", "a", encoding="utf-8") as f:

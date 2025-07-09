@@ -12,7 +12,6 @@
   <header class="header-section text-center">
     <div class="container">
       <div class="d-flex justify-content-between align-items-center">
-        <h2 class="h4 mb-0"><i class="bi bi-calendar-plus me-2"></i>Online Randevu Al</h2>
 
       </div>
     </div>
@@ -45,24 +44,31 @@
                 <div class="col-12 col-lg-6">
                   <h5 class="text-purple mb-3"><i class="bi bi-clock-history me-2"></i> Randevu Detayları</h5>
                   <div class="mb-3">
-                    <label class="form-label">Tarih</label>
-                    <input type="date" name="tarih" class="form-control" required>
-                  </div>
-                  <div class="mb-3">
-                    <label class="form-label">Saat</label>
-                    <select class="form-select" name="saat" required>
-                      <option value="">Saat Seçin</option>
-                      {% for saat in ['09:00', '10:00', '11:00', '12:00','13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00'] %}
-                        <option value="{{ saat }}">{{ saat }}</option>
+                    <label class="form-label">Hizmet</label>
+                    <select name="hizmet_id" id="hizmet_id" class="form-select" required>
+                      <option value="">Hizmet Seçiniz</option>
+                      {% for h in hizmetler %}
+                        <option value="{{ h.id }}" data-calisan="{{ h.calisan_id }}">{{ h.hizmet_adi }}</option>
                       {% endfor %}
                     </select>
                   </div>
                   <div class="mb-3">
-                    <label class="form-label">Hizmet</label>
-                    <select name="hizmet_id" class="form-select" required>
-                      <option value="">Hizmet Seçiniz</option>
-                      {% for h in hizmetler %}
-                        <option value="{{ h.id }}">{{ h.hizmet_adi }}</option>
+                    <label class="form-label">Çalışan</label>
+                    <select name="calisan_id" id="calisan_id" class="form-select">
+                      <option value="">Otomatik Ata</option>
+                      <!-- Çalışanlar JavaScript ile doldurulacak -->
+                    </select>
+                  </div>
+                  <div class="mb-3">
+                    <label class="form-label">Tarih</label>
+                    <input type="date" name="tarih" id="tarih" class="form-control" required>
+                  </div>
+                  <div class="mb-3">
+                    <label class="form-label">Saat</label>
+                    <select class="form-select" name="saat" id="saat" required>
+                      <option value="">Saat Seçin</option>
+                      {% for saat in ['09:00', '10:00', '11:00', '12:00','13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00'] %}
+                        <option value="{{ saat }}">{{ saat }}</option>
                       {% endfor %}
                     </select>
                   </div>
@@ -72,9 +78,7 @@
                 <button type="submit" class="btn btn-primary flex-fill">
                   <i class="bi bi-check-circle"></i> Randevu Al
                 </button>
-                <a href="{{ url_for('index') }}" class="btn btn-secondary flex-fill">
-                  <i class="bi bi-house-door"></i> Anasayfa
-                </a>
+
               </div>
             </form>
           </div>
@@ -85,13 +89,54 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-  const tarihInput = document.querySelector('input[name="tarih"]');
-  const saatSelect = document.querySelector('select[name="saat"]');
+  const hizmetSelect = document.getElementById('hizmet_id');
+  const calisanSelect = document.getElementById('calisan_id');
+  const tarihInput = document.getElementById('tarih');
+  const saatSelect = document.getElementById('saat');
 
+  // Hizmet seçildiğinde çalışanları getir
+  function calisanlariGetir() {
+    const seciliHizmet = hizmetSelect.value;
+    if (!seciliHizmet) return;
+    
+    // Çalışan seçimini sıfırla
+    calisanSelect.innerHTML = '<option value="">Otomatik Ata</option>';
+    
+    // Seçilen hizmetin çalışanlarını getir
+    fetch(`/api/hizmet_sorumlu_calisanlar?hizmet_id=${seciliHizmet}`)
+      .then(resp => resp.json())
+      .then(data => {
+        if (data.calisanlar && data.calisanlar.length > 0) {
+          data.calisanlar.forEach(calisan => {
+            const option = document.createElement('option');
+            option.value = calisan.id;
+            option.textContent = calisan.ad;
+            calisanSelect.appendChild(option);
+          });
+        }
+        
+        // Tarih ve saat seçilmişse saatleri güncelle
+        if (tarihInput.value) {
+          saatleriGuncelle();
+        }
+      });
+  }
+
+  // Tarih, hizmet veya çalışan değiştiğinde saatleri güncelle
   function saatleriGuncelle() {
     const seciliTarih = tarihInput.value;
-    if (!seciliTarih) return;
-    fetch('/dolu_saatler?tarih=' + seciliTarih)
+    const seciliHizmet = hizmetSelect.value;
+    const seciliCalisan = calisanSelect.value;
+    
+    if (!seciliTarih || !seciliHizmet) return;
+    
+    // API'ye hizmet_id ve seçilen çalışanı gönder
+    let url = `/dolu_saatler?tarih=${seciliTarih}&hizmet_id=${seciliHizmet}`;
+    if (seciliCalisan) {
+      url += `&calisan_id=${seciliCalisan}`;
+    }
+    
+    fetch(url)
       .then(resp => resp.json())
       .then(data => {
         Array.from(saatSelect.options).forEach(opt => {
@@ -109,9 +154,33 @@ document.addEventListener('DOMContentLoaded', function() {
       });
   }
 
+  // Olay dinleyicileri
   tarihInput.addEventListener('change', saatleriGuncelle);
-  // Sayfa ilk açıldığında da çalışsın
-  saatleriGuncelle();
+  
+  hizmetSelect.addEventListener('change', function() {
+    // Hizmet değiştiğinde çalışanları getir
+    calisanlariGetir();
+    
+    // Saatleri sıfırla
+    Array.from(saatSelect.options).forEach(opt => {
+      if (!opt.value) return;
+      opt.style.backgroundColor = '';
+      opt.disabled = false;
+      opt.textContent = opt.value;
+    });
+  });
+  
+  calisanSelect.addEventListener('change', function() {
+    // Çalışan değiştiğinde saatleri güncelle
+    if (tarihInput.value && hizmetSelect.value) {
+      saatleriGuncelle();
+    }
+  });
+  
+  // Sayfa yüklenirken bugünün tarihini ayarla
+  const today = new Date().toISOString().split('T')[0];
+  tarihInput.value = today;
+  tarihInput.min = today;
 });
 </script>
 

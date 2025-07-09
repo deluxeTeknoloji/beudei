@@ -114,8 +114,9 @@
       <div class="col-md-9">
         <div class="card shadow-sm">
           <div class="card-header bg-white">
-          <div class="d-flex justify-content-between align-items-center">
-            <h5 class="mb-0 text-primary"><i class="bi bi-calendar-plus me-2"></i>Randevu Oluştur</h5>
+            <div class="d-flex justify-content-between align-items-center">
+              <h5 class="mb-0 text-primary"><i class="bi bi-calendar-plus me-2"></i>Randevu Oluştur</h5>
+            </div>
           </div>
           <div class="card-body">
             <!-- Başarı / Hata Bildirimleri -->
@@ -189,8 +190,8 @@
                         {% for h in hizmetler %}
                           {% if h.id|string in kalan_seanslar and kalan_seanslar.get(h.id|string, 0) > 0 %}
                             {% set has_services = true %}
-                            <option value="{{ h.hizmet_adi }}" data-id="{{ h.id }}" data-seans="1" data-kalan="{{ kalan_seanslar.get(h.id|string, 0) }}">
-                              {{ h.hizmet_adi }} (Kalan: {{ kalan_seanslar.get(h.id|string, 0) }} seans)
+                            <option value="{{ h.hizmet_adi }}" data-id="{{ h.id }}" data-seans="1" data-calisan="{{ h.calisan_id }}" data-kalan="{{ kalan_seanslar.get(h.id|string, 0) }}">
+                              {{ h.hizmet_adi }} {% if h.calisan_adi %}({{ h.calisan_adi }}){% endif %} (Kalan: {{ kalan_seanslar.get(h.id|string, 0) }} seans)
                             </option>
                           {% endif %}
                         {% endfor %}
@@ -199,13 +200,14 @@
                         {% endif %}
                       {% else %}
                         {% for h in hizmetler %}
-                          <option value="{{ h.hizmet_adi }}" data-id="{{ h.id }}" data-seans="1">
-                            {{ h.hizmet_adi }}
+                          <option value="{{ h.hizmet_adi }}" data-id="{{ h.id }}" data-seans="1" data-calisan="{{ h.calisan_id }}">
+                            {{ h.hizmet_adi }} {% if h.calisan_adi %}({{ h.calisan_adi }}){% endif %}
                           </option>
                         {% endfor %}
                       {% endif %}
                     </select>
                   </div>
+                  <input type="hidden" name="calisan_id" id="calisan_id" value="">
                   <input type="hidden" name="seans" id="seans" value="1">
                   
                 </div>
@@ -296,6 +298,10 @@
       // Hizmet ID'sini gizli alana ata
       var hizmetId = this.options[this.selectedIndex].getAttribute('data-id');
       document.getElementById('hizmet_id').value = hizmetId || '';
+      
+      // Çalışan ID'sini gizli alana ata
+      var calisanId = this.options[this.selectedIndex].getAttribute('data-calisan');
+      document.getElementById('calisan_id').value = calisanId || '';
     });
     
     // Form gönderilmeden önce doğrulama yap

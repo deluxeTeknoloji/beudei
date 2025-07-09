@@ -407,15 +407,6 @@ document.getElementById('statusFilter').addEventListener('change', function() {
   });
 });
 
-document.getElementById('statusFilter').addEventListener('change', function() {
-  const filterValue = this.value;
-  const rows = document.querySelectorAll('#randevuTableBody tr');
-  rows.forEach(row => {
-    const durum = row.querySelector('.status-select').value;
-    row.style.display = filterValue === '' || durum === filterValue ? '' : 'none';
-  });
-});
-
     
     // Tarihe göre sıralama
     let sortDirection = 'desc'; // Başlangıçta en yeni tarihler üstte
