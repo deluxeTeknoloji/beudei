@@ -1,0 +1,8 @@
+flask==2.3.3
+flask-wtf==1.1.1
+flask-login==0.6.2
+werkzeug==2.3.7
+selenium==4.11.2
+webdriver-manager==4.0.0
+python-dotenv==1.0.0
+requests==2.31.0

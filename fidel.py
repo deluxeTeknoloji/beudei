@@ -73,6 +73,46 @@ def set_whatsapp_sablon(sablon):
             conn.execute("INSERT INTO bildirim_ayarlar (whatsapp_sablon) VALUES (?)", (sablon,))
         conn.commit()
 
+def get_online_whatsapp_sablon():
+    try:
+        with closing(get_db_connection()) as conn:
+            try:
+                # Önce sütunun var olup olmadığını kontrol et
+                conn.execute("SELECT online_whatsapp_sablon FROM bildirim_ayarlar LIMIT 1")
+                # Sütun varsa, değeri al
+                row = conn.execute("SELECT online_whatsapp_sablon FROM bildirim_ayarlar ORDER BY id DESC LIMIT 1").fetchone()
+                return row['online_whatsapp_sablon'] if row and row['online_whatsapp_sablon'] else None
+            except sqlite3.OperationalError:
+                # Sütun yoksa None döndür
+                return None
+    except Exception as e:
+        logger.error(f"Online WhatsApp şablonu alınırken hata: {str(e)}")
+        return None
+
+def set_online_whatsapp_sablon(sablon):
+    try:
+        with closing(get_db_connection()) as conn:
+            try:
+                # Önce sütunun var olup olmadığını kontrol et
+                conn.execute("SELECT online_whatsapp_sablon FROM bildirim_ayarlar LIMIT 1")
+                
+                # Sütun varsa, devam et
+                # Eğer hiç kayıt yoksa ekle, varsa güncelle
+                row = conn.execute("SELECT id FROM bildirim_ayarlar ORDER BY id DESC LIMIT 1").fetchone()
+                if row:
+                    conn.execute("UPDATE bildirim_ayarlar SET online_whatsapp_sablon = ? WHERE id = ?", (sablon, row['id']))
+                else:
+                    conn.execute("INSERT INTO bildirim_ayarlar (online_whatsapp_sablon) VALUES (?)", (sablon,))
+                conn.commit()
+            except sqlite3.OperationalError:
+                # Sütun yoksa, sütunu ekle ve tekrar dene
+                conn.execute("ALTER TABLE bildirim_ayarlar ADD COLUMN online_whatsapp_sablon TEXT")
+                conn.commit()
+                # Tekrar dene
+                set_online_whatsapp_sablon(sablon)
+    except Exception as e:
+        logger.error(f"Online WhatsApp şablonu kaydedilirken hata: {str(e)}")
+
 def init_db():
     with app.app_context():
         with closing(get_db_connection()) as conn:
@@ -80,9 +120,17 @@ def init_db():
             conn.execute('''
                 CREATE TABLE IF NOT EXISTS bildirim_ayarlar (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    whatsapp_sablon TEXT
+                    whatsapp_sablon TEXT,
+                    online_whatsapp_sablon TEXT
                 )
             ''')
+            
+            # Mevcut bildirim_ayarlar tablosuna online_whatsapp_sablon sütunu ekle (eğer yoksa)
+            try:
+                conn.execute("SELECT online_whatsapp_sablon FROM bildirim_ayarlar LIMIT 1")
+            except sqlite3.OperationalError:
+                conn.execute("ALTER TABLE bildirim_ayarlar ADD COLUMN online_whatsapp_sablon TEXT")
+                conn.commit()
 
             # Kullanıcılar Tablosu
             conn.execute('''
@@ -2186,12 +2234,19 @@ def bildirim_ayarlar():
 
     if request.method == 'POST':
         whatsapp_sablon = request.form.get('whatsapp_sablon')
+        online_whatsapp_sablon = request.form.get('online_whatsapp_sablon')
+        
         set_whatsapp_sablon(whatsapp_sablon)
-        flash('WhatsApp şablonu kaydedildi.', 'success')
+        set_online_whatsapp_sablon(online_whatsapp_sablon)
+        
+        flash('WhatsApp şablonları kaydedildi.', 'success')
     else:
         whatsapp_sablon = get_whatsapp_sablon()
+        online_whatsapp_sablon = get_online_whatsapp_sablon()
 
-    return render_template('bildirim_ayarlar.html', whatsapp_sablon=whatsapp_sablon)
+    return render_template('bildirim_ayarlar.html', 
+                          whatsapp_sablon=whatsapp_sablon,
+                          online_whatsapp_sablon=online_whatsapp_sablon)
 
 @app.route('/yetki_yonetimi')
 @login_required
@@ -2420,18 +2475,50 @@ def online_randevu():
                 tel = '90' + tel
             elif len(tel) == 11 and tel.startswith('0'):
                 tel = '9' + tel
-
-            mesaj = f"Sayın {ad}, {tarih} {saat} tarihinde {hizmet_adi} randevunuz başarıyla oluşturuldu. Uzman: {calisan_adi}. Teşekkürler!"
+                
+            # Online randevu için WhatsApp şablonunu veritabanından çek
+            try:
+                sablon = get_online_whatsapp_sablon() or get_whatsapp_sablon() or "Sayın {ad}, {tarih} tarihinde saat {saat}'de {hizmet} randevunuz başarıyla oluşturuldu. Uzman: {calisan}. Teşekkürler!"
+            except Exception as e:
+                logger.error(f"WhatsApp şablonu alınırken hata: {str(e)}")
+                sablon = "Sayın {ad}, {tarih} tarihinde saat {saat}'de {hizmet} randevunuz başarıyla oluşturuldu. Uzman: {calisan}. Teşekkürler!"
             
-            # WhatsApp mesaj URL'ini oluştur
+            # Tarihi güzel formatına çevir
+            try:
+                tarih_tr = datetime.strptime(tarih, "%Y-%m-%d").strftime("%d/%m/%Y")
+            except Exception:
+                tarih_tr = tarih
+                
+            # Şablonu doldur
+            mesaj = sablon.format(
+                ad=ad,
+                tarih=tarih_tr,
+                saat=saat,
+                hizmet=hizmet_adi,
+                calisan=calisan_adi,
+                telefon=telefon
+            )
+            
+            # İki farklı WhatsApp URL'i oluştur
             import urllib.parse
             encoded_mesaj = urllib.parse.quote(mesaj)
+            
+            # 1. wa.me URL'i (normal kullanıcı için)
             whatsapp_url = f"https://wa.me/{tel}?text={encoded_mesaj}"
+            
+            # 2. web.whatsapp.com URL'i (yeni sohbet başlatma için)
+            whatsapp_web_url = f"https://web.whatsapp.com/send?phone={tel}&text={encoded_mesaj}"
             
             # Randevu bilgilerini session'a kaydet
             session['randevu_basarili'] = True
             session['whatsapp_url'] = whatsapp_url
+            session['whatsapp_web_url'] = whatsapp_web_url
             session['randevu_mesaj'] = mesaj
+            
+            # Sunucudan WhatsApp mesajı gönder (arkaplanda)
+            threading.Thread(target=whatsapp_mesaj_gonder, args=(tel, mesaj)).start()
+            logger.info(f"WhatsApp mesajı gönderme işlemi başlatıldı: {tel}")
+            
             
             flash("Randevunuz başarıyla oluşturuldu!", "success")
             return redirect(url_for('randevu_basarili'))
@@ -2540,12 +2627,12 @@ def dolu_saatler():
 def randevu_basarili():
     # Session'dan bilgileri al
     whatsapp_url = session.get('whatsapp_url')
-    randevu_mesaj = session.get('randevu_basarili')
+    randevu_mesaj = session.get('randevu_mesaj')
     
     if not session.get('randevu_basarili'):
         return redirect(url_for('online_randevu'))
     
-    # Session'dan bilgileri temizle
+    # Session'dan bilgileri temizle (whatsapp_url ve randevu_mesaj hariç)
     session.pop('randevu_basarili', None)
     
     return render_template('randevu_basarili.html', 

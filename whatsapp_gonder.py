@@ -14,7 +14,7 @@ def whatsapp_mesaj_gonder(telefon, mesaj):
         # Mesajı URL-encode yap
         encoded_mesaj = urllib.parse.quote(mesaj)
         
-        # Doğrudan WhatsApp API URL'ini kullan
+        # Doğrudan WhatsApp Web URL'ini kullan - yeni sohbet başlatma için
         whatsapp_url = f"https://web.whatsapp.com/send?phone={telefon}&text={encoded_mesaj}"
         
         profile_path = os.path.join(os.path.expanduser("~"), "whatsapp_profile")

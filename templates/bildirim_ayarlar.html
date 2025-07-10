@@ -21,11 +21,33 @@
 
 <form method="post" action="{{ url_for('bildirim_ayarlar') }}">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-    <div class="mb-3">
-        <label for="whatsapp_sablon" class="form-label">WhatsApp Mesaj Şablonu</label>
-        <textarea class="form-control" id="whatsapp_sablon" name="whatsapp_sablon" rows="3">{{ whatsapp_sablon or "Sayın {ad}, {tarih} tarihinde saat {saat}'de {hizmet} randevunuz bulunmaktadır." }}</textarea>
-        <div class="form-text">Kullanılabilir değişkenler: {ad}, {tarih}, {saat}, {hizmet}</div>
+    
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Randevu WhatsApp Şablonu</h5>
+        </div>
+        <div class="card-body">
+            <div class="mb-3">
+                <label for="whatsapp_sablon" class="form-label">Normal Randevu Mesaj Şablonu</label>
+                <textarea class="form-control" id="whatsapp_sablon" name="whatsapp_sablon" rows="3">{{ whatsapp_sablon or "Sayın {ad}, {tarih} tarihinde saat {saat}'de {hizmet} randevunuz bulunmaktadır." }}</textarea>
+                <div class="form-text">Kullanılabilir değişkenler: {ad}, {tarih}, {saat}, {hizmet}, {calisan}, {telefon}</div>
+            </div>
+        </div>
     </div>
+    
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Online Randevu WhatsApp Şablonu</h5>
+        </div>
+        <div class="card-body">
+            <div class="mb-3">
+                <label for="online_whatsapp_sablon" class="form-label">Online Randevu Mesaj Şablonu</label>
+                <textarea class="form-control" id="online_whatsapp_sablon" name="online_whatsapp_sablon" rows="3">{{ online_whatsapp_sablon or "Sayın {ad}, {tarih} tarihinde saat {saat}'de {hizmet} randevunuz başarıyla oluşturuldu. Uzman: {calisan}. Teşekkürler!" }}</textarea>
+                <div class="form-text">Kullanılabilir değişkenler: {ad}, {tarih}, {saat}, {hizmet}, {calisan}, {telefon}</div>
+            </div>
+        </div>
+    </div>
+    
     <button type="submit" class="btn btn-primary">Kaydet</button>
 </form>
 </div>

@@ -26,31 +26,10 @@
           </div>
           <div class="card-body">
             <div class="alert alert-success">
-              <p><i class="bi bi-info-circle me-2"></i>Randevunuz başarıyla oluşturuldu. Randevu bilgilerinizi WhatsApp üzerinden de alabilirsiniz.</p>
+              <p><i class="bi bi-info-circle me-2"></i>Randevunuz başarıyla oluşturuldu. Randevu bilgilerinizi WhatsApp üzerinden iletilecektir.</p>
             </div>
             
-            {% if randevu_mesaj %}
-            <div class="card mb-3">
-              <div class="card-header bg-light">
-                <h6 class="mb-0"><i class="bi bi-chat-text me-2"></i>Randevu Bilgileriniz</h6>
-              </div>
-              <div class="card-body">
-                <p class="mb-0">{{ randevu_mesaj }}</p>
-              </div>
-            </div>
-            {% endif %}
-            
-            <div class="text-center my-4">
-              <a href="{{ whatsapp_url }}" target="_blank" class="btn btn-success btn-lg">
-                <i class="bi bi-whatsapp me-2"></i>WhatsApp'tan Randevu Bilgilerini Al
-              </a>
-            </div>
-            
-            <div class="alert alert-info">
-              <p><strong>Not:</strong> WhatsApp'ta ilk kez mesaj gönderiyorsanız, yeni bir sohbet başlatmanız gerekebilir. Yukarıdaki butona tıkladıktan sonra "Mesaj Gönder" butonuna tıklayın.</p>
-            </div>
-            
-            <div class="d-flex justify-content-center mt-4">
+                       <div class="d-flex justify-content-center mt-4">
               <a href="{{ url_for('online_randevu') }}" class="btn btn-outline-primary">
                 <i class="bi bi-arrow-left me-2"></i>Randevu Sayfasına Dön
               </a>
