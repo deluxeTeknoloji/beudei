@@ -67,7 +67,7 @@
                     <label class="form-label">Saat</label>
                     <select class="form-select" name="saat" id="saat" required>
                       <option value="">Saat Seçin</option>
-                      {% for saat in ['09:00', '10:00', '11:00', '12:00','13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00'] %}
+                      {% for saat in randevu_saatleri %}
                         <option value="{{ saat }}">{{ saat }}</option>
                       {% endfor %}
                     </select>
@@ -103,7 +103,7 @@ document.addEventListener('DOMContentLoaded', function() {
     calisanSelect.innerHTML = '<option value="">Otomatik Ata</option>';
     
     // Seçilen hizmetin çalışanlarını getir
-    fetch(`/api/hizmet_sorumlu_calisanlar?hizmet_id=${seciliHizmet}`)
+    return fetch(`/api/hizmet_sorumlu_calisanlar?hizmet_id=${seciliHizmet}`)
       .then(resp => resp.json())
       .then(data => {
         if (data.calisanlar && data.calisanlar.length > 0) {
@@ -114,11 +114,7 @@ document.addEventListener('DOMContentLoaded', function() {
             calisanSelect.appendChild(option);
           });
         }
-        
-        // Tarih ve saat seçilmişse saatleri güncelle
-        if (tarihInput.value) {
-          saatleriGuncelle();
-        }
+        return data;
       });
   }
 
@@ -129,6 +125,23 @@ document.addEventListener('DOMContentLoaded', function() {
     const seciliCalisan = calisanSelect.value;
     
     if (!seciliTarih || !seciliHizmet) return;
+    
+    // Pazar günü kontrolü
+    const seciliDate = new Date(seciliTarih);
+    const isPazar = seciliDate.getDay() === 0; // 0: Pazar
+    
+    if (isPazar) {
+      // Pazar günü - tüm saatleri devre dışı bırak ve "Kapalı" olarak işaretle
+      Array.from(saatSelect.options).forEach(opt => {
+        if (!opt.value) return;
+        opt.style.backgroundColor = '#ffcccc';
+        opt.disabled = true;
+        opt.textContent = opt.value + ' (Kapalı)';
+      });
+      // Seçimi sıfırla
+      saatSelect.value = '';
+      return; // API çağrısı yapmaya gerek yok
+    }
     
     // API'ye hizmet_id ve seçilen çalışanı gönder
     let url = `/dolu_saatler?tarih=${seciliTarih}&hizmet_id=${seciliHizmet}`;
@@ -158,15 +171,22 @@ document.addEventListener('DOMContentLoaded', function() {
   tarihInput.addEventListener('change', saatleriGuncelle);
   
   hizmetSelect.addEventListener('change', function() {
-    // Hizmet değiştiğinde çalışanları getir
-    calisanlariGetir();
-    
-    // Saatleri sıfırla
-    Array.from(saatSelect.options).forEach(opt => {
-      if (!opt.value) return;
-      opt.style.backgroundColor = '';
-      opt.disabled = false;
-      opt.textContent = opt.value;
+    // Hizmet değiştiğinde önce çalışanları getir, sonra saatleri güncelle
+    calisanlariGetir().then(() => {
+      // Tarih seçilmişse saatleri güncelle
+      if (tarihInput.value) {
+        saatleriGuncelle();
+      } else {
+        // Tarih seçilmemişse saatleri sıfırla
+        Array.from(saatSelect.options).forEach(opt => {
+          if (!opt.value) return;
+          opt.style.backgroundColor = '';
+          opt.disabled = false;
+          opt.textContent = opt.value;
+        });
+      }
+    }).catch(error => {
+      console.error('Hata:', error);
     });
   });
   

@@ -196,6 +196,12 @@
                           <option value="60" {{ 'selected' if ayarlar.randevu_araligi == '60' else '' }}>60 dakika</option>
                         </select>
                       </div>
+                      <div class="mb-3">
+                        <label class="form-label">Randevu Saatleri</label>
+                        <div class="alert alert-info py-2">
+                          <small><i class="bi bi-info-circle me-1"></i> Randevu saatleri, çalışma saatleri başlangıç ve bitiş aralığında, randevu aralığına göre otomatik oluşturulacaktır.</small>
+                        </div>
+                      </div>
                       <button type="submit" name="action" value="randevu" class="btn btn-primary">
                         <i class="bi bi-save me-1"></i> Kaydet
                       </button>
@@ -213,7 +219,7 @@
                   <div class="card-body">
                     <p>Veritabanınızı yedekleyin ve geri yükleyin.</p>
                     <div class="d-flex gap-2">
-                      <a href="/yedek_al" class="btn btn-success" target="_blank">
+                      <a href="{{ url_for('yedek') }}" class="btn btn-success" target="_blank">
                         <i class="bi bi-download me-1"></i> Yedek Al
                       </a>
                       <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#restoreModal">
@@ -236,7 +242,7 @@
                         <tbody>
                           <tr>
                             <td><strong><i class="bi bi-tag me-2"></i>Versiyon:</strong></td>
-                            <td>1.0.0</td>
+                            <td>{{ SURUM }}</td>
                           </tr>
                           <tr>
                             <td><strong><i class="bi bi-database me-2"></i>Veritabanı:</strong></td>
@@ -257,6 +263,12 @@
                         </tbody>
                       </table>
                     </div>
+                    <div class="mt-3">
+                      <button id="guncellemeKontrolBtn" class="btn btn-primary">
+                        <i class="bi bi-cloud-download me-1"></i> Güncelleme Kontrol Et
+                      </button>
+                    </div>
+                    <div id="guncellemeStatus" class="mt-2" style="display: none;"></div>
                   </div>
                 </div>
               </div>
@@ -306,5 +318,106 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Güncelleme kontrol butonu için
+    document.addEventListener('DOMContentLoaded', function() {
+      const guncellemeBtn = document.getElementById('guncellemeKontrolBtn');
+      const guncellemeStatus = document.getElementById('guncellemeStatus');
+      
+      if (guncellemeBtn) {
+        guncellemeBtn.addEventListener('click', function() {
+          // Buton durumunu güncelle
+          guncellemeBtn.disabled = true;
+          guncellemeBtn.innerHTML = '<i class="bi bi-hourglass-split me-1"></i> Kontrol Ediliyor...';
+          
+          // Güncelleme kontrolü yap
+          fetch('/guncelleme_kontrol')
+            .then(response => response.json())
+            .then(data => {
+              if (data.success) {
+                if (data.guncelleme_var) {
+                  // Güncelleme var
+                  guncellemeStatus.innerHTML = `
+                    <div class="alert alert-success">
+                      <h5><i class="bi bi-cloud-download me-2"></i>Yeni sürüm bulundu!</h5>
+                      <p><strong>Sürüm:</strong> ${data.yeni_surum}</p>
+                      <p>${data.aciklama || 'Bu sürüm yeni özellikler ve iyileştirmeler içerir.'}</p>
+                      <button id="guncellemeIndirBtn" class="btn btn-success">
+                        <i class="bi bi-cloud-download me-1"></i> Güncellemeyi İndir
+                      </button>
+                    </div>
+                  `;
+                  
+                  // Güncelleme indirme butonu için olay dinleyici
+                  document.getElementById('guncellemeIndirBtn').addEventListener('click', function() {
+                    this.disabled = true;
+                    this.innerHTML = '<i class="bi bi-hourglass-split me-1"></i> Güncelleme İndiriliyor...';
+                    
+                    fetch('/guncelleme_indir')
+                      .then(response => response.json())
+                      .then(data => {
+                        if (data.success) {
+                          guncellemeStatus.innerHTML = `
+                            <div class="alert alert-info">
+                              <h5><i class="bi bi-info-circle me-2"></i>Güncelleme Başlatıldı</h5>
+                              <p>Güncelleme indiriliyor ve kurulacak. Uygulama otomatik olarak yeniden başlatılacak.</p>
+                            </div>
+                          `;
+                        } else {
+                          guncellemeStatus.innerHTML = `
+                            <div class="alert alert-danger">
+                              <h5><i class="bi bi-exclamation-triangle me-2"></i>Güncelleme Hatası</h5>
+                              <p>${data.error || 'Güncelleme indirilirken bir hata oluştu.'}</p>
+                            </div>
+                          `;
+                        }
+                      })
+                      .catch(error => {
+                        guncellemeStatus.innerHTML = `
+                          <div class="alert alert-danger">
+                            <h5><i class="bi bi-exclamation-triangle me-2"></i>Bağlantı Hatası</h5>
+                            <p>Güncelleme sunucusuna bağlanılamadı.</p>
+                          </div>
+                        `;
+                      });
+                  });
+                } else {
+                  // Güncelleme yok
+                  guncellemeStatus.innerHTML = `
+                    <div class="alert alert-info">
+                      <i class="bi bi-check-circle me-2"></i>Uygulamanız güncel!
+                    </div>
+                  `;
+                }
+              } else {
+                // Hata
+                guncellemeStatus.innerHTML = `
+                  <div class="alert alert-danger">
+                    <i class="bi bi-exclamation-triangle me-2"></i>Güncelleme kontrolü sırasında bir hata oluştu: ${data.error}
+                  </div>
+                `;
+              }
+              
+              // Buton durumunu sıfırla
+              guncellemeBtn.disabled = false;
+              guncellemeBtn.innerHTML = '<i class="bi bi-cloud-download me-1"></i> Güncelleme Kontrol Et';
+              guncellemeStatus.style.display = 'block';
+            })
+            .catch(error => {
+              guncellemeStatus.innerHTML = `
+                <div class="alert alert-danger">
+                  <i class="bi bi-exclamation-triangle me-2"></i>Bağlantı hatası! Sunucuya erişilemedi.
+                </div>
+              `;
+              
+              // Buton durumunu sıfırla
+              guncellemeBtn.disabled = false;
+              guncellemeBtn.innerHTML = '<i class="bi bi-cloud-download me-1"></i> Güncelleme Kontrol Et';
+              guncellemeStatus.style.display = 'block';
+            });
+        });
+      }
+    });
+  </script>
 </body>
 </html>

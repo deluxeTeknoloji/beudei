@@ -1,0 +1,367 @@
+2025-07-10 16:12:50 - INFO - Log dosyası temizlendi
+2025-07-10 16:12:50 - INFO - 127.0.0.1 - - [10/Jul/2025 16:12:50] "POST /log_temizle HTTP/1.1" 200 -
+2025-07-10 16:12:51 - INFO - 127.0.0.1 - - [10/Jul/2025 16:12:51] "GET /log_kayitlari HTTP/1.1" 200 -
+2025-07-10 16:12:51 - INFO - 127.0.0.1 - - [10/Jul/2025 16:12:51] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2025-07-10 17:11:33 - INFO - 127.0.0.1 - - [10/Jul/2025 17:11:33] "GET /log_kayitlari HTTP/1.1" 200 -
+2025-07-10 17:11:33 - INFO - 127.0.0.1 - - [10/Jul/2025 17:11:33] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2025-07-10 17:11:34 - INFO - 127.0.0.1 - - [10/Jul/2025 17:11:34] "GET /sistem_ayarlar HTTP/1.1" 200 -
+2025-07-10 17:11:34 - INFO - 127.0.0.1 - - [10/Jul/2025 17:11:34] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2025-07-10 17:11:35 - INFO - 127.0.0.1 - - [10/Jul/2025 17:11:35] "GET /sistem_ayarlar HTTP/1.1" 200 -
+2025-07-10 17:11:35 - INFO - 127.0.0.1 - - [10/Jul/2025 17:11:35] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2025-07-10 17:11:36 - INFO - 127.0.0.1 - - [10/Jul/2025 17:11:36] "GET /sistem_ayarlar HTTP/1.1" 200 -
+2025-07-10 17:11:36 - INFO - 127.0.0.1 - - [10/Jul/2025 17:11:36] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2025-07-10 17:11:36 - INFO - 127.0.0.1 - - [10/Jul/2025 17:11:36] "GET /sistem_ayarlar HTTP/1.1" 200 -
+2025-07-10 17:11:36 - INFO - 127.0.0.1 - - [10/Jul/2025 17:11:36] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2025-07-10 17:11:36 - INFO - 127.0.0.1 - - [10/Jul/2025 17:11:36] "GET /sistem_ayarlar HTTP/1.1" 200 -
+2025-07-10 17:11:36 - INFO - 127.0.0.1 - - [10/Jul/2025 17:11:36] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2025-07-10 17:11:36 - INFO - 127.0.0.1 - - [10/Jul/2025 17:11:36] "GET /sistem_ayarlar HTTP/1.1" 200 -
+2025-07-10 17:11:36 - INFO - 127.0.0.1 - - [10/Jul/2025 17:11:36] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2025-07-10 17:11:36 - INFO - 127.0.0.1 - - [10/Jul/2025 17:11:36] "GET /sistem_ayarlar HTTP/1.1" 200 -
+2025-07-10 17:11:36 - INFO - 127.0.0.1 - - [10/Jul/2025 17:11:36] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2025-07-10 17:11:36 - INFO - 127.0.0.1 - - [10/Jul/2025 17:11:36] "GET /sistem_ayarlar HTTP/1.1" 200 -
+2025-07-10 17:11:36 - INFO - 127.0.0.1 - - [10/Jul/2025 17:11:36] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2025-07-10 17:11:37 - INFO - 127.0.0.1 - - [10/Jul/2025 17:11:37] "GET /sistem_ayarlar HTTP/1.1" 200 -
+2025-07-10 17:11:37 - INFO - 127.0.0.1 - - [10/Jul/2025 17:11:37] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2025-07-10 17:11:37 - INFO - 127.0.0.1 - - [10/Jul/2025 17:11:37] "GET /sistem_ayarlar HTTP/1.1" 200 -
+2025-07-10 17:11:37 - INFO - 127.0.0.1 - - [10/Jul/2025 17:11:37] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2025-07-10 17:11:39 - INFO - 127.0.0.1 - - [10/Jul/2025 17:11:39] "GET /hizmet_tanimlari HTTP/1.1" 200 -
+2025-07-10 17:11:39 - INFO - 127.0.0.1 - - [10/Jul/2025 17:11:39] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2025-07-10 17:11:40 - INFO - 127.0.0.1 - - [10/Jul/2025 17:11:40] "GET /bildirim_ayarlar HTTP/1.1" 200 -
+2025-07-10 17:11:40 - INFO - 127.0.0.1 - - [10/Jul/2025 17:11:40] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2025-07-10 17:11:42 - INFO - 127.0.0.1 - - [10/Jul/2025 17:11:42] "GET /kullanici_yonetimi HTTP/1.1" 200 -
+2025-07-10 17:11:42 - INFO - 127.0.0.1 - - [10/Jul/2025 17:11:42] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2025-07-10 17:12:40 - INFO -  * Detected change in 'C:\\Users\\Trenkwalder\\Documents\\GitHub\\beudei\\fidel.py', reloading
+2025-07-10 17:12:44 - INFO - Ödeme durumları güncellendi.
+2025-07-10 17:12:44 - WARNING -  * Debugger is active!
+2025-07-10 17:12:44 - INFO -  * Debugger PIN: 143-078-855
+2025-07-10 17:13:01 - INFO -  * Detected change in 'C:\\Users\\Trenkwalder\\Documents\\GitHub\\beudei\\fidel.py', reloading
+2025-07-10 17:13:01 - INFO - Ödeme durumları güncellendi.
+2025-07-10 17:13:01 - WARNING -  * Debugger is active!
+2025-07-10 17:13:01 - INFO -  * Debugger PIN: 143-078-855
+2025-07-10 17:13:14 - INFO - 127.0.0.1 - - [10/Jul/2025 17:13:14] "GET /sadece_admin HTTP/1.1" 200 -
+2025-07-10 17:13:14 - INFO - 127.0.0.1 - - [10/Jul/2025 17:13:14] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2025-07-10 17:13:15 - INFO - 127.0.0.1 - - [10/Jul/2025 17:13:15] "[32mGET /logout HTTP/1.1[0m" 302 -
+2025-07-10 17:13:15 - INFO - 127.0.0.1 - - [10/Jul/2025 17:13:15] "GET /login HTTP/1.1" 200 -
+2025-07-10 17:13:15 - INFO - 127.0.0.1 - - [10/Jul/2025 17:13:15] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2025-07-10 17:13:19 - INFO - 127.0.0.1 - - [10/Jul/2025 17:13:19] "[32mGET / HTTP/1.1[0m" 302 -
+2025-07-10 17:13:19 - INFO - 127.0.0.1 - - [10/Jul/2025 17:13:19] "GET /login?next=/ HTTP/1.1" 200 -
+2025-07-10 17:13:19 - INFO - 127.0.0.1 - - [10/Jul/2025 17:13:19] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2025-07-10 17:13:20 - INFO -  * Detected change in 'C:\\Users\\Trenkwalder\\Documents\\GitHub\\beudei\\fidel.py', reloading
+2025-07-10 17:13:21 - INFO - Ödeme durumları güncellendi.
+2025-07-10 17:13:21 - WARNING -  * Debugger is active!
+2025-07-10 17:13:21 - INFO -  * Debugger PIN: 143-078-855
+2025-07-10 17:13:42 - INFO - 127.0.0.1 - - [10/Jul/2025 17:13:42] "[32mPOST /login?next=/ HTTP/1.1[0m" 302 -
+2025-07-10 17:13:42 - INFO - 127.0.0.1 - - [10/Jul/2025 17:13:42] "GET / HTTP/1.1" 200 -
+2025-07-10 17:13:42 - INFO - 127.0.0.1 - - [10/Jul/2025 17:13:42] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2025-07-10 17:13:42 - INFO - 127.0.0.1 - - [10/Jul/2025 17:13:42] "GET /api/yaklasan_randevular HTTP/1.1" 200 -
+2025-07-10 17:13:42 - INFO - 127.0.0.1 - - [10/Jul/2025 17:13:42] "GET /api/randevular?start=2025-06-30T00:00:00%2B03:00&end=2025-08-11T00:00:00%2B03:00 HTTP/1.1" 200 -
+2025-07-10 17:13:42 - INFO -  * Detected change in 'C:\\Users\\Trenkwalder\\Documents\\GitHub\\beudei\\fidel.py', reloading
+2025-07-10 17:13:43 - INFO - Ödeme durumları güncellendi.
+2025-07-10 17:13:43 - WARNING -  * Debugger is active!
+2025-07-10 17:13:43 - INFO -  * Debugger PIN: 143-078-855
+2025-07-10 17:13:46 - INFO - 127.0.0.1 - - [10/Jul/2025 17:13:46] "[32mGET /logout HTTP/1.1[0m" 302 -
+2025-07-10 17:13:46 - INFO - 127.0.0.1 - - [10/Jul/2025 17:13:46] "GET /login HTTP/1.1" 200 -
+2025-07-10 17:13:46 - INFO - 127.0.0.1 - - [10/Jul/2025 17:13:46] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2025-07-10 17:13:53 - INFO - 127.0.0.1 - - [10/Jul/2025 17:13:53] "[32mPOST /login HTTP/1.1[0m" 302 -
+2025-07-10 17:13:53 - INFO - 127.0.0.1 - - [10/Jul/2025 17:13:53] "GET / HTTP/1.1" 200 -
+2025-07-10 17:13:53 - INFO - 127.0.0.1 - - [10/Jul/2025 17:13:53] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2025-07-10 17:13:53 - INFO - 127.0.0.1 - - [10/Jul/2025 17:13:53] "GET /api/yaklasan_randevular HTTP/1.1" 200 -
+2025-07-10 17:13:53 - INFO - 127.0.0.1 - - [10/Jul/2025 17:13:53] "GET /api/randevular?start=2025-06-30T00:00:00%2B03:00&end=2025-08-11T00:00:00%2B03:00 HTTP/1.1" 200 -
+2025-07-10 17:14:10 - INFO -  * Detected change in 'C:\\Users\\Trenkwalder\\Documents\\GitHub\\beudei\\fidel.py', reloading
+2025-07-10 17:14:10 - INFO - Ödeme durumları güncellendi.
+2025-07-10 17:14:10 - WARNING -  * Debugger is active!
+2025-07-10 17:14:11 - INFO -  * Debugger PIN: 143-078-855
+2025-07-10 17:14:31 - INFO -  * Detected change in 'C:\\Users\\Trenkwalder\\Documents\\GitHub\\beudei\\fidel.py', reloading
+2025-07-10 17:14:32 - INFO - Ödeme durumları güncellendi.
+2025-07-10 17:14:32 - WARNING -  * Debugger is active!
+2025-07-10 17:14:32 - INFO -  * Debugger PIN: 143-078-855
+2025-07-10 17:14:49 - INFO -  * Detected change in 'C:\\Users\\Trenkwalder\\Documents\\GitHub\\beudei\\fidel.py', reloading
+2025-07-10 17:14:49 - INFO - Ödeme durumları güncellendi.
+2025-07-10 17:14:49 - WARNING -  * Debugger is active!
+2025-07-10 17:14:49 - INFO -  * Debugger PIN: 143-078-855
+2025-07-10 17:18:53 - INFO - 127.0.0.1 - - [10/Jul/2025 17:18:53] "GET /api/yaklasan_randevular HTTP/1.1" 200 -
+2025-07-10 17:30:47 - INFO - 127.0.0.1 - - [10/Jul/2025 17:30:47] "GET /api/yaklasan_randevular HTTP/1.1" 200 -
+2025-07-10 17:30:48 - INFO - 127.0.0.1 - - [10/Jul/2025 17:30:48] "[33mGET /static/favicon.ico HTTP/1.1[0m" 404 -
+2025-07-10 17:30:48 - INFO - 127.0.0.1 - - [10/Jul/2025 17:30:48] "[33mGET /static/favicon.ico HTTP/1.1[0m" 404 -
+2025-07-10 17:32:23 - INFO - 127.0.0.1 - - [10/Jul/2025 17:32:23] "[33mGET /static/notification.mp3 HTTP/1.1[0m" 404 -
+2025-07-10 17:32:23 - INFO - 127.0.0.1 - - [10/Jul/2025 17:32:23] "[33mGET /static/notification.mp3 HTTP/1.1[0m" 404 -
+2025-07-11 11:30:38 - INFO - Ödeme durumları güncellendi.
+2025-07-11 11:30:38 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.1.51:5000
+2025-07-11 11:30:38 - INFO - [33mPress CTRL+C to quit[0m
+2025-07-11 11:30:49 - INFO - 127.0.0.1 - - [11/Jul/2025 11:30:49] "[32mGET / HTTP/1.1[0m" 302 -
+2025-07-11 11:30:49 - INFO - 127.0.0.1 - - [11/Jul/2025 11:30:49] "GET /login?next=http://127.0.0.1:5000/ HTTP/1.1" 200 -
+2025-07-11 11:30:49 - INFO - 127.0.0.1 - - [11/Jul/2025 11:30:49] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2025-07-11 11:30:49 - INFO - 127.0.0.1 - - [11/Jul/2025 11:30:49] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-07-11 11:30:55 - INFO - 127.0.0.1 - - [11/Jul/2025 11:30:55] "[32mPOST /login?next=http://127.0.0.1:5000/ HTTP/1.1[0m" 302 -
+2025-07-11 11:30:55 - INFO - 127.0.0.1 - - [11/Jul/2025 11:30:55] "GET / HTTP/1.1" 200 -
+2025-07-11 11:30:55 - INFO - 127.0.0.1 - - [11/Jul/2025 11:30:55] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2025-07-11 11:30:55 - INFO - 127.0.0.1 - - [11/Jul/2025 11:30:55] "GET /api/yaklasan_randevular HTTP/1.1" 200 -
+2025-07-11 11:30:55 - INFO - 127.0.0.1 - - [11/Jul/2025 11:30:55] "GET /api/randevular?start=2025-06-30T00:00:00%2B03:00&end=2025-08-11T00:00:00%2B03:00 HTTP/1.1" 200 -
+2025-07-11 11:31:00 - INFO - 127.0.0.1 - - [11/Jul/2025 11:31:00] "GET /sadece_admin HTTP/1.1" 200 -
+2025-07-11 11:31:00 - INFO - 127.0.0.1 - - [11/Jul/2025 11:31:00] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2025-07-11 11:31:03 - INFO - 127.0.0.1 - - [11/Jul/2025 11:31:03] "GET /sistem_ayarlar HTTP/1.1" 200 -
+2025-07-11 11:31:03 - INFO - 127.0.0.1 - - [11/Jul/2025 11:31:03] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2025-07-11 11:31:09 - INFO - Güncelleme kontrolü yapılıyor...
+2025-07-11 11:31:10 - WARNING - Sunucudan hata kodu: 404
+2025-07-11 11:31:10 - INFO - 127.0.0.1 - - [11/Jul/2025 11:31:10] "GET /guncelleme_kontrol HTTP/1.1" 200 -
+2025-07-11 11:31:17 - INFO - 127.0.0.1 - - [11/Jul/2025 11:31:17] "POST /sistem_ayarlar HTTP/1.1" 200 -
+2025-07-11 11:31:17 - INFO - 127.0.0.1 - - [11/Jul/2025 11:31:17] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2025-07-11 11:31:21 - INFO - 127.0.0.1 - - [11/Jul/2025 11:31:21] "[33mGET /yedek_al HTTP/1.1[0m" 404 -
+2025-07-11 11:34:15 - INFO - 127.0.0.1 - - [11/Jul/2025 11:34:15] "POST /sistem_ayarlar HTTP/1.1" 200 -
+2025-07-11 11:34:15 - INFO - 127.0.0.1 - - [11/Jul/2025 11:34:15] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2025-07-11 11:34:18 - INFO - 127.0.0.1 - - [11/Jul/2025 11:34:18] "GET /calisan_yonetimi HTTP/1.1" 200 -
+2025-07-11 11:34:18 - INFO - 127.0.0.1 - - [11/Jul/2025 11:34:18] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2025-07-11 11:34:19 - INFO - 127.0.0.1 - - [11/Jul/2025 11:34:19] "GET /kullanici_yonetimi HTTP/1.1" 200 -
+2025-07-11 11:34:19 - INFO - 127.0.0.1 - - [11/Jul/2025 11:34:19] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2025-07-11 11:34:29 - INFO - 127.0.0.1 - - [11/Jul/2025 11:34:29] "GET /hizmet_tanimlari HTTP/1.1" 200 -
+2025-07-11 11:34:29 - INFO - 127.0.0.1 - - [11/Jul/2025 11:34:29] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2025-07-11 11:34:30 - INFO - 127.0.0.1 - - [11/Jul/2025 11:34:30] "GET /sistem_ayarlar HTTP/1.1" 200 -
+2025-07-11 11:34:30 - INFO - 127.0.0.1 - - [11/Jul/2025 11:34:30] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2025-07-11 11:34:33 - INFO - 127.0.0.1 - - [11/Jul/2025 11:34:33] "[33mGET /yedek_al HTTP/1.1[0m" 404 -
+2025-07-11 12:09:32 - INFO - 127.0.0.1 - - [11/Jul/2025 12:09:32] "GET /sistem_ayarlar HTTP/1.1" 200 -
+2025-07-11 12:09:32 - INFO - 127.0.0.1 - - [11/Jul/2025 12:09:32] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2025-07-11 12:10:12 - INFO - 127.0.0.1 - - [11/Jul/2025 12:10:12] "[33mGET /yedekleme HTTP/1.1[0m" 404 -
+2025-07-11 12:23:51 - INFO - 127.0.0.1 - - [11/Jul/2025 12:23:51] "[33mGET /yedek_al HTTP/1.1[0m" 404 -
+2025-07-11 12:23:54 - INFO - 127.0.0.1 - - [11/Jul/2025 12:23:54] "GET /sistem_ayarlar HTTP/1.1" 200 -
+2025-07-11 12:23:54 - INFO - 127.0.0.1 - - [11/Jul/2025 12:23:54] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2025-07-11 12:24:15 - INFO - 127.0.0.1 - - [11/Jul/2025 12:24:15] "GET /sistem_ayarlar HTTP/1.1" 200 -
+2025-07-11 12:24:15 - INFO - 127.0.0.1 - - [11/Jul/2025 12:24:15] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2025-07-11 12:24:21 - INFO - 127.0.0.1 - - [11/Jul/2025 12:24:21] "GET /sistem_ayarlar HTTP/1.1" 200 -
+2025-07-11 12:24:21 - INFO - 127.0.0.1 - - [11/Jul/2025 12:24:21] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2025-07-11 12:24:21 - INFO - 127.0.0.1 - - [11/Jul/2025 12:24:21] "GET /log_kayitlari HTTP/1.1" 200 -
+2025-07-11 12:24:21 - INFO - 127.0.0.1 - - [11/Jul/2025 12:24:21] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2025-07-11 12:24:22 - INFO - 127.0.0.1 - - [11/Jul/2025 12:24:22] "GET /hizmet_tanimlari HTTP/1.1" 200 -
+2025-07-11 12:24:22 - INFO - 127.0.0.1 - - [11/Jul/2025 12:24:22] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2025-07-11 12:24:23 - INFO - 127.0.0.1 - - [11/Jul/2025 12:24:23] "GET /bildirim_ayarlar HTTP/1.1" 200 -
+2025-07-11 12:24:23 - INFO - 127.0.0.1 - - [11/Jul/2025 12:24:23] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2025-07-11 12:24:23 - INFO - 127.0.0.1 - - [11/Jul/2025 12:24:23] "GET /destek HTTP/1.1" 200 -
+2025-07-11 12:24:25 - INFO - 127.0.0.1 - - [11/Jul/2025 12:24:25] "GET /sistem_ayarlar HTTP/1.1" 200 -
+2025-07-11 12:24:25 - INFO - 127.0.0.1 - - [11/Jul/2025 12:24:25] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2025-07-11 12:24:26 - INFO - 127.0.0.1 - - [11/Jul/2025 12:24:26] "GET /log_kayitlari HTTP/1.1" 200 -
+2025-07-11 12:24:26 - INFO - 127.0.0.1 - - [11/Jul/2025 12:24:26] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2025-07-11 12:24:27 - INFO - 127.0.0.1 - - [11/Jul/2025 12:24:27] "GET /sistem_ayarlar HTTP/1.1" 200 -
+2025-07-11 12:24:27 - INFO - 127.0.0.1 - - [11/Jul/2025 12:24:27] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2025-07-11 12:30:31 - INFO - Ödeme durumları güncellendi.
+2025-07-11 12:30:31 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.1.51:5000
+2025-07-11 12:30:31 - INFO - [33mPress CTRL+C to quit[0m
+2025-07-11 12:30:34 - INFO - 127.0.0.1 - - [11/Jul/2025 12:30:34] "GET /sistem_ayarlar HTTP/1.1" 200 -
+2025-07-11 12:30:34 - INFO - 127.0.0.1 - - [11/Jul/2025 12:30:34] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2025-07-11 12:30:36 - INFO - Yedekleme işlemi başlatıldı: kuaför.db
+2025-07-11 12:30:36 - INFO - Veritabanı yedeklendi: C:\Users\Trenkwalder\Documents\GitHub\beudei\yedek_20250711_123036.db
+2025-07-11 12:30:36 - INFO - 127.0.0.1 - - [11/Jul/2025 12:30:36] "GET /yedek_al HTTP/1.1" 200 -
+2025-07-11 12:31:04 - INFO - 127.0.0.1 - - [11/Jul/2025 12:31:04] "[33mPOST /yedek_yukle HTTP/1.1[0m" 404 -
+2025-07-11 12:59:13 - INFO - 127.0.0.1 - - [11/Jul/2025 12:59:13] "GET /sistem_ayarlar HTTP/1.1" 200 -
+2025-07-11 12:59:13 - INFO - 127.0.0.1 - - [11/Jul/2025 12:59:13] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2025-07-11 12:59:18 - INFO - 127.0.0.1 - - [11/Jul/2025 12:59:18] "[33mPOST /yedek_yukle HTTP/1.1[0m" 404 -
+2025-07-11 13:07:29 - INFO - 127.0.0.1 - - [11/Jul/2025 13:07:29] "GET /sistem_ayarlar HTTP/1.1" 200 -
+2025-07-11 13:07:29 - INFO - 127.0.0.1 - - [11/Jul/2025 13:07:29] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2025-07-11 13:07:34 - INFO - 127.0.0.1 - - [11/Jul/2025 13:07:34] "[33mPOST /yedek_yukle HTTP/1.1[0m" 404 -
+2025-07-11 13:07:40 - INFO - Yedekleme işlemi başlatıldı: kuaför.db
+2025-07-11 13:07:40 - INFO - Veritabanı yedeklendi: C:\Users\Trenkwalder\Documents\GitHub\beudei\yedek_20250711_130740.db
+2025-07-11 13:07:40 - INFO - 127.0.0.1 - - [11/Jul/2025 13:07:40] "GET /yedek_al HTTP/1.1" 200 -
+2025-07-11 13:07:50 - INFO - Güncelleme kontrolü yapılıyor...
+2025-07-11 13:07:51 - WARNING - Sunucudan hata kodu: 404
+2025-07-11 13:07:51 - INFO - 127.0.0.1 - - [11/Jul/2025 13:07:51] "GET /guncelleme_kontrol HTTP/1.1" 200 -
+2025-07-11 14:26:54 - INFO - Ödeme durumları güncellendi.
+2025-07-11 14:26:54 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.1.51:5000
+2025-07-11 14:26:54 - INFO - [33mPress CTRL+C to quit[0m
+2025-07-11 14:27:12 - INFO - 127.0.0.1 - - [11/Jul/2025 14:27:12] "GET / HTTP/1.1" 200 -
+2025-07-11 14:27:12 - INFO - 127.0.0.1 - - [11/Jul/2025 14:27:12] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2025-07-11 14:27:12 - INFO - 127.0.0.1 - - [11/Jul/2025 14:27:12] "GET /api/yaklasan_randevular HTTP/1.1" 200 -
+2025-07-11 14:27:13 - INFO - 127.0.0.1 - - [11/Jul/2025 14:27:13] "GET /api/randevular?start=2025-06-30T00:00:00%2B03:00&end=2025-08-11T00:00:00%2B03:00 HTTP/1.1" 200 -
+2025-07-11 14:27:14 - INFO - 127.0.0.1 - - [11/Jul/2025 14:27:14] "GET /randevu_al HTTP/1.1" 200 -
+2025-07-11 14:27:14 - INFO - 127.0.0.1 - - [11/Jul/2025 14:27:14] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2025-07-11 14:27:26 - INFO - 127.0.0.1 - - [11/Jul/2025 14:27:26] "GET / HTTP/1.1" 200 -
+2025-07-11 14:27:26 - INFO - 127.0.0.1 - - [11/Jul/2025 14:27:26] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2025-07-11 14:27:26 - INFO - 127.0.0.1 - - [11/Jul/2025 14:27:26] "GET /api/yaklasan_randevular HTTP/1.1" 200 -
+2025-07-11 14:27:26 - INFO - 127.0.0.1 - - [11/Jul/2025 14:27:26] "GET /api/randevular?start=2025-06-30T00:00:00%2B03:00&end=2025-08-11T00:00:00%2B03:00 HTTP/1.1" 200 -
+2025-07-11 14:27:27 - INFO - 127.0.0.1 - - [11/Jul/2025 14:27:27] "GET /online_randevu HTTP/1.1" 200 -
+2025-07-11 14:27:31 - INFO - 127.0.0.1 - - [11/Jul/2025 14:27:31] "GET /api/hizmet_sorumlu_calisanlar?hizmet_id=1 HTTP/1.1" 200 -
+2025-07-11 14:27:31 - INFO - 127.0.0.1 - - [11/Jul/2025 14:27:31] "GET /dolu_saatler?tarih=2025-07-11&hizmet_id=1 HTTP/1.1" 200 -
+2025-07-11 14:27:32 - INFO - 127.0.0.1 - - [11/Jul/2025 14:27:32] "GET /dolu_saatler?tarih=2025-07-11&hizmet_id=1&calisan_id=4 HTTP/1.1" 200 -
+2025-07-11 14:27:35 - INFO - 127.0.0.1 - - [11/Jul/2025 14:27:35] "GET /dolu_saatler?tarih=2025-07-13&hizmet_id=1&calisan_id=4 HTTP/1.1" 200 -
+2025-07-11 14:27:44 - INFO - 127.0.0.1 - - [11/Jul/2025 14:27:44] "POST /online_randevu HTTP/1.1" 200 -
+2025-07-11 14:29:32 - INFO - 127.0.0.1 - - [11/Jul/2025 14:29:32] "POST /online_randevu HTTP/1.1" 200 -
+2025-07-11 14:29:48 - INFO - 127.0.0.1 - - [11/Jul/2025 14:29:48] "POST /online_randevu HTTP/1.1" 200 -
+2025-07-11 14:29:57 - INFO - 127.0.0.1 - - [11/Jul/2025 14:29:57] "POST /online_randevu HTTP/1.1" 200 -
+2025-07-11 14:30:00 - INFO - 127.0.0.1 - - [11/Jul/2025 14:30:00] "POST /online_randevu HTTP/1.1" 200 -
+2025-07-11 14:30:03 - INFO - 127.0.0.1 - - [11/Jul/2025 14:30:03] "POST /online_randevu HTTP/1.1" 200 -
+2025-07-11 14:30:07 - INFO - 127.0.0.1 - - [11/Jul/2025 14:30:07] "GET /online_randevu HTTP/1.1" 200 -
+2025-07-11 14:30:15 - INFO - 127.0.0.1 - - [11/Jul/2025 14:30:15] "GET /online_randevu HTTP/1.1" 200 -
+2025-07-11 14:30:38 - INFO - 127.0.0.1 - - [11/Jul/2025 14:30:38] "GET /online_randevu HTTP/1.1" 200 -
+2025-07-11 14:30:38 - INFO - 127.0.0.1 - - [11/Jul/2025 14:30:38] "GET /online_randevu HTTP/1.1" 200 -
+2025-07-11 14:30:38 - INFO - 127.0.0.1 - - [11/Jul/2025 14:30:38] "GET /online_randevu HTTP/1.1" 200 -
+2025-07-11 14:30:38 - INFO - 127.0.0.1 - - [11/Jul/2025 14:30:38] "GET /online_randevu HTTP/1.1" 200 -
+2025-07-11 14:30:40 - INFO - 127.0.0.1 - - [11/Jul/2025 14:30:40] "GET /api/hizmet_sorumlu_calisanlar?hizmet_id=3 HTTP/1.1" 200 -
+2025-07-11 14:30:40 - INFO - 127.0.0.1 - - [11/Jul/2025 14:30:40] "GET /dolu_saatler?tarih=2025-07-11&hizmet_id=3 HTTP/1.1" 200 -
+2025-07-11 14:30:43 - INFO - 127.0.0.1 - - [11/Jul/2025 14:30:43] "GET /dolu_saatler?tarih=2025-07-13&hizmet_id=3 HTTP/1.1" 200 -
+2025-07-11 14:30:46 - INFO - 127.0.0.1 - - [11/Jul/2025 14:30:46] "GET /api/hizmet_sorumlu_calisanlar?hizmet_id=4 HTTP/1.1" 200 -
+2025-07-11 14:30:46 - INFO - 127.0.0.1 - - [11/Jul/2025 14:30:46] "GET /dolu_saatler?tarih=2025-07-13&hizmet_id=4 HTTP/1.1" 200 -
+2025-07-11 14:30:53 - INFO - 127.0.0.1 - - [11/Jul/2025 14:30:53] "POST /online_randevu HTTP/1.1" 200 -
+2025-07-11 14:31:09 - INFO - 127.0.0.1 - - [11/Jul/2025 14:31:09] "POST /online_randevu HTTP/1.1" 200 -
+2025-07-11 14:31:14 - INFO - 127.0.0.1 - - [11/Jul/2025 14:31:14] "GET /api/hizmet_sorumlu_calisanlar?hizmet_id=7 HTTP/1.1" 200 -
+2025-07-11 14:31:14 - INFO - 127.0.0.1 - - [11/Jul/2025 14:31:14] "GET /dolu_saatler?tarih=2025-07-11&hizmet_id=7 HTTP/1.1" 200 -
+2025-07-11 14:31:17 - INFO - 127.0.0.1 - - [11/Jul/2025 14:31:17] "GET /api/hizmet_sorumlu_calisanlar?hizmet_id=1 HTTP/1.1" 200 -
+2025-07-11 14:31:17 - INFO - 127.0.0.1 - - [11/Jul/2025 14:31:17] "GET /dolu_saatler?tarih=2025-07-11&hizmet_id=1 HTTP/1.1" 200 -
+2025-07-11 14:31:21 - INFO - 127.0.0.1 - - [11/Jul/2025 14:31:21] "GET /dolu_saatler?tarih=2025-07-13&hizmet_id=1 HTTP/1.1" 200 -
+2025-07-11 14:31:26 - INFO - 127.0.0.1 - - [11/Jul/2025 14:31:26] "GET /online_randevu HTTP/1.1" 200 -
+2025-07-11 14:31:27 - INFO - 127.0.0.1 - - [11/Jul/2025 14:31:27] "GET /online_randevu HTTP/1.1" 200 -
+2025-07-11 14:31:27 - INFO - 127.0.0.1 - - [11/Jul/2025 14:31:27] "GET /online_randevu HTTP/1.1" 200 -
+2025-07-11 14:31:27 - INFO - 127.0.0.1 - - [11/Jul/2025 14:31:27] "GET /online_randevu HTTP/1.1" 200 -
+2025-07-11 14:31:39 - INFO - Ödeme durumları güncellendi.
+2025-07-11 14:31:39 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.1.51:5000
+2025-07-11 14:31:39 - INFO - [33mPress CTRL+C to quit[0m
+2025-07-11 14:31:44 - INFO - 127.0.0.1 - - [11/Jul/2025 14:31:44] "GET /api/hizmet_sorumlu_calisanlar?hizmet_id=2 HTTP/1.1" 200 -
+2025-07-11 14:31:44 - INFO - 127.0.0.1 - - [11/Jul/2025 14:31:44] "GET /dolu_saatler?tarih=2025-07-11&hizmet_id=2 HTTP/1.1" 200 -
+2025-07-11 14:31:45 - INFO - 127.0.0.1 - - [11/Jul/2025 14:31:45] "GET /dolu_saatler?tarih=2025-07-11&hizmet_id=2&calisan_id=2 HTTP/1.1" 200 -
+2025-07-11 14:31:47 - INFO - 127.0.0.1 - - [11/Jul/2025 14:31:47] "GET /api/hizmet_sorumlu_calisanlar?hizmet_id=5 HTTP/1.1" 200 -
+2025-07-11 14:31:47 - INFO - 127.0.0.1 - - [11/Jul/2025 14:31:47] "GET /dolu_saatler?tarih=2025-07-11&hizmet_id=5 HTTP/1.1" 200 -
+2025-07-11 14:31:56 - INFO - 127.0.0.1 - - [11/Jul/2025 14:31:56] "[32mGET / HTTP/1.1[0m" 302 -
+2025-07-11 14:31:56 - INFO - 127.0.0.1 - - [11/Jul/2025 14:31:56] "GET /login?next=http://localhost:5000/ HTTP/1.1" 200 -
+2025-07-11 14:31:56 - INFO - 127.0.0.1 - - [11/Jul/2025 14:31:56] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2025-07-11 14:31:57 - INFO - 127.0.0.1 - - [11/Jul/2025 14:31:57] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-07-11 14:32:00 - INFO - 127.0.0.1 - - [11/Jul/2025 14:32:00] "[32mPOST /login?next=http://localhost:5000/ HTTP/1.1[0m" 302 -
+2025-07-11 14:32:01 - INFO - 127.0.0.1 - - [11/Jul/2025 14:32:01] "GET / HTTP/1.1" 200 -
+2025-07-11 14:32:01 - INFO - 127.0.0.1 - - [11/Jul/2025 14:32:01] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2025-07-11 14:32:01 - INFO - 127.0.0.1 - - [11/Jul/2025 14:32:01] "GET /api/yaklasan_randevular HTTP/1.1" 200 -
+2025-07-11 14:32:01 - INFO - 127.0.0.1 - - [11/Jul/2025 14:32:01] "GET /api/randevular?start=2025-06-30T00:00:00%2B03:00&end=2025-08-11T00:00:00%2B03:00 HTTP/1.1" 200 -
+2025-07-11 14:32:10 - INFO - 127.0.0.1 - - [11/Jul/2025 14:32:10] "GET /api/hizmet_sorumlu_calisanlar?hizmet_id=1 HTTP/1.1" 200 -
+2025-07-11 14:32:10 - INFO - 127.0.0.1 - - [11/Jul/2025 14:32:10] "GET /dolu_saatler?tarih=2025-07-11&hizmet_id=1 HTTP/1.1" 200 -
+2025-07-11 14:32:11 - INFO - 127.0.0.1 - - [11/Jul/2025 14:32:11] "GET /dolu_saatler?tarih=2025-07-11&hizmet_id=1&calisan_id=4 HTTP/1.1" 200 -
+2025-07-11 14:32:22 - INFO - WhatsApp mesajı gönderme işlemi başlatıldı: 905469250500
+2025-07-11 14:32:22 - INFO - 127.0.0.1 - - [11/Jul/2025 14:32:22] "[32mPOST /online_randevu HTTP/1.1[0m" 302 -
+2025-07-11 14:32:22 - INFO - 127.0.0.1 - - [11/Jul/2025 14:32:22] "GET /randevu_basarili HTTP/1.1" 200 -
+2025-07-11 14:32:23 - INFO - ====== WebDriver manager ======
+2025-07-11 14:32:23 - INFO - 127.0.0.1 - - [11/Jul/2025 14:32:23] "GET /online_randevu HTTP/1.1" 200 -
+2025-07-11 14:32:24 - INFO - Get LATEST chromedriver version for google-chrome
+2025-07-11 14:32:24 - INFO - Get LATEST chromedriver version for google-chrome
+2025-07-11 14:32:25 - INFO - Get LATEST chromedriver version for google-chrome
+2025-07-11 14:32:26 - INFO - WebDriver version 138.0.7204.94 selected
+2025-07-11 14:32:26 - INFO - Modern chrome version https://storage.googleapis.com/chrome-for-testing-public/138.0.7204.94/win32/chromedriver-win32.zip
+2025-07-11 14:32:26 - INFO - About to download new driver from https://storage.googleapis.com/chrome-for-testing-public/138.0.7204.94/win32/chromedriver-win32.zip
+2025-07-11 14:32:26 - INFO - 127.0.0.1 - - [11/Jul/2025 14:32:26] "GET / HTTP/1.1" 200 -
+2025-07-11 14:32:26 - INFO - Driver downloading response is 200
+2025-07-11 14:32:26 - INFO - 127.0.0.1 - - [11/Jul/2025 14:32:26] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2025-07-11 14:32:27 - INFO - 127.0.0.1 - - [11/Jul/2025 14:32:27] "GET /api/yaklasan_randevular HTTP/1.1" 200 -
+2025-07-11 14:32:27 - INFO - 127.0.0.1 - - [11/Jul/2025 14:32:27] "GET /api/randevular?start=2025-06-30T00:00:00%2B03:00&end=2025-08-11T00:00:00%2B03:00 HTTP/1.1" 200 -
+2025-07-11 14:32:29 - INFO - Get LATEST chromedriver version for google-chrome
+2025-07-11 14:32:30 - INFO - Driver has been saved in cache [C:\Users\Trenkwalder\.wdm\drivers\chromedriver\win64\138.0.7204.94]
+2025-07-11 14:32:46 - INFO - 127.0.0.1 - - [11/Jul/2025 14:32:46] "GET /online_randevu HTTP/1.1" 200 -
+2025-07-11 14:32:51 - INFO - 127.0.0.1 - - [11/Jul/2025 14:32:51] "GET /api/hizmet_sorumlu_calisanlar?hizmet_id=1 HTTP/1.1" 200 -
+2025-07-11 14:32:51 - INFO - 127.0.0.1 - - [11/Jul/2025 14:32:51] "GET /dolu_saatler?tarih=2025-07-11&hizmet_id=1 HTTP/1.1" 200 -
+2025-07-11 14:32:52 - INFO - 127.0.0.1 - - [11/Jul/2025 14:32:52] "GET /dolu_saatler?tarih=2025-07-11&hizmet_id=1&calisan_id=4 HTTP/1.1" 200 -
+2025-07-11 14:32:57 - INFO - 127.0.0.1 - - [11/Jul/2025 14:32:57] "GET /randevu_duzenle/204 HTTP/1.1" 200 -
+2025-07-11 14:32:57 - INFO - 127.0.0.1 - - [11/Jul/2025 14:32:57] "[33mGET /randevu_duzenle/style.css HTTP/1.1[0m" 404 -
+2025-07-11 14:33:15 - INFO - 127.0.0.1 - - [11/Jul/2025 14:33:15] "GET /api/hizmet_sorumlu_calisanlar?hizmet_id=5 HTTP/1.1" 200 -
+2025-07-11 14:33:18 - INFO - 127.0.0.1 - - [11/Jul/2025 14:33:18] "GET /online_randevu HTTP/1.1" 200 -
+2025-07-11 14:33:20 - INFO - 127.0.0.1 - - [11/Jul/2025 14:33:20] "GET /api/hizmet_sorumlu_calisanlar?hizmet_id=6 HTTP/1.1" 200 -
+2025-07-11 14:33:20 - INFO - 127.0.0.1 - - [11/Jul/2025 14:33:20] "GET /dolu_saatler?tarih=2025-07-11&hizmet_id=6 HTTP/1.1" 200 -
+2025-07-11 14:33:22 - INFO - 127.0.0.1 - - [11/Jul/2025 14:33:22] "GET /dolu_saatler?tarih=2025-07-12&hizmet_id=6 HTTP/1.1" 200 -
+2025-07-11 14:33:26 - INFO - 127.0.0.1 - - [11/Jul/2025 14:33:26] "GET /dolu_saatler?tarih=2025-07-11&hizmet_id=6 HTTP/1.1" 200 -
+2025-07-11 14:33:30 - INFO - 127.0.0.1 - - [11/Jul/2025 14:33:30] "GET /api/hizmet_sorumlu_calisanlar?hizmet_id=8 HTTP/1.1" 200 -
+2025-07-11 14:33:30 - INFO - 127.0.0.1 - - [11/Jul/2025 14:33:30] "GET /dolu_saatler?tarih=2025-07-11&hizmet_id=8 HTTP/1.1" 200 -
+2025-07-11 14:33:34 - INFO - 127.0.0.1 - - [11/Jul/2025 14:33:34] "GET /api/hizmet_sorumlu_calisanlar?hizmet_id=12 HTTP/1.1" 200 -
+2025-07-11 14:33:34 - INFO - 127.0.0.1 - - [11/Jul/2025 14:33:34] "GET /dolu_saatler?tarih=2025-07-11&hizmet_id=12 HTTP/1.1" 200 -
+2025-07-11 14:33:37 - INFO - 127.0.0.1 - - [11/Jul/2025 14:33:37] "GET /api/hizmet_sorumlu_calisanlar?hizmet_id=17 HTTP/1.1" 200 -
+2025-07-11 14:33:37 - INFO - 127.0.0.1 - - [11/Jul/2025 14:33:37] "GET /dolu_saatler?tarih=2025-07-11&hizmet_id=17 HTTP/1.1" 200 -
+2025-07-11 14:33:40 - INFO - 127.0.0.1 - - [11/Jul/2025 14:33:40] "GET /online_randevu HTTP/1.1" 200 -
+2025-07-11 14:33:45 - INFO - 127.0.0.1 - - [11/Jul/2025 14:33:45] "GET /api/hizmet_sorumlu_calisanlar?hizmet_id=17 HTTP/1.1" 200 -
+2025-07-11 14:33:45 - INFO - 127.0.0.1 - - [11/Jul/2025 14:33:45] "GET /dolu_saatler?tarih=2025-07-11&hizmet_id=17 HTTP/1.1" 200 -
+2025-07-11 14:33:50 - INFO - 127.0.0.1 - - [11/Jul/2025 14:33:50] "GET /api/hizmet_sorumlu_calisanlar?hizmet_id=1 HTTP/1.1" 200 -
+2025-07-11 14:33:50 - INFO - 127.0.0.1 - - [11/Jul/2025 14:33:50] "GET /dolu_saatler?tarih=2025-07-11&hizmet_id=1 HTTP/1.1" 200 -
+2025-07-11 14:33:52 - INFO - 127.0.0.1 - - [11/Jul/2025 14:33:52] "GET /api/hizmet_sorumlu_calisanlar?hizmet_id=2 HTTP/1.1" 200 -
+2025-07-11 14:33:52 - INFO - 127.0.0.1 - - [11/Jul/2025 14:33:52] "GET /dolu_saatler?tarih=2025-07-11&hizmet_id=2 HTTP/1.1" 200 -
+2025-07-11 14:33:56 - INFO - 127.0.0.1 - - [11/Jul/2025 14:33:56] "GET /api/hizmet_sorumlu_calisanlar?hizmet_id=1 HTTP/1.1" 200 -
+2025-07-11 14:33:56 - INFO - 127.0.0.1 - - [11/Jul/2025 14:33:56] "GET /dolu_saatler?tarih=2025-07-11&hizmet_id=1 HTTP/1.1" 200 -
+2025-07-11 14:34:03 - INFO - 127.0.0.1 - - [11/Jul/2025 14:34:03] "GET / HTTP/1.1" 200 -
+2025-07-11 14:34:03 - INFO - 127.0.0.1 - - [11/Jul/2025 14:34:03] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2025-07-11 14:34:04 - INFO - 127.0.0.1 - - [11/Jul/2025 14:34:04] "GET /api/yaklasan_randevular HTTP/1.1" 200 -
+2025-07-11 14:34:04 - INFO - 127.0.0.1 - - [11/Jul/2025 14:34:04] "GET /api/randevular?start=2025-06-30T00:00:00%2B03:00&end=2025-08-11T00:00:00%2B03:00 HTTP/1.1" 200 -
+2025-07-11 14:34:05 - INFO - 127.0.0.1 - - [11/Jul/2025 14:34:05] "GET /online_randevu HTTP/1.1" 200 -
+2025-07-11 14:38:38 - INFO - 127.0.0.1 - - [11/Jul/2025 14:38:38] "GET /sadece_admin HTTP/1.1" 200 -
+2025-07-11 14:38:38 - INFO - 127.0.0.1 - - [11/Jul/2025 14:38:38] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2025-07-11 14:38:41 - INFO - 127.0.0.1 - - [11/Jul/2025 14:38:41] "GET /sistem_ayarlar HTTP/1.1" 200 -
+2025-07-11 14:38:41 - INFO - 127.0.0.1 - - [11/Jul/2025 14:38:41] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2025-07-11 14:38:57 - INFO - 127.0.0.1 - - [11/Jul/2025 14:38:57] "POST /sistem_ayarlar HTTP/1.1" 200 -
+2025-07-11 14:38:57 - INFO - 127.0.0.1 - - [11/Jul/2025 14:38:57] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2025-07-11 14:39:04 - INFO - 127.0.0.1 - - [11/Jul/2025 14:39:04] "POST /sistem_ayarlar HTTP/1.1" 200 -
+2025-07-11 14:39:04 - INFO - 127.0.0.1 - - [11/Jul/2025 14:39:04] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2025-07-11 14:42:15 - INFO - 127.0.0.1 - - [11/Jul/2025 14:42:15] "POST /sistem_ayarlar HTTP/1.1" 200 -
+2025-07-11 14:42:15 - INFO - 127.0.0.1 - - [11/Jul/2025 14:42:15] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2025-07-11 14:42:52 - INFO - 127.0.0.1 - - [11/Jul/2025 14:42:52] "POST /sistem_ayarlar HTTP/1.1" 200 -
+2025-07-11 14:42:52 - INFO - 127.0.0.1 - - [11/Jul/2025 14:42:52] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2025-07-11 14:42:58 - INFO - 127.0.0.1 - - [11/Jul/2025 14:42:58] "POST /sistem_ayarlar HTTP/1.1" 200 -
+2025-07-11 14:42:58 - INFO - 127.0.0.1 - - [11/Jul/2025 14:42:58] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2025-07-11 14:43:04 - INFO - 127.0.0.1 - - [11/Jul/2025 14:43:04] "POST /sistem_ayarlar HTTP/1.1" 200 -
+2025-07-11 14:43:04 - INFO - 127.0.0.1 - - [11/Jul/2025 14:43:04] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2025-07-11 14:43:06 - INFO - 127.0.0.1 - - [11/Jul/2025 14:43:06] "GET /online_randevu HTTP/1.1" 200 -
+2025-07-11 14:44:06 - INFO - 127.0.0.1 - - [11/Jul/2025 14:44:06] "GET /online_randevu HTTP/1.1" 200 -
+2025-07-11 14:44:17 - INFO - 127.0.0.1 - - [11/Jul/2025 14:44:17] "POST /sistem_ayarlar HTTP/1.1" 200 -
+2025-07-11 14:44:17 - INFO - 127.0.0.1 - - [11/Jul/2025 14:44:17] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2025-07-11 14:44:20 - INFO - 127.0.0.1 - - [11/Jul/2025 14:44:20] "GET /online_randevu HTTP/1.1" 200 -
+2025-07-11 14:46:42 - INFO - 127.0.0.1 - - [11/Jul/2025 14:46:42] "GET /online_randevu HTTP/1.1" 200 -
+2025-07-11 14:46:46 - INFO - 127.0.0.1 - - [11/Jul/2025 14:46:46] "POST /sistem_ayarlar HTTP/1.1" 200 -
+2025-07-11 14:46:46 - INFO - 127.0.0.1 - - [11/Jul/2025 14:46:46] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2025-07-11 14:55:22 - INFO - 127.0.0.1 - - [11/Jul/2025 14:55:22] "POST /sistem_ayarlar HTTP/1.1" 200 -
+2025-07-11 14:55:22 - INFO - 127.0.0.1 - - [11/Jul/2025 14:55:22] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2025-07-11 14:55:26 - INFO - 127.0.0.1 - - [11/Jul/2025 14:55:26] "GET /online_randevu HTTP/1.1" 200 -
+2025-07-11 14:55:46 - INFO - 127.0.0.1 - - [11/Jul/2025 14:55:46] "POST /sistem_ayarlar HTTP/1.1" 200 -
+2025-07-11 14:55:46 - INFO - 127.0.0.1 - - [11/Jul/2025 14:55:46] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2025-07-11 14:55:51 - INFO - 127.0.0.1 - - [11/Jul/2025 14:55:51] "GET /online_randevu HTTP/1.1" 200 -
+2025-07-11 14:55:58 - INFO - 127.0.0.1 - - [11/Jul/2025 14:55:58] "GET /api/hizmet_sorumlu_calisanlar?hizmet_id=1 HTTP/1.1" 200 -
+2025-07-11 14:56:04 - INFO - 127.0.0.1 - - [11/Jul/2025 14:56:04] "GET /dolu_saatler?tarih=2025-07-12&hizmet_id=1 HTTP/1.1" 200 -
+2025-07-11 14:58:27 - INFO - 127.0.0.1 - - [11/Jul/2025 14:58:27] "POST /sistem_ayarlar HTTP/1.1" 200 -
+2025-07-11 14:58:27 - INFO - 127.0.0.1 - - [11/Jul/2025 14:58:27] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2025-07-11 14:58:34 - INFO - 127.0.0.1 - - [11/Jul/2025 14:58:34] "POST /sistem_ayarlar HTTP/1.1" 200 -
+2025-07-11 14:58:34 - INFO - 127.0.0.1 - - [11/Jul/2025 14:58:34] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2025-07-11 14:58:44 - INFO - 127.0.0.1 - - [11/Jul/2025 14:58:44] "GET /sadece_admin HTTP/1.1" 200 -
+2025-07-11 14:58:44 - INFO - 127.0.0.1 - - [11/Jul/2025 14:58:44] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2025-07-11 14:58:46 - INFO - 127.0.0.1 - - [11/Jul/2025 14:58:46] "GET /sistem_ayarlar HTTP/1.1" 200 -
+2025-07-11 14:58:46 - INFO - 127.0.0.1 - - [11/Jul/2025 14:58:46] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2025-07-11 14:58:48 - INFO - 127.0.0.1 - - [11/Jul/2025 14:58:48] "GET /raporlar HTTP/1.1" 200 -
+2025-07-11 14:58:49 - INFO - 127.0.0.1 - - [11/Jul/2025 14:58:49] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2025-07-11 14:58:54 - INFO - 127.0.0.1 - - [11/Jul/2025 14:58:54] "GET /raporlar HTTP/1.1" 200 -
+2025-07-11 14:58:54 - INFO - 127.0.0.1 - - [11/Jul/2025 14:58:54] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2025-07-11 14:58:56 - INFO - 127.0.0.1 - - [11/Jul/2025 14:58:56] "GET /raporlar HTTP/1.1" 200 -
+2025-07-11 14:58:56 - INFO - 127.0.0.1 - - [11/Jul/2025 14:58:56] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2025-07-11 14:59:02 - INFO - 127.0.0.1 - - [11/Jul/2025 14:59:02] "GET /sistem_ayarlar HTTP/1.1" 200 -
+2025-07-11 14:59:02 - INFO - 127.0.0.1 - - [11/Jul/2025 14:59:02] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2025-07-11 14:59:03 - INFO - 127.0.0.1 - - [11/Jul/2025 14:59:03] "GET /log_kayitlari HTTP/1.1" 200 -
+2025-07-11 14:59:03 - INFO - 127.0.0.1 - - [11/Jul/2025 14:59:03] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2025-07-11 14:59:06 - INFO - 127.0.0.1 - - [11/Jul/2025 14:59:06] "GET /sistem_ayarlar HTTP/1.1" 200 -
+2025-07-11 14:59:06 - INFO - 127.0.0.1 - - [11/Jul/2025 14:59:06] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2025-07-11 14:59:28 - INFO - Ödeme durumları güncellendi.
+2025-07-11 14:59:28 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.1.51:5000
+2025-07-11 14:59:28 - INFO - [33mPress CTRL+C to quit[0m
+2025-07-11 14:59:33 - INFO - 127.0.0.1 - - [11/Jul/2025 14:59:33] "GET /online_randevu HTTP/1.1" 200 -
+2025-07-11 14:59:53 - INFO - 127.0.0.1 - - [11/Jul/2025 14:59:53] "POST /sistem_ayarlar HTTP/1.1" 200 -
+2025-07-11 14:59:53 - INFO - 127.0.0.1 - - [11/Jul/2025 14:59:53] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2025-07-11 15:00:06 - INFO - 127.0.0.1 - - [11/Jul/2025 15:00:06] "GET /online_randevu HTTP/1.1" 200 -
+2025-07-11 15:02:49 - INFO - 127.0.0.1 - - [11/Jul/2025 15:02:49] "GET /api/hizmet_sorumlu_calisanlar?hizmet_id=2 HTTP/1.1" 200 -
+2025-07-11 15:03:11 - INFO - 127.0.0.1 - - [11/Jul/2025 15:03:11] "GET /dolu_saatler?tarih=2025-07-12&hizmet_id=2 HTTP/1.1" 200 -
+2025-07-11 15:06:37 - INFO - 127.0.0.1 - - [11/Jul/2025 15:06:37] "GET /sistem_ayarlar HTTP/1.1" 200 -
+2025-07-11 15:06:43 - INFO - 127.0.0.1 - - [11/Jul/2025 15:06:43] "GET / HTTP/1.1" 200 -
+2025-07-11 15:06:43 - INFO - 127.0.0.1 - - [11/Jul/2025 15:06:43] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2025-07-11 15:06:44 - INFO - 127.0.0.1 - - [11/Jul/2025 15:06:44] "GET /api/yaklasan_randevular HTTP/1.1" 200 -
+2025-07-11 15:06:44 - INFO - 127.0.0.1 - - [11/Jul/2025 15:06:44] "GET /api/randevular?start=2025-06-30T00:00:00%2B03:00&end=2025-08-11T00:00:00%2B03:00 HTTP/1.1" 200 -
+2025-07-11 15:06:47 - INFO - 127.0.0.1 - - [11/Jul/2025 15:06:47] "GET /randevular HTTP/1.1" 200 -
+2025-07-11 15:06:47 - INFO - 127.0.0.1 - - [11/Jul/2025 15:06:47] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2025-07-11 15:07:11 - INFO - 127.0.0.1 - - [11/Jul/2025 15:07:11] "GET /randevular HTTP/1.1" 200 -
+2025-07-11 15:07:11 - INFO - 127.0.0.1 - - [11/Jul/2025 15:07:11] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2025-07-11 15:07:27 - INFO - 127.0.0.1 - - [11/Jul/2025 15:07:27] "GET /randevular HTTP/1.1" 200 -
+2025-07-11 15:07:27 - INFO - 127.0.0.1 - - [11/Jul/2025 15:07:27] "[36mGET /static/style.css HTTP/1.1[0m" 304 -

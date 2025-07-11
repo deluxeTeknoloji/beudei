@@ -433,8 +433,25 @@ document.getElementById('statusFilter').addEventListener('change', function() {
         const partsB = dateTextB.split('.');
         
         // Yıl-Ay-Gün formatına çevir
-        const dateA = partsA.length === 3 ? new Date(partsA[2], partsA[1]-1, partsA[0]) : new Date(0);
-        const dateB = partsB.length === 3 ? new Date(partsB[2], partsB[1]-1, partsB[0]) : new Date(0);
+        let dateA, dateB;
+        
+        if (partsA.length === 3) {
+          const yearA = parseInt(partsA[2]);
+          const monthA = parseInt(partsA[1]) - 1; // Ay 0-11 arası olmalı
+          const dayA = parseInt(partsA[0]);
+          dateA = new Date(yearA, monthA, dayA);
+        } else {
+          dateA = new Date(0);
+        }
+        
+        if (partsB.length === 3) {
+          const yearB = parseInt(partsB[2]);
+          const monthB = parseInt(partsB[1]) - 1; // Ay 0-11 arası olmalı
+          const dayB = parseInt(partsB[0]);
+          dateB = new Date(yearB, monthB, dayB);
+        } else {
+          dateB = new Date(0);
+        }
         
         return sortDirection === 'asc' 
           ? dateA - dateB  // Eskiden yeniye
@@ -457,13 +474,30 @@ document.getElementById('dateFilterBtn').addEventListener('click', function() {
   const startDate = startDateValue ? new Date(startDateValue) : new Date(0);
   const endDate = endDateValue ? new Date(endDateValue) : new Date('2099-12-31');
   
+  // Bitiş tarihini günün sonuna ayarla (23:59:59)
+  if (endDateValue) {
+    endDate.setHours(23, 59, 59, 999);
+  }
+  
   const rows = document.querySelectorAll('#randevuTableBody tr');
   rows.forEach(row => {
     const dateText = row.children[1].textContent.trim();
     const parts = dateText.split('.');
-    const rowDate = parts.length === 3 ? new Date(parts[2], parts[1]-1, parts[0]) : new Date(0);
-    const inRange = rowDate >= startDate && rowDate <= endDate;
-    row.style.display = inRange ? '' : 'none';
+    
+    // Türkçe tarih formatını (GG.AA.YYYY) JavaScript Date nesnesine çevirme
+    if (parts.length === 3) {
+      // Doğru şekilde yıl, ay (0-11 arası) ve gün olarak ayarla
+      const year = parseInt(parts[2]);
+      const month = parseInt(parts[1]) - 1; // Ay 0-11 arası olmalı
+      const day = parseInt(parts[0]);
+      
+      const rowDate = new Date(year, month, day);
+      const inRange = rowDate >= startDate && rowDate <= endDate;
+      row.style.display = inRange ? '' : 'none';
+    } else {
+      // Geçersiz tarih formatı, satırı gösterme
+      row.style.display = 'none';
+    }
   });
 });
 

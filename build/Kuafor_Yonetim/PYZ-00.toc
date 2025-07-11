@@ -609,6 +609,9 @@
    'C:\\Program '
    'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\\Lib\\glob.py',
    'PYMODULE'),
+  ('guncelleme',
+   'C:\\Users\\Trenkwalder\\Documents\\GitHub\\beudei\\guncelleme.py',
+   'PYMODULE'),
   ('gzip',
    'C:\\Program '
    'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\\Lib\\gzip.py',

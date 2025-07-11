@@ -176,7 +176,7 @@
                     <label class="form-label">Saat <span class="text-danger">*</span></label>
                     <select class="form-select" name="saat" required>
                       <option value="">Saat Seçin</option>
-                      {% for saat in ['09:00', '10:00', '11:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00'] %}
+                      {% for saat in randevu_saatleri %}
                         <option value="{{ saat }}">{{ saat }}</option>
                       {% endfor %}
                     </select>
@@ -284,7 +284,42 @@
           hizmetSelect.innerHTML = '<option value="Satın alınmış hizmet bulunamadı">Satın alınmış hizmet bulunamadı</option>';
         }
       {% endif %}
+      
+      // Tarih değiştiğinde saatleri kontrol et
+      document.querySelector('input[name="tarih"]').addEventListener('change', function() {
+        checkSundayAndUpdateTimeSlots(this.value);
+      });
+      
+      // Sayfa yüklendiğinde de kontrol et
+      checkSundayAndUpdateTimeSlots(today);
     });
+    
+    // Pazar günü kontrolü ve saat seçimlerini güncelleme
+    function checkSundayAndUpdateTimeSlots(dateStr) {
+      const date = new Date(dateStr);
+      const isSunday = date.getDay() === 0; // 0: Pazar
+      const saatSelect = document.querySelector('select[name="saat"]');
+      
+      if (isSunday) {
+        // Pazar günü - tüm saatleri devre dışı bırak ve "Kapalı" olarak işaretle
+        Array.from(saatSelect.options).forEach(option => {
+          if (option.value) { // Boş seçenek değilse
+            option.disabled = true;
+            option.textContent = option.value + ' (Kapalı)';
+          }
+        });
+        // Seçimi sıfırla
+        saatSelect.value = '';
+      } else {
+        // Diğer günler - normal görünüm
+        Array.from(saatSelect.options).forEach(option => {
+          if (option.value) { // Boş seçenek değilse
+            option.disabled = false;
+            option.textContent = option.value;
+          }
+        });
+      }
+    }
 
     // Hizmet seçildiğinde yapılacak işlemler
     document.getElementById('hizmet').addEventListener('change', function () {

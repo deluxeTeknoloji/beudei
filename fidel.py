@@ -9,9 +9,21 @@ from flask_login import LoginManager, login_user, login_required, logout_user, U
 from werkzeug.security import generate_password_hash, check_password_hash
 from whatsapp_gonder import whatsapp_mesaj_gonder
 import threading
+import time
+
+# Uygulama sürüm bilgisi
+SURUM = "1.0.0"
 
 # Logging ayarları
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S',
+    handlers=[
+        logging.FileHandler('kuafor_app.log', encoding='utf-8'),
+        logging.StreamHandler()
+    ]
+)
 logger = logging.getLogger(__name__)
 
 
@@ -42,6 +54,31 @@ app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "kuaför_uygulaması_gizli_anahtar")
 csrf = CSRFProtect(app)
 app.jinja_env.globals['datetime'] = datetime
+
+# Açık rotalar listesi (login gerektirmeyen rotalar)
+ACIK_ROTALAR = [
+    'online_randevu',  # Online randevu sayfası
+    'hizmet_sorumlu_calisanlar',  # Online randevu için API
+    'dolu_saatler',  # Online randevu için API
+    'login',  # Giriş sayfası
+    'static',  # Statik dosyalar
+    'randevu_basarili',  # Randevu başarılı sayfası
+    'yedek_yukle'  # Yedek yükleme sayfası (admin kontrolü içinde yapılıyor)
+]
+
+# Tüm rotaları otomatik olarak korumak için before_request
+@app.before_request
+def koruma():
+    # Mevcut endpoint'i al
+    endpoint = request.endpoint
+    
+    # Eğer endpoint None ise veya açık rotalarda ise, devam et
+    if endpoint is None or any(endpoint.endswith(rota) for rota in ACIK_ROTALAR):
+        return
+    
+    # Kullanıcı giriş yapmamışsa, login sayfasına yönlendir
+    if not current_user.is_authenticated:
+        return redirect(url_for('login', next=request.url))
 
 
 login_manager = LoginManager()
@@ -88,6 +125,45 @@ def get_online_whatsapp_sablon():
     except Exception as e:
         logger.error(f"Online WhatsApp şablonu alınırken hata: {str(e)}")
         return None
+        
+def generate_randevu_saatleri():
+    """Sistem ayarlarına göre randevu saatlerini otomatik oluşturur"""
+    try:
+        with closing(get_db_connection()) as conn:
+            # Çalışma saatleri ve randevu aralığını al
+            calisma_baslangic_row = conn.execute("SELECT deger FROM sistem_ayarlar WHERE anahtar = 'calisma_baslangic'").fetchone()
+            calisma_bitis_row = conn.execute("SELECT deger FROM sistem_ayarlar WHERE anahtar = 'calisma_bitis'").fetchone()
+            randevu_araligi_row = conn.execute("SELECT deger FROM sistem_ayarlar WHERE anahtar = 'randevu_araligi'").fetchone()
+            
+            calisma_baslangic = calisma_baslangic_row['deger'] if calisma_baslangic_row else '09:00'
+            calisma_bitis = calisma_bitis_row['deger'] if calisma_bitis_row else '18:00'
+            randevu_araligi = int(randevu_araligi_row['deger']) if randevu_araligi_row else 30
+            
+            # Randevu saatlerini otomatik oluştur
+            randevu_saatleri = []
+            try:
+                baslangic = datetime.strptime(calisma_baslangic, '%H:%M')
+                bitis = datetime.strptime(calisma_bitis, '%H:%M')
+                
+                # Bitiş saatinden randevu aralığı kadar önce son randevu olabilir
+                son_randevu_saati = bitis - timedelta(minutes=1)
+                
+                current = baslangic
+                while current < son_randevu_saati:
+                    randevu_saatleri.append(current.strftime('%H:%M'))
+                    current = current + timedelta(minutes=randevu_araligi)
+                    
+                    # Eğer bir sonraki randevu bitiş saatini geçiyorsa döngüyü sonlandır
+                    if current >= bitis:
+                        break
+            except Exception as e:
+                logger.error(f"Randevu saatleri oluşturulurken hata: {str(e)}")
+                randevu_saatleri = ['09:00', '10:00', '11:00', '13:00', '14:00', '15:00', '16:00', '17:00']
+                
+            return randevu_saatleri
+    except Exception as e:
+        logger.error(f"Randevu saatleri oluşturulurken hata: {str(e)}")
+        return ['09:00', '10:00', '11:00', '13:00', '14:00', '15:00', '16:00', '17:00']
 
 def set_online_whatsapp_sablon(sablon):
     try:
@@ -933,6 +1009,9 @@ def randevu_al():
             # Çalışanları getir
             calisanlar = conn.execute('SELECT * FROM çalışanlar').fetchall()
             
+            # Randevu saatlerini otomatik oluştur
+            randevu_saatleri = generate_randevu_saatleri()
+            
             # Hizmetlere çalışan adlarını ekle
             for i in range(len(hizmetler)):
                 h = hizmetler[i]
@@ -985,6 +1064,30 @@ def randevu_al():
         calisan_id = request.form.get('calisan_id')
         seans = request.form.get('seans', 1, type=int)
         ucret = request.form.get('ucret')
+        
+        # Pazar günü kontrolü
+        try:
+            tarih_obj = datetime.strptime(tarih, '%Y-%m-%d')
+            if tarih_obj.weekday() == 6:  # 6 = Pazar
+                flash("Pazar günleri salon kapalıdır, randevu oluşturulamaz!", "danger")
+                return render_template('randevu_al.html',
+                                    hizmetler=hizmetler,
+                                    musteri=musteri,
+                                    musteri_id=musteri_id,
+                                    tum_musteriler=tum_musteriler,
+                                    satilmis_hizmet_idler=satilmis_hizmet_idler,
+                                    satislar=satislar,
+                                    kalan_seanslar=kalan_seanslar)
+        except ValueError:
+            flash("Geçersiz tarih formatı!", "danger")
+            return render_template('randevu_al.html',
+                                hizmetler=hizmetler,
+                                musteri=musteri,
+                                musteri_id=musteri_id,
+                                tum_musteriler=tum_musteriler,
+                                satilmis_hizmet_idler=satilmis_hizmet_idler,
+                                satislar=satislar,
+                                kalan_seanslar=kalan_seanslar)
         
         # Hizmet id'sini bul
         hizmet_id = None
@@ -1096,7 +1199,8 @@ def randevu_al():
                            tum_musteriler=tum_musteriler,
                            satilmis_hizmet_idler=satilmis_hizmet_idler,
                            satislar=satislar,
-                           kalan_seanslar=kalan_seanslar)
+                           kalan_seanslar=kalan_seanslar,
+                           randevu_saatleri=randevu_saatleri)
                            
 # Çalışan Yönetimi Route'ları
 @app.route('/calisan_ekle', methods=['POST'])
@@ -1336,10 +1440,14 @@ def randevu_duzenle(randevu_id):
     try:
         with closing(get_db_connection()) as conn:
             hizmetler = conn.execute('SELECT * FROM hizmetler').fetchall()
+            
+            # Randevu saatlerini otomatik oluştur
+            randevu_saatleri = generate_randevu_saatleri()
     except Exception as e:
         logger.error("Hizmet listesi çekilirken hata: %s", e)
         flash(f'Hata: {str(e)}', 'danger')
         hizmetler = []
+        randevu_saatleri = generate_randevu_saatleri()
 
     if request.method == 'POST':
         yeni_tarih = request.form.get('tarih', '')
@@ -1359,7 +1467,7 @@ def randevu_duzenle(randevu_id):
             logger.error("Randevu güncelleme hatası: %s", e)
             flash(f'Hata: {str(e)}', 'danger')
 
-    return render_template('randevu_duzenle.html', randevu=randevu, hizmetler=hizmetler)
+    return render_template('randevu_duzenle.html', randevu=randevu, hizmetler=hizmetler, randevu_saatleri=randevu_saatleri)
 
 from datetime import datetime
 
@@ -1904,6 +2012,9 @@ def sistem_ayarlar():
     if current_user.rol != 'admin':
         flash('Bu sayfaya erişim yetkiniz yok!', 'danger')
         return redirect(url_for('index'))
+        
+    # Sürüm bilgisini şablona gönder
+    global SURUM
     
     if request.method == 'POST':
         action = request.form.get('action')
@@ -1981,7 +2092,8 @@ def sistem_ayarlar():
                          ayarlar=ayarlar,
                          toplam_musteri=toplam_musteri,
                          toplam_randevu=toplam_randevu,
-                         son_guncelleme=datetime.now().strftime('%d.%m.%Y'))
+                         son_guncelleme=datetime.now().strftime('%d.%m.%Y'),
+                         SURUM=SURUM)
 
 from datetime import datetime, timedelta
 
@@ -2191,12 +2303,86 @@ def log_kayitlari():
     if current_user.rol != 'admin':
         flash('Bu sayfaya erişim yetkiniz yok!', 'danger')
         return redirect(url_for('index'))
-    # Örnek loglar
-    loglar = [
-        {"tarih": "2024-05-29", "olay": "Kullanıcı girişi"},
-        {"tarih": "2024-05-28", "olay": "Yeni müşteri eklendi"},
-    ]
+    
+    try:
+        
+        # Log dosyasını oku
+        import os
+        log_dosyasi = os.path.join(os.getcwd(), 'kuafor_app.log')
+        loglar = []
+        
+        if os.path.exists(log_dosyasi):
+            with open(log_dosyasi, 'r', encoding='utf-8') as f:
+                for line in f:
+                    try:
+                        # Log satırını parçala
+                        parts = line.strip().split(' - ')
+                        if len(parts) >= 3:
+                            tarih_zaman = parts[0]
+                            log_seviyesi = parts[1]
+                            mesaj = ' - '.join(parts[2:])
+                            
+                            # Log türünü belirle
+                            tur = "info"
+                            if "WARNING" in log_seviyesi:
+                                tur = "warning"
+                            elif "ERROR" in log_seviyesi or "CRITICAL" in log_seviyesi:
+                                tur = "error"
+                            
+                            # Mesajdan tarih/saat bilgisini kaldır
+                            # Mesajın başında tarih formatı varsa temizle
+                            import re
+                            # Tarih formatını temizle (YYYY-MM-DD HH:MM:SS)
+                            temiz_mesaj = re.sub(r'^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2} - ', '', mesaj)
+                            
+                            loglar.append({
+                                "tarih": tarih_zaman,
+                                "olay": temiz_mesaj,
+                                "tur": tur
+                            })
+                    except Exception as e:
+                        # Hatalı log satırlarını atla
+                        continue
+        
+        # Logları tarihe göre sırala (en yeni en üstte)
+        loglar.reverse()
+        
+        # Eğer log dosyası yoksa veya boşsa örnek loglar göster
+        if not loglar:
+            loglar = [
+                {"tarih": datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "olay": "Log kayıtları sayfası görüntülendi", "tur": "info"},
+                {"tarih": (datetime.now() - timedelta(minutes=5)).strftime("%Y-%m-%d %H:%M:%S"), "olay": "Bu bir test uyarısıdır", "tur": "warning"},
+                {"tarih": (datetime.now() - timedelta(minutes=10)).strftime("%Y-%m-%d %H:%M:%S"), "olay": "Bu bir test hata mesajıdır", "tur": "error"},
+            ]
+    except Exception as e:
+        logger.error(f"Log kayıtları alınırken hata: {str(e)}")
+        flash(f"Log kayıtları alınırken hata oluştu: {str(e)}", "danger")
+        loglar = []
+    
     return render_template('log_kayitlari.html', loglar=loglar)
+
+@app.route('/log_temizle', methods=['POST'])
+@login_required
+def log_temizle():
+    if current_user.rol != 'admin':
+        return jsonify({'success': False, 'error': 'Yetkiniz yok!'})
+    
+    try:
+        import os
+        log_dosyasi = os.path.join(os.getcwd(), 'kuafor_app.log')
+        
+        # Log dosyasını temizle
+        if os.path.exists(log_dosyasi):
+            with open(log_dosyasi, 'w', encoding='utf-8') as f:
+                f.write('')  # Dosyayı boşalt
+        
+        # Temizleme işlemini logla
+        logger.info("Log dosyası temizlendi")
+        
+        return jsonify({'success': True})
+    except Exception as e:
+        logger.error(f"Log temizleme hatası: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)})
 
 @app.route('/hizmet_tanimlari')
 @login_required
@@ -2303,6 +2489,8 @@ def update_payment_status():
 
 
 @app.route('/yedek')
+@app.route('/yedek_al')
+@login_required
 def yedek():
     """Basit yedekleme fonksiyonu"""
     try:
@@ -2317,6 +2505,7 @@ def yedek():
             return redirect(url_for('sistem_ayarlar'))
         
         db_file = db_files[0]  # İlk bulunan .db dosyasını kullan
+        logger.info(f"Yedekleme işlemi başlatıldı: {db_file}")
         
         # Yedek dosya adı
         backup_filename = f"yedek_{datetime.now().strftime('%Y%m%d_%H%M%S')}.db"
@@ -2324,6 +2513,7 @@ def yedek():
         
         # Veritabanını kopyala
         shutil.copy2(db_file, backup_path)
+        logger.info(f"Veritabanı yedeklendi: {backup_path}")
         
         # Dosyayı indir
         return send_file(backup_path, as_attachment=True, download_name=backup_filename)
@@ -2334,7 +2524,79 @@ def yedek():
         logger.error(f"Yedekleme hatası: {str(e)}\n{error_details}")
         flash(f'Yedekleme hatası: {str(e)}', 'danger')
         return redirect(url_for('sistem_ayarlar'))
+
+@app.route('/yedek_yukle', methods=['POST'])
+def yedek_yukle():
+    """Yedek dosyasını yükleme fonksiyonu"""
+    # Kullanıcı giriş yapmış mı kontrol et
+    if not current_user.is_authenticated:
+        flash('Bu işlemi yapmak için giriş yapmalısınız!', 'danger')
+        return redirect(url_for('login'))
+        
+    # Admin yetkisi kontrolü
+    if current_user.rol != 'admin':
+        flash('Bu işlemi yapmaya yetkiniz yok!', 'danger')
+        return redirect(url_for('sistem_ayarlar'))
     
+    try:
+        import os
+        import shutil
+        from werkzeug.utils import secure_filename
+        
+        # Yüklenen dosyayı kontrol et
+        if 'backup_file' not in request.files:
+            flash('Dosya seçilmedi!', 'danger')
+            return redirect(url_for('sistem_ayarlar'))
+        
+        file = request.files['backup_file']
+        if file.filename == '':
+            flash('Dosya seçilmedi!', 'danger')
+            return redirect(url_for('sistem_ayarlar'))
+        
+        if not file.filename.endswith('.db'):
+            flash('Geçersiz dosya formatı! Sadece .db uzantılı dosyalar yüklenebilir.', 'danger')
+            return redirect(url_for('sistem_ayarlar'))
+        
+        # Mevcut veritabanını bul
+        db_files = [f for f in os.listdir('.') if f.endswith('.db')]
+        if not db_files:
+            flash('Mevcut veritabanı dosyası bulunamadı!', 'danger')
+            return redirect(url_for('sistem_ayarlar'))
+        
+        db_file = db_files[0]  # İlk bulunan .db dosyasını kullan
+        
+        # Mevcut veritabanının yedeğini al
+        backup_filename = f"otomatik_yedek_{datetime.now().strftime('%Y%m%d_%H%M%S')}.db"
+        backup_path = os.path.join(os.getcwd(), backup_filename)
+        shutil.copy2(db_file, backup_path)
+        logger.info(f"Geri yükleme öncesi otomatik yedek alındı: {backup_path}")
+        
+        # Yüklenen dosyayı geçici olarak kaydet
+        temp_path = os.path.join(os.getcwd(), 'temp_upload.db')
+        file.save(temp_path)
+        
+        # Uygulamayı yeniden başlatmadan önce veritabanı bağlantılarını kapat
+        # SQLite veritabanı dosyasını değiştirmeden önce tüm bağlantıları kapatmak önemli
+        import sqlite3
+        sqlite3.connect(':memory:').close()  # SQLite bağlantı havuzunu temizle
+        
+        # Yüklenen dosyayı mevcut veritabanının yerine koy
+        shutil.copy2(temp_path, db_file)
+        os.remove(temp_path)  # Geçici dosyayı sil
+        
+        logger.info(f"Veritabanı başarıyla geri yüklendi: {db_file}")
+        flash('Veritabanı başarıyla geri yüklendi! Değişikliklerin tam olarak uygulanması için uygulamayı yeniden başlatmanız gerekebilir.', 'success')
+        
+        return redirect(url_for('sistem_ayarlar'))
+        
+    except Exception as e:
+        import traceback
+        error_details = traceback.format_exc()
+        logger.error(f"Yedek yükleme hatası: {str(e)}\n{error_details}")
+        flash(f'Yedek yükleme hatası: {str(e)}', 'danger')
+        return redirect(url_for('sistem_ayarlar'))
+    
+# Bu sayfa dış erişime açık, login_required dekoratörü yok
 @app.route('/online_randevu', methods=['GET', 'POST'])
 def online_randevu():
     try:
@@ -2344,6 +2606,9 @@ def online_randevu():
             
             # Çalışanları getir
             calisanlar = conn.execute('SELECT * FROM çalışanlar').fetchall()
+            
+            # Randevu saatlerini otomatik oluştur
+            randevu_saatleri = generate_randevu_saatleri()
             
             # Hizmetlere çalışan adlarını ekle
             for i in range(len(hizmetler)):
@@ -2369,6 +2634,16 @@ def online_randevu():
             if not (ad and telefon and hizmet_id and tarih and saat):
                 flash("Tüm alanlar zorunludur!", "danger")
                 return render_template('online_randevu.html', hizmetler=hizmetler, current_year=datetime.now().year)
+                
+            # Pazar günü kontrolü
+            try:
+                tarih_obj = datetime.strptime(tarih, '%Y-%m-%d')
+                if tarih_obj.weekday() == 6:  # 6 = Pazar
+                    flash("Pazar günleri salon kapalıdır, randevu oluşturulamaz!", "danger")
+                    return render_template('online_randevu.html', hizmetler=hizmetler, randevu_saatleri=randevu_saatleri, current_year=datetime.now().year)
+            except ValueError:
+                flash("Geçersiz tarih formatı!", "danger")
+                return render_template('online_randevu.html', hizmetler=hizmetler, randevu_saatleri=randevu_saatleri, current_year=datetime.now().year)
 
             with closing(get_db_connection()) as conn:
                 # Hizmet bilgilerini al
@@ -2523,12 +2798,15 @@ def online_randevu():
             flash("Randevunuz başarıyla oluşturuldu!", "success")
             return redirect(url_for('randevu_basarili'))
 
-        return render_template('online_randevu.html', hizmetler=hizmetler, current_year=datetime.now().year)
+        return render_template('online_randevu.html', hizmetler=hizmetler, randevu_saatleri=randevu_saatleri, current_year=datetime.now().year)
     except Exception as e:
         logger.error(f"Online randevu hatası: {str(e)}")
         flash(f"Hata oluştu: {str(e)}", "danger")
-        return render_template('online_randevu.html', hizmetler=[], current_year=datetime.now().year)
+        # Hata durumunda da otomatik oluşturulan saatleri kullan
+        randevu_saatleri = generate_randevu_saatleri()
+        return render_template('online_randevu.html', hizmetler=[], randevu_saatleri=randevu_saatleri, current_year=datetime.now().year)
 
+# Online randevu için gerekli API
 @app.route('/api/hizmet_sorumlu_calisanlar')
 def hizmet_sorumlu_calisanlar():
     hizmet_id = request.args.get('hizmet_id')
@@ -2563,6 +2841,7 @@ def hizmet_sorumlu_calisanlar():
         logger.error(f"Hizmet çalışanları API hatası: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
+# Online randevu için gerekli API
 @app.route('/dolu_saatler')
 def dolu_saatler():
     tarih = request.args.get('tarih')
@@ -2623,6 +2902,7 @@ def dolu_saatler():
         return jsonify({'error': str(e)}), 500
 
 
+# Bu sayfa da dış erişime açık
 @app.route('/randevu_basarili')
 def randevu_basarili():
     # Session'dan bilgileri al
@@ -2640,7 +2920,68 @@ def randevu_basarili():
                           randevu_mesaj=randevu_mesaj,
                           current_year=datetime.now().year)
 
+# Güncelleme kontrolü için API
+@app.route('/guncelleme_kontrol')
+@login_required
+def guncelleme_kontrol():
+    if current_user.rol != 'admin':
+        return jsonify({'success': False, 'error': 'Yetkiniz yok!'})
+    
+    try:
+        from guncelleme import surum_kontrol
+        guncelleme_bilgisi = surum_kontrol()
+        
+        if guncelleme_bilgisi:
+            return jsonify({
+                'success': True, 
+                'guncelleme_var': True,
+                'yeni_surum': guncelleme_bilgisi.get('yeni_surum'),
+                'aciklama': guncelleme_bilgisi.get('aciklama')
+            })
+        else:
+            return jsonify({'success': True, 'guncelleme_var': False})
+    except Exception as e:
+        logger.error(f"Güncelleme kontrolü sırasında hata: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)})
+
+@app.route('/guncelleme_indir')
+@login_required
+def guncelleme_indir():
+    if current_user.rol != 'admin':
+        return jsonify({'success': False, 'error': 'Yetkiniz yok!'})
+    
+    try:
+        from guncelleme import surum_kontrol, guncelleme_indir
+        guncelleme_bilgisi = surum_kontrol()
+        
+        if guncelleme_bilgisi:
+            # Güncelleme işlemini arkaplanda başlat
+            threading.Thread(target=guncelleme_indir, args=(guncelleme_bilgisi,)).start()
+            return jsonify({'success': True, 'message': 'Güncelleme başlatıldı'})
+        else:
+            return jsonify({'success': False, 'error': 'Güncelleme bulunamadı'})
+    except Exception as e:
+        logger.error(f"Güncelleme indirme sırasında hata: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)})
+
+# Otomatik güncelleme kontrolü için arkaplan görevi
+def otomatik_guncelleme_kontrol_gorevi():
+    while True:
+        try:
+            # Haftada bir güncelleme kontrolü yap
+            time.sleep(7 * 24 * 60 * 60)  # 7 gün
+            
+            from guncelleme import otomatik_guncelleme_kontrol
+            otomatik_guncelleme_kontrol()
+        except Exception as e:
+            logger.error(f"Otomatik güncelleme kontrolü sırasında hata: {str(e)}")
+
 if __name__ == '__main__':
     init_db()  # Veritabanı şemasını güncelle
     update_payment_status()
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    
+    # Otomatik güncelleme kontrolü için arkaplan görevi başlat
+    guncelleme_thread = threading.Thread(target=otomatik_guncelleme_kontrol_gorevi, daemon=True)
+    guncelleme_thread.start()
+    
+    app.run(host="0.0.0.0", port=5000, debug=False)  # Canlı ortamda debug=False olmalı
