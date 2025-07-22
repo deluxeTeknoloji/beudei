@@ -342,3 +342,32 @@
 2025-07-22 12:39:18 - INFO - Get LATEST chromedriver version for google-chrome
 2025-07-22 12:39:18 - INFO - Get LATEST chromedriver version for google-chrome
 2025-07-22 12:39:18 - INFO - Driver [C:\Users\Trenkwalder\.wdm\drivers\chromedriver\win64\138.0.7204.157\chromedriver-win32/chromedriver.exe] found in cache
+2025-07-22 12:41:09 - INFO - Ödeme durumları güncellendi.
+2025-07-22 12:41:09 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.1.51:5000
+2025-07-22 12:41:09 - INFO - [33mPress CTRL+C to quit[0m
+2025-07-22 12:41:11 - INFO - 127.0.0.1 - - [22/Jul/2025 12:41:11] "GET /online_randevu HTTP/1.1" 200 -
+2025-07-22 12:41:22 - INFO - 127.0.0.1 - - [22/Jul/2025 12:41:22] "GET /api/hizmet_sorumlu_calisanlar?hizmet_id=1 HTTP/1.1" 200 -
+2025-07-22 12:41:22 - INFO - 127.0.0.1 - - [22/Jul/2025 12:41:22] "GET /dolu_saatler?tarih=2025-07-22&hizmet_id=1 HTTP/1.1" 200 -
+2025-07-22 12:41:23 - INFO - 127.0.0.1 - - [22/Jul/2025 12:41:23] "GET /dolu_saatler?tarih=2025-07-22&hizmet_id=1&calisan_id=1 HTTP/1.1" 200 -
+2025-07-22 12:41:26 - INFO - WhatsApp mesajı gönderme işlemi başlatıldı: 905469250500
+2025-07-22 12:41:26 - INFO - 127.0.0.1 - - [22/Jul/2025 12:41:26] "[32mPOST /online_randevu HTTP/1.1[0m" 302 -
+2025-07-22 12:41:26 - INFO - 127.0.0.1 - - [22/Jul/2025 12:41:26] "GET /randevu_basarili HTTP/1.1" 200 -
+2025-07-22 12:41:26 - INFO - ====== WebDriver manager ======
+2025-07-22 12:41:27 - INFO - Get LATEST chromedriver version for google-chrome
+2025-07-22 12:41:28 - INFO - Get LATEST chromedriver version for google-chrome
+2025-07-22 12:41:29 - INFO - Driver [C:\Users\Trenkwalder\.wdm\drivers\chromedriver\win64\138.0.7204.157\chromedriver-win32/chromedriver.exe] found in cache
+2025-07-22 12:42:08 - INFO - 127.0.0.1 - - [22/Jul/2025 12:42:08] "[32mGET /randevu_basarili HTTP/1.1[0m" 302 -
+2025-07-22 12:42:08 - INFO - 127.0.0.1 - - [22/Jul/2025 12:42:08] "GET /online_randevu HTTP/1.1" 200 -
+2025-07-22 12:42:15 - INFO - 127.0.0.1 - - [22/Jul/2025 12:42:15] "GET /api/hizmet_sorumlu_calisanlar?hizmet_id=1 HTTP/1.1" 200 -
+2025-07-22 12:42:15 - INFO - 127.0.0.1 - - [22/Jul/2025 12:42:15] "GET /dolu_saatler?tarih=2025-07-22&hizmet_id=1 HTTP/1.1" 200 -
+2025-07-22 12:42:15 - INFO - 127.0.0.1 - - [22/Jul/2025 12:42:15] "GET /dolu_saatler?tarih=2025-07-22&hizmet_id=1&calisan_id=1 HTTP/1.1" 200 -
+2025-07-22 12:42:18 - INFO - ====== WebDriver manager ======
+2025-07-22 12:42:18 - INFO - WhatsApp mesajı gönderme işlemi başlatıldı: 905469250500
+2025-07-22 12:42:18 - INFO - 127.0.0.1 - - [22/Jul/2025 12:42:18] "[32mPOST /online_randevu HTTP/1.1[0m" 302 -
+2025-07-22 12:42:18 - INFO - 127.0.0.1 - - [22/Jul/2025 12:42:18] "GET /randevu_basarili HTTP/1.1" 200 -
+2025-07-22 12:42:19 - INFO - Get LATEST chromedriver version for google-chrome
+2025-07-22 12:42:22 - INFO - Get LATEST chromedriver version for google-chrome
+2025-07-22 12:42:23 - INFO - Driver [C:\Users\Trenkwalder\.wdm\drivers\chromedriver\win64\138.0.7204.157\chromedriver-win32/chromedriver.exe] found in cache

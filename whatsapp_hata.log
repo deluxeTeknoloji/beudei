@@ -429,3 +429,181 @@ Traceback (most recent call last):
     raise MaxRetryError(_pool, url, reason) from reason  # type: ignore[arg-type]
     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 urllib3.exceptions.MaxRetryError: HTTPConnectionPool(host='localhost', port=62196): Max retries exceeded with url: /session/287d1896e8040e7e10d381eb8070da32/screenshot (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000022EB8E56910>: Failed to establish a new connection: [WinError 10061] Hedef makine etkin olarak reddettiğinden bağlantı kurulamadı'))
+Traceback (most recent call last):
+  File "C:\Users\Trenkwalder\Documents\GitHub\beudei\whatsapp_gonder.py", line 34, in whatsapp_mesaj_gonder
+    mesaj_kutusu = wait.until(
+                   ^^^^^^^^^^^
+  File "C:\Users\Trenkwalder\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\selenium\webdriver\support\wait.py", line 137, in until
+    value = method(self._driver)
+            ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Trenkwalder\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\selenium\webdriver\support\expected_conditions.py", line 110, in _predicate
+    return driver.find_element(*locator)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Trenkwalder\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\selenium\webdriver\remote\webdriver.py", line 917, in find_element
+    return self.execute(Command.FIND_ELEMENT, {"using": by, "value": value})["value"]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Trenkwalder\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\selenium\webdriver\remote\webdriver.py", line 448, in execute
+    self.error_handler.check_response(response)
+  File "C:\Users\Trenkwalder\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\selenium\webdriver\remote\errorhandler.py", line 232, in check_response
+    raise exception_class(message, screen, stacktrace)
+selenium.common.exceptions.InvalidSessionIdException: Message: invalid session id: session deleted as the browser has closed the connection
+from disconnected: not connected to DevTools
+  (Session info: chrome=138.0.7204.158)
+Stacktrace:
+	GetHandleVerifier [0x0x9f1a33+62339]
+	GetHandleVerifier [0x0x9f1a74+62404]
+	(No symbol) [0x0x832123]
+	(No symbol) [0x0x821b30]
+	(No symbol) [0x0x83f8f2]
+	(No symbol) [0x0x8a5cbc]
+	(No symbol) [0x0x8c0089]
+	(No symbol) [0x0x89f1b6]
+	(No symbol) [0x0x86e7a2]
+	(No symbol) [0x0x86f644]
+	GetHandleVerifier [0x0xc665c3+2637587]
+	GetHandleVerifier [0x0xc619ca+2618138]
+	GetHandleVerifier [0x0xa184aa+220666]
+	GetHandleVerifier [0x0xa088d8+156200]
+	GetHandleVerifier [0x0xa0f06d+182717]
+	GetHandleVerifier [0x0x9f9978+94920]
+	GetHandleVerifier [0x0x9f9b02+95314]
+	GetHandleVerifier [0x0x9e4c4a+9626]
+	BaseThreadInitThunk [0x0x75f45d49+25]
+	RtlInitializeExceptionChain [0x0x7729d1ab+107]
+	RtlGetAppContainerNamedObjectPath [0x0x7729d131+561]
+
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\Trenkwalder\Documents\GitHub\beudei\whatsapp_gonder.py", line 45, in whatsapp_mesaj_gonder
+    driver.save_screenshot("whatsapp_error.png")
+  File "C:\Users\Trenkwalder\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\selenium\webdriver\remote\webdriver.py", line 1013, in save_screenshot
+    return self.get_screenshot_as_file(filename)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Trenkwalder\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\selenium\webdriver\remote\webdriver.py", line 988, in get_screenshot_as_file
+    png = self.get_screenshot_as_png()
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Trenkwalder\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\selenium\webdriver\remote\webdriver.py", line 1022, in get_screenshot_as_png
+    return b64decode(self.get_screenshot_as_base64().encode("ascii"))
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Trenkwalder\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\selenium\webdriver\remote\webdriver.py", line 1032, in get_screenshot_as_base64
+    return self.execute(Command.SCREENSHOT)["value"]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Trenkwalder\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\selenium\webdriver\remote\webdriver.py", line 448, in execute
+    self.error_handler.check_response(response)
+  File "C:\Users\Trenkwalder\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\selenium\webdriver\remote\errorhandler.py", line 232, in check_response
+    raise exception_class(message, screen, stacktrace)
+selenium.common.exceptions.InvalidSessionIdException: Message: invalid session id
+Stacktrace:
+	GetHandleVerifier [0x0x9f1a33+62339]
+	GetHandleVerifier [0x0x9f1a74+62404]
+	(No symbol) [0x0x831f80]
+	(No symbol) [0x0x86da98]
+	(No symbol) [0x0x89f276]
+	(No symbol) [0x0x89ae75]
+	(No symbol) [0x0x89a3f6]
+	(No symbol) [0x0x803a45]
+	(No symbol) [0x0x803f9e]
+	(No symbol) [0x0x80442d]
+	GetHandleVerifier [0x0xc665c3+2637587]
+	GetHandleVerifier [0x0xc619ca+2618138]
+	GetHandleVerifier [0x0xa184aa+220666]
+	GetHandleVerifier [0x0xa088d8+156200]
+	GetHandleVerifier [0x0xa0f06d+182717]
+	(No symbol) [0x0x803710]
+	(No symbol) [0x0x802f1d]
+	GetHandleVerifier [0x0xd9a65c+3899308]
+	BaseThreadInitThunk [0x0x75f45d49+25]
+	RtlInitializeExceptionChain [0x0x7729d1ab+107]
+	RtlGetAppContainerNamedObjectPath [0x0x7729d131+561]
+
+Traceback (most recent call last):
+  File "C:\Users\Trenkwalder\Documents\GitHub\beudei\whatsapp_gonder.py", line 34, in whatsapp_mesaj_gonder
+    mesaj_kutusu = wait.until(
+                   ^^^^^^^^^^^
+  File "C:\Users\Trenkwalder\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\selenium\webdriver\support\wait.py", line 137, in until
+    value = method(self._driver)
+            ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Trenkwalder\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\selenium\webdriver\support\expected_conditions.py", line 110, in _predicate
+    return driver.find_element(*locator)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Trenkwalder\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\selenium\webdriver\remote\webdriver.py", line 917, in find_element
+    return self.execute(Command.FIND_ELEMENT, {"using": by, "value": value})["value"]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Trenkwalder\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\selenium\webdriver\remote\webdriver.py", line 448, in execute
+    self.error_handler.check_response(response)
+  File "C:\Users\Trenkwalder\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\selenium\webdriver\remote\errorhandler.py", line 232, in check_response
+    raise exception_class(message, screen, stacktrace)
+selenium.common.exceptions.InvalidSessionIdException: Message: invalid session id: session deleted as the browser has closed the connection
+from disconnected: not connected to DevTools
+  (Session info: chrome=138.0.7204.158)
+Stacktrace:
+	GetHandleVerifier [0x0x9f1a33+62339]
+	GetHandleVerifier [0x0x9f1a74+62404]
+	(No symbol) [0x0x832123]
+	(No symbol) [0x0x821b30]
+	(No symbol) [0x0x83f8f2]
+	(No symbol) [0x0x8a5cbc]
+	(No symbol) [0x0x8c0089]
+	(No symbol) [0x0x89f1b6]
+	(No symbol) [0x0x86e7a2]
+	(No symbol) [0x0x86f644]
+	GetHandleVerifier [0x0xc665c3+2637587]
+	GetHandleVerifier [0x0xc619ca+2618138]
+	GetHandleVerifier [0x0xa184aa+220666]
+	GetHandleVerifier [0x0xa088d8+156200]
+	GetHandleVerifier [0x0xa0f06d+182717]
+	GetHandleVerifier [0x0x9f9978+94920]
+	GetHandleVerifier [0x0x9f9b02+95314]
+	GetHandleVerifier [0x0x9e4c4a+9626]
+	BaseThreadInitThunk [0x0x75f45d49+25]
+	RtlInitializeExceptionChain [0x0x7729d1ab+107]
+	RtlGetAppContainerNamedObjectPath [0x0x7729d131+561]
+
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\Trenkwalder\Documents\GitHub\beudei\whatsapp_gonder.py", line 45, in whatsapp_mesaj_gonder
+    driver.save_screenshot("whatsapp_error.png")
+  File "C:\Users\Trenkwalder\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\selenium\webdriver\remote\webdriver.py", line 1013, in save_screenshot
+    return self.get_screenshot_as_file(filename)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Trenkwalder\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\selenium\webdriver\remote\webdriver.py", line 988, in get_screenshot_as_file
+    png = self.get_screenshot_as_png()
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Trenkwalder\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\selenium\webdriver\remote\webdriver.py", line 1022, in get_screenshot_as_png
+    return b64decode(self.get_screenshot_as_base64().encode("ascii"))
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Trenkwalder\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\selenium\webdriver\remote\webdriver.py", line 1032, in get_screenshot_as_base64
+    return self.execute(Command.SCREENSHOT)["value"]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Trenkwalder\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\selenium\webdriver\remote\webdriver.py", line 448, in execute
+    self.error_handler.check_response(response)
+  File "C:\Users\Trenkwalder\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\selenium\webdriver\remote\errorhandler.py", line 232, in check_response
+    raise exception_class(message, screen, stacktrace)
+selenium.common.exceptions.InvalidSessionIdException: Message: invalid session id
+Stacktrace:
+	GetHandleVerifier [0x0x9f1a33+62339]
+	GetHandleVerifier [0x0x9f1a74+62404]
+	(No symbol) [0x0x831f80]
+	(No symbol) [0x0x86da98]
+	(No symbol) [0x0x89f276]
+	(No symbol) [0x0x89ae75]
+	(No symbol) [0x0x89a3f6]
+	(No symbol) [0x0x803a45]
+	(No symbol) [0x0x803f9e]
+	(No symbol) [0x0x80442d]
+	GetHandleVerifier [0x0xc665c3+2637587]
+	GetHandleVerifier [0x0xc619ca+2618138]
+	GetHandleVerifier [0x0xa184aa+220666]
+	GetHandleVerifier [0x0xa088d8+156200]
+	GetHandleVerifier [0x0xa0f06d+182717]
+	(No symbol) [0x0x803710]
+	(No symbol) [0x0x802f1d]
+	GetHandleVerifier [0x0xd9a65c+3899308]
+	BaseThreadInitThunk [0x0x75f45d49+25]
+	RtlInitializeExceptionChain [0x0x7729d1ab+107]
+	RtlGetAppContainerNamedObjectPath [0x0x7729d131+561]
+
