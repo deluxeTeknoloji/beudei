@@ -191,7 +191,7 @@
                           {% if h.id|string in kalan_seanslar and kalan_seanslar.get(h.id|string, 0) > 0 %}
                             {% set has_services = true %}
                             <option value="{{ h.hizmet_adi }}" data-id="{{ h.id }}" data-seans="1" data-calisan="{{ h.calisan_id }}" data-kalan="{{ kalan_seanslar.get(h.id|string, 0) }}">
-                              {{ h.hizmet_adi }} {% if h.calisan_adi %}({{ h.calisan_adi }}){% endif %} (Kalan: {{ kalan_seanslar.get(h.id|string, 0) }} seans)
+                              {{ h.hizmet_adi }} (Kalan: {{ kalan_seanslar.get(h.id|string, 0) }} seans)
                             </option>
                           {% endif %}
                         {% endfor %}
@@ -201,10 +201,18 @@
                       {% else %}
                         {% for h in hizmetler %}
                           <option value="{{ h.hizmet_adi }}" data-id="{{ h.id }}" data-seans="1" data-calisan="{{ h.calisan_id }}">
-                            {{ h.hizmet_adi }} {% if h.calisan_adi %}({{ h.calisan_adi }}){% endif %}
+                            {{ h.hizmet_adi }}
                           </option>
                         {% endfor %}
                       {% endif %}
+                    </select>
+                  </div>
+                  
+                  <!-- Çalışan Seçimi -->
+                  <div class="mb-3" id="calisan-secim-container" style="display: none;">
+                    <label class="form-label">Çalışan <span class="text-danger">*</span></label>
+                    <select name="calisan_id" id="calisan_secim" class="form-select">
+                      <option value="">Çalışan Seçiniz</option>
                     </select>
                   </div>
                   <input type="hidden" name="calisan_id" id="calisan_id" value="">
@@ -252,6 +260,13 @@
         const hizmetSelect = document.getElementById('hizmet');
         hizmetSelect.innerHTML = '<option value="">Hizmet Seçiniz</option>';
         
+        // Çalışan seçim alanını temizle ve gizle
+        const calisanSecimContainer = document.getElementById('calisan-secim-container');
+        const calisanSecim = document.getElementById('calisan_secim');
+        calisanSecim.innerHTML = '<option value="">Çalışan Seçiniz</option>';
+        calisanSecimContainer.style.display = 'none';
+        document.getElementById('calisan_id').value = '';
+        
         // Müşteri seçilmediğinde URL'yi temizle
         window.location.replace("{{ url_for('randevu_al') }}");
       }
@@ -285,9 +300,27 @@
         }
       {% endif %}
       
-      // Tarih değiştiğinde saatleri kontrol et
+      // Tarih değiştiğinde saatleri ve çalışan durumlarını kontrol et
       document.querySelector('input[name="tarih"]').addEventListener('change', function() {
         checkSundayAndUpdateTimeSlots(this.value);
+        // Eğer hizmet seçilmişse ve çalışan seçim alanı görünüyorsa, çalışan durumlarını güncelle
+        const hizmetId = document.getElementById('hizmet_id').value;
+        const calisanSecimContainer = document.getElementById('calisan-secim-container');
+        if (hizmetId && calisanSecimContainer.style.display !== 'none') {
+          // Hizmet seçimini tetikle
+          document.getElementById('hizmet').dispatchEvent(new Event('change'));
+        }
+      });
+      
+      // Saat değiştiğinde çalışan durumlarını güncelle
+      document.querySelector('select[name="saat"]').addEventListener('change', function() {
+        // Eğer hizmet seçilmişse ve çalışan seçim alanı görünüyorsa, çalışan durumlarını güncelle
+        const hizmetId = document.getElementById('hizmet_id').value;
+        const calisanSecimContainer = document.getElementById('calisan-secim-container');
+        if (hizmetId && calisanSecimContainer.style.display !== 'none') {
+          // Hizmet seçimini tetikle
+          document.getElementById('hizmet').dispatchEvent(new Event('change'));
+        }
       });
       
       // Sayfa yüklendiğinde de kontrol et
@@ -299,6 +332,10 @@
       const date = new Date(dateStr);
       const isSunday = date.getDay() === 0; // 0: Pazar
       const saatSelect = document.querySelector('select[name="saat"]');
+      const hizmetSelect = document.getElementById('hizmet');
+      const hizmetId = document.getElementById('hizmet_id').value;
+      const calisanId = document.getElementById('calisan_id').value;
+      const calisanSecimContainer = document.getElementById('calisan-secim-container');
       
       if (isSunday) {
         // Pazar günü - tüm saatleri devre dışı bırak ve "Kapalı" olarak işaretle
@@ -310,15 +347,85 @@
         });
         // Seçimi sıfırla
         saatSelect.value = '';
-      } else {
-        // Diğer günler - normal görünüm
-        Array.from(saatSelect.options).forEach(option => {
-          if (option.value) { // Boş seçenek değilse
-            option.disabled = false;
-            option.textContent = option.value;
-          }
-        });
+        return; // API çağrısı yapmaya gerek yok
       }
+      
+      // Diğer günler - dolu saatleri kontrol et
+      let url = `/dolu_saatler?tarih=${dateStr}`;
+      if (hizmetId) {
+        url += `&hizmet_id=${hizmetId}`;
+      }
+      if (calisanId) {
+        url += `&calisan_id=${calisanId}`;
+      }
+      
+      fetch(url)
+        .then(resp => resp.json())
+        .then(data => {
+          // Normal dolu saatler kontrolü
+          Array.from(saatSelect.options).forEach(option => {
+            if (!option.value) return; // Boş seçenek değilse
+            
+            if (data.dolu_saatler && data.dolu_saatler.includes(option.value)) {
+              option.disabled = true;
+              option.style.backgroundColor = '#ffcccc';
+              option.textContent = option.value + ' (DOLU)';
+            } else {
+              option.disabled = false;
+              option.style.backgroundColor = '';
+              option.textContent = option.value;
+            }
+          });
+          
+          // Çalışan seçim alanı görünüyorsa
+          if (calisanSecimContainer.style.display !== 'none' && data.dolu_calisanlar) {
+            const calisanSecim = document.getElementById('calisan_secim');
+            const seciliSaat = saatSelect.value;
+            
+            // Seçili bir saat varsa, o saatte dolu olan çalışanları devre dışı bırak
+            if (seciliSaat && data.dolu_calisanlar[seciliSaat]) {
+              const doluCalisanlar = data.dolu_calisanlar[seciliSaat];
+              
+              // Çalışan seçim listesini güncelle
+              Array.from(calisanSecim.options).forEach(option => {
+                if (!option.value) return; // Boş seçenek ise atla
+                
+                const calisanId = parseInt(option.value);
+                if (doluCalisanlar.includes(calisanId)) {
+                  option.disabled = true;
+                  option.textContent = option.textContent.replace(' (DOLU)', '') + ' (DOLU)';
+                } else {
+                  option.disabled = false;
+                  option.textContent = option.textContent.replace(' (DOLU)', '');
+                }
+              });
+              
+              // Eğer seçili çalışan doluysa, müsait bir çalışan seç
+              const seciliCalisanId = parseInt(document.getElementById('calisan_id').value);
+              if (seciliCalisanId && doluCalisanlar.includes(seciliCalisanId)) {
+                // Müsait bir çalışan bul
+                const musaitCalisan = Array.from(calisanSecim.options).find(option => 
+                  option.value && !option.disabled
+                );
+                
+                if (musaitCalisan) {
+                  calisanSecim.value = musaitCalisan.value;
+                  document.getElementById('calisan_id').value = musaitCalisan.value;
+                }
+              }
+            }
+          }
+        })
+        .catch(error => {
+          console.error('Dolu saatler alınırken hata:', error);
+          // Hata durumunda normal görünüm
+          Array.from(saatSelect.options).forEach(option => {
+            if (option.value) { // Boş seçenek değilse
+              option.disabled = false;
+              option.textContent = option.value;
+            }
+          });
+        });
     }
 
     // Hizmet seçildiğinde yapılacak işlemler
@@ -334,9 +441,157 @@
       var hizmetId = this.options[this.selectedIndex].getAttribute('data-id');
       document.getElementById('hizmet_id').value = hizmetId || '';
       
+      // Çalışan seçim alanını temizle ve gizle
+      const calisanSecimContainer = document.getElementById('calisan-secim-container');
+      const calisanSecim = document.getElementById('calisan_secim');
+      calisanSecim.innerHTML = '<option value="">Çalışan Seçiniz</option>';
+      calisanSecimContainer.style.display = 'none';
+      
       // Çalışan ID'sini gizli alana ata
       var calisanId = this.options[this.selectedIndex].getAttribute('data-calisan');
-      document.getElementById('calisan_id').value = calisanId || '';
+      
+      // Hata ayıklama için çalışan ID'sini konsola yazdır
+      console.log('Seçilen hizmetin çalışan ID\'si:', calisanId);
+      console.log('Seçilen hizmetin ID\'si:', hizmetId);
+      
+      // Her durumda çalışanları getir
+      if (hizmetId) {
+        // Çalışan seçim alanını temizle
+        const calisanSecimContainer = document.getElementById('calisan-secim-container');
+        const calisanSecim = document.getElementById('calisan_secim');
+        calisanSecim.innerHTML = '<option value="">Çalışan Seçiniz</option>';
+        calisanSecimContainer.style.display = 'none';
+        
+        // Çalışan ID'sini gizli alana ata
+        document.getElementById('calisan_id').value = calisanId || '';
+        // Hizmet için çalışanları getir
+        console.log(`API çağrısı yapılıyor: /api/hizmet_calisanlar?hizmet_id=${hizmetId}`);
+        fetch(`/api/hizmet_calisanlar?hizmet_id=${hizmetId}`)
+          .then(response => {
+            if (!response.ok) {
+              throw new Error(`API yanıtı hatalı: ${response.status}`);
+            }
+            return response.json();
+          })
+          .then(data => {
+            console.log('API yanıtı:', data);
+            // Sadece birden fazla çalışan varsa çalışan seçim alanını göster
+            if (data.calisanlar && data.calisanlar.length > 1) {
+              // Seçilen tarih ve saat için müsait çalışanları kontrol et
+              const tarih = document.querySelector('input[name="tarih"]').value;
+              const saat = document.querySelector('select[name="saat"]').value;
+              
+              if (tarih && saat) {
+                // Müsait çalışanları kontrol et
+                fetch(`/dolu_saatler?tarih=${tarih}&hizmet_id=${hizmetId}`)
+                  .then(response => response.json())
+                  .then(saatData => {
+                    console.log('Dolu saatler yanıtı:', saatData);
+                    const doluSaatler = saatData.dolu_saatler || [];
+                    
+                    // Çalışan seçim alanını göster
+                    calisanSecimContainer.style.display = 'block';
+                    
+                    // Çalışanları seçim listesine ekle
+                    let musaitCalisanVar = false;
+                    let ilkMusaitCalisan = null;
+                    
+                    data.calisanlar.forEach(calisan => {
+                      // Çalışanın bu saatte randevusu var mı kontrol et
+                      const calisanDolu = saatData.dolu_calisanlar && saatData.dolu_calisanlar[saat] && 
+                                          saatData.dolu_calisanlar[saat].includes(parseInt(calisan.id));
+                      
+                      const option = document.createElement('option');
+                      option.value = calisan.id;
+                      option.textContent = calisan.ad;
+                      
+                      if (calisanDolu) {
+                        option.disabled = true;
+                        option.textContent += ' (DOLU)';
+                      } else {
+                        musaitCalisanVar = true;
+                        if (!ilkMusaitCalisan) ilkMusaitCalisan = calisan.id;
+                      }
+                      
+                      calisanSecim.appendChild(option);
+                    });
+                    
+                    // Eğer müsait çalışan varsa ilkini seç
+                    if (musaitCalisanVar) {
+                      calisanSecim.value = ilkMusaitCalisan;
+                      document.getElementById('calisan_id').value = ilkMusaitCalisan;
+                    } else {
+                      document.getElementById('calisan_id').value = '';
+                    }
+                  })
+                  .catch(error => {
+                    console.error('Dolu saatler alınırken hata:', error);
+                    // Hata durumunda normal çalışan listesini göster
+                    calisanSecimContainer.style.display = 'block';
+                    
+                    data.calisanlar.forEach(calisan => {
+                      const option = document.createElement('option');
+                      option.value = calisan.id;
+                      option.textContent = calisan.ad;
+                      calisanSecim.appendChild(option);
+                    });
+                    
+                    document.getElementById('calisan_id').value = '';
+                  });
+              } else {
+                // Tarih veya saat seçilmemişse normal çalışan listesini göster
+                calisanSecimContainer.style.display = 'block';
+                
+                data.calisanlar.forEach(calisan => {
+                  const option = document.createElement('option');
+                  option.value = calisan.id;
+                  option.textContent = calisan.ad;
+                  calisanSecim.appendChild(option);
+                });
+                
+                document.getElementById('calisan_id').value = '';
+              }
+            } else if (data.calisanlar && data.calisanlar.length === 1) {
+              // Tek çalışan varsa direkt ata
+              document.getElementById('calisan_id').value = data.calisanlar[0].id;
+              // Çalışan seçim alanını gizle
+              calisanSecimContainer.style.display = 'none';
+            } else {
+              // Hiç çalışan yoksa boş bırak
+              document.getElementById('calisan_id').value = calisanId || '';
+              // Çalışan seçim alanını gizle
+              calisanSecimContainer.style.display = 'none';
+            }
+          })
+          .catch(error => {
+            console.error('Çalışanlar alınırken hata:', error);
+            document.getElementById('calisan_id').value = calisanId || '';
+            // Hata durumunda çalışan seçim alanını gizle
+            calisanSecimContainer.style.display = 'none';
+          });
+      } else {
+        // Hizmet ID'si yoksa çalışan ID'sini direkt ata ve seçim alanını gizle
+        document.getElementById('calisan_id').value = calisanId || '';
+        calisanSecimContainer.style.display = 'none';
+      }
+      
+      // Hizmet değiştiğinde saatleri güncelle
+      const tarih = document.querySelector('input[name="tarih"]').value;
+      if (tarih) {
+        checkSundayAndUpdateTimeSlots(tarih);
+      }
+    });
+    
+    // Çalışan seçildiğinde yapılacak işlemler
+    document.getElementById('calisan_secim').addEventListener('change', function () {
+      var calisanId = this.value;
+      document.getElementById('calisan_id').value = calisanId;
+      
+      // Çalışan değiştiğinde saatleri güncelle
+      const tarih = document.querySelector('input[name="tarih"]').value;
+      if (tarih) {
+        checkSundayAndUpdateTimeSlots(tarih);
+      }
     });
     
     // Form gönderilmeden önce doğrulama yap
@@ -347,6 +602,8 @@
       var hizmet = document.getElementById('hizmet').value;
       var tarih = document.querySelector('input[name="tarih"]').value;
       var saat = document.querySelector('select[name="saat"]').value;
+      var calisanSecimContainer = document.getElementById('calisan-secim-container');
+      var calisanId = document.getElementById('calisan_id').value;
       
       // Müşteri seçilmemişse, yeni müşteri bilgileri kontrol edilir
       if (!musteriId && (!ad || !telefon)) {
@@ -366,6 +623,12 @@
       
       if (!saat) {
         alert("Lütfen bir saat seçin!");
+        return false;
+      }
+      
+      // Çalışan seçim alanı görünüyorsa ve çalışan seçilmemişse
+      if (calisanSecimContainer.style.display !== 'none' && !calisanId) {
+        alert("Lütfen bir çalışan seçin!");
         return false;
       }
       

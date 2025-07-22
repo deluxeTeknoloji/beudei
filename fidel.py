@@ -738,11 +738,29 @@ def hizmet_bilgisi(hizmet_adi):
         app.logger.error(f"API hatası: {e}")
         return jsonify({'seans': 1}), 500
 
-@app.route('/api/hizmet_calisanlar/<int:hizmet_id>')
-def hizmet_calisanlar(hizmet_id):
+@app.route('/api/hizmet_calisanlar')
+def hizmet_calisanlar():
+    hizmet_id = request.args.get('hizmet_id')
+    if not hizmet_id:
+        return jsonify({'error': 'Hizmet ID parametresi gerekli'}), 400
+        
     try:
         with closing(get_db_connection()) as conn:
-            # Belirli bir hizmeti verebilen çalışanları getir
+            # Önce hizmetin calisan_id değerini kontrol et
+            hizmet = conn.execute('SELECT calisan_id FROM hizmetler WHERE id = ?', (hizmet_id,)).fetchone()
+            
+            # Eğer calisan_id varsa ve virgül içeriyorsa, ilişkisel tabloya bakmadan direkt çalışanları getir
+            if hizmet and hizmet['calisan_id'] and ',' in str(hizmet['calisan_id']):
+                calisan_ids = [cid.strip() for cid in str(hizmet['calisan_id']).split(',') if cid.strip()]
+                if calisan_ids:
+                    placeholders = ','.join(['?' for _ in calisan_ids])
+                    calisanlar = conn.execute(f'SELECT id, ad FROM çalışanlar WHERE id IN ({placeholders}) ORDER BY ad', calisan_ids).fetchall()
+                    result = {
+                        'calisanlar': [{'id': c['id'], 'ad': c['ad']} for c in calisanlar]
+                    }
+                    return jsonify(result)
+            
+            # Belirli bir hizmeti verebilen çalışanları getir (ilişkisel tablodan)
             calisanlar = conn.execute('''
                 SELECT c.id, c.ad
                 FROM çalışanlar c
@@ -2682,33 +2700,11 @@ def online_randevu():
                         flash("Seçilen çalışan bulunamadı!", "danger")
                         return render_template('online_randevu.html', hizmetler=hizmetler, current_year=datetime.now().year)
                 
-                # Eğer çalışan seçilmemişse, otomatik olarak müsait bir çalışan bul
-                elif hizmet_row['calisan_id']:
-                    # Virgülle ayrılmış çalışan ID'lerini listeye çevir
-                    calisan_id_str = str(hizmet_row['calisan_id'])
-                    calisan_ids = [cid.strip() for cid in calisan_id_str.split(',') if cid.strip()]
-                    
-                    # Her çalışan için müsaitlik kontrolü yap
-                    for cid in calisan_ids:
-                        # Çalışanın bu saatte başka randevusu var mı kontrol et
-                        var_mi = conn.execute(
-                            'SELECT id FROM randevular WHERE tarih = ? AND saat = ? AND çalışan_id = ?',
-                            (tarih, saat, cid)
-                        ).fetchone()
-                        
-                        if not var_mi:
-                            # Müsait çalışan bulundu
-                            calisan_id = cid
-                            # Çalışan adını al
-                            calisan_row = conn.execute('SELECT ad FROM çalışanlar WHERE id = ?', (cid,)).fetchone()
-                            if calisan_row:
-                                calisan_adi = calisan_row['ad']
-                            break
-                    
-                    # Eğer hiçbir çalışan müsait değilse
-                    if not calisan_id:
-                        flash("Seçtiğiniz hizmetin tüm sorumlu çalışanları bu tarih ve saatte dolu!", "danger")
-                        return render_template('online_randevu.html', hizmetler=hizmetler, current_year=datetime.now().year)
+                # Çalışan seçilmemişse, online randevuda çalışan ataması yapmıyoruz
+                # Kullanıcıya çalışan seçmesi gerektiğini bildir
+                if not calisan_id:
+                    flash("Lütfen bir çalışan seçiniz!", "danger")
+                    return render_template('online_randevu.html', hizmetler=hizmetler, randevu_saatleri=randevu_saatleri, current_year=datetime.now().year)
                 
                 # Online randevu olduğunu belirt
                 hizmet_adi_online = f"{hizmet_adi} (online) - {calisan_adi}"
@@ -2857,11 +2853,22 @@ def dolu_saatler():
             
             # Eğer hizmet_id varsa ve calisan_id yoksa, hizmetin sorumlu çalışanlarını bul
             if hizmet_id and not calisan_id:
+                # Önce hizmetin calisan_id değerini kontrol et
                 hizmet_row = conn.execute("SELECT calisan_id FROM hizmetler WHERE id = ?", (hizmet_id,)).fetchone()
                 if hizmet_row and hizmet_row['calisan_id']:
                     # Virgülle ayrılmış çalışan ID'lerini listeye çevir
                     calisan_id_str = str(hizmet_row['calisan_id'])
                     calisan_ids = [cid.strip() for cid in calisan_id_str.split(',') if cid.strip()]
+                    
+                # Eğer calisan_id boşsa veya yoksa, ilişkisel tablodan çalışanları getir
+                if not calisan_ids:
+                    calisan_rows = conn.execute('''
+                        SELECT c.id 
+                        FROM çalışanlar c
+                        JOIN calisan_hizmet ch ON c.id = ch.calisan_id
+                        WHERE ch.hizmet_id = ?
+                    ''', (hizmet_id,)).fetchall()
+                    calisan_ids = [str(row['id']) for row in calisan_rows]
             elif calisan_id:
                 # Eğer calisan_id doğrudan verilmişse, onu kullan
                 calisan_ids = [calisan_id]
@@ -2875,6 +2882,7 @@ def dolu_saatler():
                 
             # Tüm çalışanların dolu saatlerini topla
             dolu_saatler = []
+            dolu_calisanlar = {}
             
             if calisan_ids:
                 # Her çalışan için dolu saatleri al
@@ -2882,20 +2890,38 @@ def dolu_saatler():
                     query = "SELECT saat FROM randevular WHERE tarih = ? AND durum != 'İptal' AND çalışan_id = ?"
                     params = [tarih, cid]
                     dolu_randevular = conn.execute(query, params).fetchall()
-                    dolu_saatler.extend([r['saat'] for r in dolu_randevular])
+                    calisan_dolu_saatler = [r['saat'] for r in dolu_randevular]
+                    
+                    # Genel dolu saatler listesine ekle
+                    dolu_saatler.extend(calisan_dolu_saatler)
+                    
+                    # Her saat için hangi çalışanların dolu olduğunu kaydet
+                    for saat in calisan_dolu_saatler:
+                        if saat not in dolu_calisanlar:
+                            dolu_calisanlar[saat] = []
+                        dolu_calisanlar[saat].append(int(cid))
             else:
                 # Çalışan belirtilmemişse tüm dolu saatleri al
-                query = "SELECT saat FROM randevular WHERE tarih = ? AND durum != 'İptal'"
+                query = "SELECT saat, çalışan_id FROM randevular WHERE tarih = ? AND durum != 'İptal'"
                 params = [tarih]
                 dolu_randevular = conn.execute(query, params).fetchall()
-                dolu_saatler = [r['saat'] for r in dolu_randevular]
+                
+                for r in dolu_randevular:
+                    dolu_saatler.append(r['saat'])
+                    
+                    if r['saat'] not in dolu_calisanlar:
+                        dolu_calisanlar[r['saat']] = []
+                    
+                    if r['çalışan_id']:
+                        dolu_calisanlar[r['saat']].append(r['çalışan_id'])
             
             # Tekrar eden saatleri çıkar
             dolu_saatler = list(set(dolu_saatler))
             
             return jsonify({
                 'dolu_saatler': dolu_saatler, 
-                'calisan_ids': calisan_ids
+                'calisan_ids': calisan_ids,
+                'dolu_calisanlar': dolu_calisanlar
             })
     except Exception as e:
         logger.error(f"Dolu saatler API hatası: {str(e)}")

@@ -53,9 +53,9 @@
                     </select>
                   </div>
                   <div class="mb-3">
-                    <label class="form-label">Çalışan</label>
-                    <select name="calisan_id" id="calisan_id" class="form-select">
-                      <option value="">Otomatik Ata</option>
+                    <label class="form-label">Çalışan <span class="text-danger">*</span></label>
+                    <select name="calisan_id" id="calisan_id" class="form-select" required>
+                      <option value="">Çalışan Seçiniz</option>
                       <!-- Çalışanlar JavaScript ile doldurulacak -->
                     </select>
                   </div>
@@ -100,7 +100,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (!seciliHizmet) return;
     
     // Çalışan seçimini sıfırla
-    calisanSelect.innerHTML = '<option value="">Otomatik Ata</option>';
+    calisanSelect.innerHTML = '<option value="">Çalışan Seçiniz</option>';
     
     // Seçilen hizmetin çalışanlarını getir
     return fetch(`/api/hizmet_sorumlu_calisanlar?hizmet_id=${seciliHizmet}`)
