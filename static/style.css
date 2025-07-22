@@ -220,6 +220,25 @@ h6 {
     .musteri-kart .card-title { font-size: 1.05rem; margin-top: 28px; }
     .musteri-avatar { width: 48px; height: 48px; font-size: 1.5rem; }
     .musteri-kart .card { padding-bottom: 1.5rem; }
+    
+    /* Online Randevu Mobil Stiller */
+    .card.shadow-sm {
+        border-radius: 10px;
+        margin-top: 10px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1) !important;
+    }
+    .form-control, .form-select {
+        height: 48px; /* Mobilde daha büyük dokunma alanı */
+    }
+    .btn {
+        padding: 12px; /* Mobilde daha büyük butonlar */
+        font-size: 16px;
+    }
+    .header-section {
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+    }
 }
 @media (max-width: 575px) {
   .card, .stat-card, .chart-card, .randevu-item, .toplam-gelir, .toplam-gider, .net-bakiye {
@@ -698,5 +717,48 @@ h6 {
   }
   .container .row.gx-lg-0 > .col-lg-2 .randevu-item .small {
     font-size: 0.875em; /* Varsayılan küçük metin boyutu */
+  }
+}
+
+/* ======================
+   Online Randevu Sayfası
+   ====================== */
+/* Online randevu sayfası için genel stiller */
+.online-randevu-body {
+  padding-bottom: 70px; /* Footer için alan bırak */
+}
+
+/* Online randevu form stilleri */
+.online-randevu .card {
+  border: none;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.05);
+}
+
+.online-randevu .form-label {
+  font-weight: 500;
+}
+
+.online-randevu .header-section {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.online-randevu .footer-section {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  z-index: 1000;
+}
+
+/* Mobil cihazlar için özel iyileştirmeler */
+@media (max-width: 767px) {
+  .online-randevu input[type="date"] {
+    -webkit-appearance: none;
+  }
+  
+  .online-randevu .form-control:focus,
+  .online-randevu .form-select:focus {
+    box-shadow: 0 0 0 0.25rem rgba(111, 66, 193, 0.25);
+    border-color: var(--primary-color);
   }
 }
